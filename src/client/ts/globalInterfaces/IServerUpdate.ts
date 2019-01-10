@@ -1,0 +1,3 @@
+interface IZIRServerUpdate{
+    onServerUpdate:() => void;
+}

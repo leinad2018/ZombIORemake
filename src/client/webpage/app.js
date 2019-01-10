@@ -1,0 +1,5 @@
+requirejs.config({
+    
+});
+
+requirejs(['mainScript']);
