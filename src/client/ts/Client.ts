@@ -1,8 +1,8 @@
 import { ZIRClientBase } from "./baseObjects/ClientBase";
+import { ZIRAssetLoader } from "./AssetLoader";
 
 export class ZIRClient extends ZIRClientBase{
     public getBackgroundImage(){
-        //TODO get or store a background image
-        return "";
+        return ZIRAssetLoader.getAsset("grass");
     }
 }

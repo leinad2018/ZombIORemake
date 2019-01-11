@@ -7,42 +7,52 @@ export class ZIRAssetLoader {
      * @param imageUrl 
      */
     public static loadAsset(assetName: string, imageUrl: string) {
-        this.assets[assetName] = new ZIRAsset(imageUrl);
+        var asset = new ZIRAsset(imageUrl);
+        asset.name = assetName;
+        this.assets.push(asset);
     }
-    
+
     /**
      * Returns the asset associated with this name.
      * The asset must be loaded with loadAsset before it can be retrieved from this method.
      * @param assetName 
      */
-    public static getAsset(assetName: string){
-        var asset = this.assets[assetName];
-        return asset;
+    public static getAsset(assetName: string) {
+        for (var asset of this.assets) {
+            if (asset.name == assetName) {
+                return asset;
+            }
+        }
     }
 
     /**
      * Checks to see if all assets are loaded
      */
-    public static doneLoading(){
+    public static doneLoading() {
         var doneLoading = true;
-        this.assets.forEach((asset)=>{
-            if(!asset.isLoaded()){
+        for (var asset of this.assets) {
+            if (!asset.isLoaded()) {
                 doneLoading = false;
             }
-        });
+        }
         return doneLoading;
     }
 }
 
 class ZIRAsset implements IZIRAsset {
     private image: HTMLImageElement;
-    private loaded: boolean;
+    public loaded: boolean;
+    public name: string;
 
     constructor(imageUrl: string) {
-        this.image = new Image();
-        this.image.src = imageUrl;
+        var image: CustomImage = new Image() as CustomImage;
         this.loaded = false;
-        this.image.onload = () => { this.loaded = true; }
+        image.assetInstance = this;
+        image.onload = function () {
+            image.assetInstance.loaded = true;
+        }
+        image.src = imageUrl;
+        this.image = image;
     }
 
     /**
@@ -65,4 +75,8 @@ class ZIRAsset implements IZIRAsset {
     public isLoaded() {
         return this.loaded;
     }
+}
+
+interface CustomImage extends HTMLImageElement {
+    assetInstance: ZIRAsset;
 }

@@ -4,6 +4,7 @@ interface IZIRRenderable {
 }
 
 interface IZIRAsset {
+    name: string;
     getImage: () => HTMLImageElement;
     isLoaded: () => boolean;
 }

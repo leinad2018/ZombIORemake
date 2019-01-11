@@ -1,4 +1,5 @@
 import { ZIRClientBase } from "../baseObjects/ClientBase";
+import { ZIRAssetLoader } from "../AssetLoader";
 
 export class ZIRTestClient extends ZIRClientBase{
     public runTest(){
@@ -6,7 +7,7 @@ export class ZIRTestClient extends ZIRClientBase{
     }
 
     public getBackgroundImage(){
-        return "../assets/grass.png";
+        return ZIRAssetLoader.getAsset("grass");
     }
 
 }

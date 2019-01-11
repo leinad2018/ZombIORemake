@@ -22,20 +22,17 @@ export class ZIRCanvasController implements IZIRServerUpdate {
     private render() {
         var ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
 
-        var background: string = this.client.getBackgroundImage();
+        var background: IZIRAsset = this.client.getBackgroundImage();
         this.renderBackground(ctx, background);
     }
 
-    private renderBackground(ctx: CanvasRenderingContext2D, imageUrl: string) {
+    private renderBackground(ctx: CanvasRenderingContext2D, image: IZIRAsset) {
         ctx.save();
-        var background: HTMLImageElement = new Image();
-        background.src = imageUrl;
-        background.onload = () => {
-            var pattern = ctx.createPattern(background, 'repeat');
-            ctx.fillStyle = pattern;
-            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            ctx.restore();
-        }
+        var background = image.getImage();
+        var pattern = ctx.createPattern(background, 'repeat');
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.restore();
     }
 
     public resizeWindow() {

@@ -15,5 +15,5 @@ export abstract class ZIRClientBase implements IZIRClient{
         });
     }
 
-    abstract getBackgroundImage();
+    abstract getBackgroundImage(): IZIRAsset;
 }
