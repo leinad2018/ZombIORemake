@@ -41,18 +41,18 @@ export class ZIRAssetLoader {
 
 class ZIRAsset implements IZIRAsset {
     private image: HTMLImageElement;
-    public loaded: boolean;
+    private loaded: boolean;
     public name: string;
 
     constructor(imageUrl: string) {
-        var image: CustomImage = new Image() as CustomImage;
+        this.image = new Image();
         this.loaded = false;
-        image.assetInstance = this;
-        image.onload = function () {
-            image.assetInstance.loaded = true;
-        }
-        image.src = imageUrl;
-        this.image = image;
+        this.image.onload = this.handleLoad.bind(this);
+        this.image.src = imageUrl;
+    }
+
+    private handleLoad(){
+        this.loaded = true;
     }
 
     /**
@@ -75,8 +75,4 @@ class ZIRAsset implements IZIRAsset {
     public isLoaded() {
         return this.loaded;
     }
-}
-
-interface CustomImage extends HTMLImageElement {
-    assetInstance: ZIRAsset;
 }

@@ -1,5 +1,6 @@
-export abstract class ZIRClientBase implements IZIRClient{
+export abstract class ZIRClientBase implements IZIRClient {
     private objectsToUpdate: IZIRServerUpdate[];
+    protected sizeVector: Point;
 
     constructor() {
         this.objectsToUpdate = [];
@@ -9,8 +10,20 @@ export abstract class ZIRClientBase implements IZIRClient{
         this.objectsToUpdate.push(objectToUpdate);
     }
 
-    protected updateObjects(){
-        this.objectsToUpdate.forEach((object)=>{
+    public getEntitiesToRender() {
+        var toReturn: IZIRRenderable[] = [];
+        return toReturn;
+    }
+
+    public setViewSize(width: number, height: number) {
+        this.sizeVector = {
+            x: width,
+            y: height
+        }
+    }
+
+    protected updateObjects() {
+        this.objectsToUpdate.forEach((object) => {
             object.onServerUpdate();
         });
     }
