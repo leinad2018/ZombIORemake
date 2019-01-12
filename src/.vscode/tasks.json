@@ -37,11 +37,22 @@
             "label": "buildAssets",
             "type": "shell",
             "command": "${workspaceFolder}/copyAssets.bat",
-            "group": "build"  
+            "group": "build",
+            "dependsOn": "emptyOutput"
+        },
+        {
+            "label": "emptyOutput",
+            "type": "shell",
+            "command": "${workspaceFolder}/deleteOutput.bat",
+            "group": "build"
         },
         {
             "label": "Build",
-            "dependsOn": ["buildServer", "buildClient", "buildAssets"],
+            "dependsOn": [
+                "buildServer",
+                "buildClient",
+                "buildAssets"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
