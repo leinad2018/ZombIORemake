@@ -51,7 +51,7 @@ class ZIRAsset implements IZIRAsset {
         this.loaded = false;
         this.image.onload = this.handleLoad.bind(this);
         this.image.src = imageUrl;
-    }
+    }d
 
     private handleLoad() {
         this.loaded = true;
