@@ -1,0 +1,1 @@
+xcopy /y /i "./assets" "./output/static/assets"

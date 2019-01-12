@@ -29,8 +29,8 @@ var waitForLoad = () => new Promise(() => {
 })();
 
 function loadAssets() {
-    ZIRAssetLoader.loadAsset("grass", "../assets/grass.png");
-    ZIRAssetLoader.loadAsset("circle", "../assets/circle.png");
+    ZIRAssetLoader.loadAsset("grass", "../static/assets/grass.png");
+    ZIRAssetLoader.loadAsset("circle", "../static/assets/circle.png");
 }
 
 function runAfterLoaded() {

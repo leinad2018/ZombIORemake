@@ -34,8 +34,14 @@
             "group": "build"
         },
         {
+            "label": "buildAssets",
+            "type": "shell",
+            "command": "${workspaceFolder}/copyAssets.bat",
+            "group": "build"  
+        },
+        {
             "label": "Build",
-            "dependsOn": ["buildServer", "buildClient"],
+            "dependsOn": ["buildServer", "buildClient", "buildAssets"],
             "group": {
                 "kind": "build",
                 "isDefault": true
