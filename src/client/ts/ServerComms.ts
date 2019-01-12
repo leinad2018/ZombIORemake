@@ -23,7 +23,7 @@ export class ZIRServerCommunications {
     }
 
     public sendMessageToServer(message: string) {
-        this.socket.emit(message);
+        this.socket.emit('rename', message);
     }
 
     private updateClient() {
