@@ -1,9 +1,11 @@
-interface IZIRRenderable {
+import { Point } from "./UtilityInterfaces";
+
+export interface IZIRRenderable {
     position: Point;
     getImageToRender: () => IZIRAsset;
 }
 
-interface IZIRAsset {
+export interface IZIRAsset {
     name: string;
     getImage: () => HTMLImageElement;
     isLoaded: () => boolean;

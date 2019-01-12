@@ -1,5 +1,7 @@
 import { ZIRClientBase } from "../baseObjects/ClientBase";
 import { ZIRAssetLoader } from "../AssetLoader";
+import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
+import { Point } from "../globalInterfaces/UtilityInterfaces";
 
 export class ZIRTestClient extends ZIRClientBase {
     private entities: IZIRRenderable[];

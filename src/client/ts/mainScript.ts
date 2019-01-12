@@ -1,6 +1,7 @@
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRTestClient } from "./unitTesting/TestClient";
 import { ZIRAssetLoader } from "./AssetLoader";
+import { IZIRClient } from "./globalInterfaces/MainInterfaces";
 var mainCanvas = document.getElementById("mainCanvas");
 console.log("step1");
 loadAssets();

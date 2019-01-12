@@ -1,3 +1,5 @@
+import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
+
 export class ZIRAssetLoader {
     private static assets: IZIRAsset[] = [];
 
@@ -51,7 +53,7 @@ class ZIRAsset implements IZIRAsset {
         this.image.src = imageUrl;
     }
 
-    private handleLoad(){
+    private handleLoad() {
         this.loaded = true;
     }
 

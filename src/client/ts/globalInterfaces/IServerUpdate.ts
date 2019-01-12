@@ -1,3 +1,3 @@
-interface IZIRServerUpdate{
+export interface IZIRServerUpdate{
     onServerUpdate:() => void;
 }
