@@ -2,19 +2,40 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "tsCompile",
+            "label": "compileServer",
             "type": "typescript",
-            "tsconfig": "tsconfig.json",
+            "tsconfig": "tsconfig-server.json",
             "problemMatcher": [
                 "$tsc"
             ],
             "group": "build"
         },
         {
-            "label": "Build",
-            "dependsOn": "tsCompile",
+            "label": "buildServer",
+            "dependsOn": "compileServer",
             "type": "shell",
-            "command":"${workspaceFolder}/copyFiles.bat",
+            "command": "${workspaceFolder}/copyServer.bat",
+            "group": "build"
+        },
+        {
+            "label": "compileClient",
+            "type": "typescript",
+            "tsconfig": "tsconfig-client.json",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildClient",
+            "dependsOn": "compileClient",
+            "type": "shell",
+            "command": "${workspaceFolder}/copyClient.bat",
+            "group": "build"
+        },
+        {
+            "label": "Build",
+            "dependsOn": ["compileServer", "compileClient"],
             "group": {
                 "kind": "build",
                 "isDefault": true

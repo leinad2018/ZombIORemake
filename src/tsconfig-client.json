@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "amd",
+        "outDir": "output/static"
+    },
+    "include": [
+        "client/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

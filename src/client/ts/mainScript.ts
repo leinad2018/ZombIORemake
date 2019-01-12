@@ -1,9 +1,14 @@
-import { ZIRCanvasController } from "CanvasController";
+import { ZIRCanvasController } from "./CanvasController";
 import { ZIRTestClient } from "./unitTesting/TestClient";
 import { ZIRAssetLoader } from "./AssetLoader";
 var mainCanvas = document.getElementById("mainCanvas");
 console.log("step1");
 loadAssets();
+
+//var socket = io();
+//socket.on('message', function(data) {
+//  console.log(data);
+//});
 
 var waitForLoad = () => new Promise(() => {
     var check = () => {
