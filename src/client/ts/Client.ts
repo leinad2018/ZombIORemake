@@ -13,7 +13,7 @@ export class ZIRClient extends ZIRClientBase {
 
     private setUpdateHandler() {
         this.serverComms.setUpdateHandler(() => {
-            return this.handleServerPing.bind(this);
+            this.handleServerPing();
         });
     }
 

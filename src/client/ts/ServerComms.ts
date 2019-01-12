@@ -13,8 +13,8 @@ export class ZIRServerCommunications {
         socket.emit('login');
         socket.on('message', ((data) => {
             console.log(data);
-            return this.updateClient.bind(this);
-        }));
+            this.updateClient();
+        }).bind(this));
         this.socket = socket;
     }
 
