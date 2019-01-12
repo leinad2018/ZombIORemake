@@ -3,6 +3,7 @@ import { ZIRTestClient } from "./unitTesting/TestClient";
 import { ZIRAssetLoader } from "./AssetLoader";
 import { IZIRClient } from "./globalInterfaces/MainInterfaces";
 import { ZIRServerCommunications } from "./ServerComms";
+import { ZIRClient } from "./Client";
 declare function io();
 
 var mainCanvas = document.getElementById("mainCanvas");
@@ -32,10 +33,8 @@ function loadAssets() {
 }
 
 function runAfterLoaded() {
-    var client: IZIRClient = new ZIRTestClient();
-    var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
-    (client as ZIRTestClient).runTest();
     var serverLink: ZIRServerCommunications = new ZIRServerCommunications();
-    serverLink.registerServerListener();
-    console.log("Test Ran");
+    var client: IZIRClient = new ZIRClient(serverLink);
+    var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
+    console.log("Ran");
 }
