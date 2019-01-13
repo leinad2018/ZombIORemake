@@ -8,17 +8,23 @@ export class ZIRClient extends ZIRClientBase {
     constructor(comms: ZIRServerCommunications) {
         super();
         this.serverComms = comms;
-        this.setUpdateHandler();
+        this.setUpdateHandlers();
     }
 
-    private setUpdateHandler() {
+    private setUpdateHandlers() {
         this.serverComms.setUpdateHandler(() => {
-            this.handleServerPing();
+            this.onUpdate();
+        });
+        this.serverComms.setUsernameHandler(() => {
+            this.fetchUsername();
         });
     }
 
-    private handleServerPing() {
+    private onUpdate() {
         this.updateObjects();
+    }
+
+    private fetchUsername() {
         var message = prompt("Enter some text");
         this.serverComms.sendMessageToServer(message);
     }
