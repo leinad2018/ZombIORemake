@@ -44,7 +44,6 @@ export class ZIRSessionManager {
     }
 
     private onConnection = function(socket) : void {
-        socket.emit("update")
         socket.emit("requestUsername")
 
         this.handleLogin(socket)
@@ -114,7 +113,6 @@ export class ZIRSessionManager {
     public broadcast = (header : string, data : string) : void => {
         this.io.sockets.emit(header, data)
     }
-
 }
 
 export class Session {

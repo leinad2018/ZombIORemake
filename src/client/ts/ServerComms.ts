@@ -4,6 +4,7 @@ export class ZIRServerCommunications {
     private updateHandler: () => void;
     private usernameHandler: () => void;
     private socket;
+    public playersOnline: string[] = [];
 
     constructor() {
         this.registerServerListener();
@@ -13,15 +14,13 @@ export class ZIRServerCommunications {
         var socket = io();
         socket.emit('login');
         socket.on('update', ((data) => {
-            console.log(data);
             this.updateClient();
         }).bind(this));
         socket.on('requestUsername', ((data) => {
-            console.log("username request data " + data);
             this.usernameHandler();
         }).bind(this));
         socket.on('players', ((data) => {
-            console.log("Players online: " + data);
+            this.playersOnline = JSON.parse(data)
         }).bind(this));
         this.socket = socket;
     }

@@ -2,6 +2,7 @@ import { IZIRServerUpdate } from "./IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./RenderingInterfaces";
 
 export interface IZIRClient {
+    getPlayersOnline: () => string[];
     /**
      * Registers a handler to be called when the the client is updated
      */

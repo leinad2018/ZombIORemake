@@ -4,6 +4,7 @@ import { ZIRServerCommunications } from "./ServerComms";
 
 export class ZIRClient extends ZIRClientBase {
     private serverComms: ZIRServerCommunications;
+    public playersOnline: string[];
 
     constructor(comms: ZIRServerCommunications) {
         super();
@@ -21,12 +22,17 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private onUpdate() {
+        this.playersOnline = this.serverComms.playersOnline;
         this.updateObjects();
     }
 
     private fetchUsername() {
         var message = prompt("Enter some text");
         this.serverComms.sendMessageToServer(message);
+    }
+
+    public getPlayersOnline() {
+        return this.playersOnline;
     }
 
     public getBackgroundImage() {

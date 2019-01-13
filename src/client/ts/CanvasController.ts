@@ -1,6 +1,7 @@
 import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
 import { IZIRClient } from "./globalInterfaces/MainInterfaces";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
+import { createContext } from "vm";
 
 export class ZIRCanvasController implements IZIRServerUpdate {
     private canvas: HTMLCanvasElement;
@@ -29,6 +30,20 @@ export class ZIRCanvasController implements IZIRServerUpdate {
 
         var entities: IZIRRenderable[] = this.client.getEntitiesToRender();
         this.renderEntities(ctx, entities);
+        this.renderPlayerBox(ctx, this.client.getPlayersOnline());
+    }
+
+    private renderPlayerBox(ctx: CanvasRenderingContext2D, players: string[]) {
+        ctx.save();
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, 150, players.length*10+30);
+        ctx.fillStyle = "white";
+        ctx.fillText("Players Online:\n",5,15);
+        for(var i = 0; i < players.length; i++) {
+            ctx.fillText(players[i],5,25+i*10);
+        }
+
+        ctx.restore();
     }
 
     private renderBackground(ctx: CanvasRenderingContext2D, image: IZIRAsset) {

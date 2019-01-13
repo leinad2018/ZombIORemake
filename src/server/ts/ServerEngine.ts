@@ -20,5 +20,6 @@ export class ZIRServerEngine {
     //console.log(this.dt);
     private tick = () => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
+        this.sessionManager.broadcast("update", "");
     }
 }

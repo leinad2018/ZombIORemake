@@ -11,6 +11,10 @@ export class ZIRTestClient extends ZIRClientBase {
         this.entities = [];
     }
 
+    public getPlayersOnline() {
+        return [];
+    }
+
     public runTest() {
         this.loadTestEntities();
         this.updateObjects();
