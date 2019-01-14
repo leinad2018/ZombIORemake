@@ -31,6 +31,6 @@ export class ZIRServerEngine {
 
     private tick = () : void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
-        this.sessionManager.broadcast("update", JSON.stringify({"updates":[]}));
+        this.sessionManager.broadcast("update", {updates:[]});
     }
 }

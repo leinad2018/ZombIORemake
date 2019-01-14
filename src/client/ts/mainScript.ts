@@ -33,9 +33,8 @@ function loadAssets() {
 }
 
 function runAfterLoaded() {
-    var serverLink: IZIRServerCommunications = new TestServer();
+    var serverLink: IZIRServerCommunications = new ZIRServerCommunications();
     var client: IZIRClient = new ZIRClient(serverLink);
     var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
     console.log("Constructed Objects");
-    (serverLink as TestServer).runTests();
 }

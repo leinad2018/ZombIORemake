@@ -110,7 +110,7 @@ export class ZIRSessionManager {
         return usernames;
     }
 
-    public broadcast = (header : string, data : string) : void => {
+    public broadcast = (header : string, data : any) : void => {
         this.io.sockets.emit(header, data)
     }
 }

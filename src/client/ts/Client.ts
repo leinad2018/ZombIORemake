@@ -59,6 +59,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
+        console.log(data.updates);
         for (var enitity of data.updates) {
             var id = enitity.id;
             for (var i = 0; i < this.entities.length; i++) {
