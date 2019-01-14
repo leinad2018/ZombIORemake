@@ -10,16 +10,27 @@ export class ZIRServerEngine {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
     }
 
-    private gameLoop = () => {
+    /**
+     * Return delta time from the
+     * previous game tick
+     */
+    public getDT = () : number => {
+        return this.dt;
+    }
+
+    /**
+     * Called each game tick
+     */
+    private gameLoop = () : void => {
         const t = Date.now()
 
         this.tick();
 
         this.dt = Date.now() - t + (1000 / this.TPS);
     }
-    //console.log(this.dt);
-    private tick = () => {
+
+    private tick = () : void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
-        this.sessionManager.broadcast("update", "");
+        this.sessionManager.broadcast("update", JSON.stringify({"updates":[]}));
     }
 }
