@@ -12,6 +12,7 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         window.addEventListener("resize", this.handleResize.bind(this));
         this.client = client;
         this.resizeWindow();
+        this.render();
         this.client.registerUpdateHandler(this);
     }
 
@@ -58,7 +59,8 @@ export class ZIRCanvasController implements IZIRServerUpdate {
     private renderEntities(ctx: CanvasRenderingContext2D, entities: IZIRRenderable[]) {
         for (var entity of entities) {
             var asset = entity.getImageToRender();
-            ctx.drawImage(asset.getImage(), entity.position.x, entity.position.y);
+            var position = entity.getPosition();
+            ctx.drawImage(asset.getImage(), position.x, position.y);
         }
     }
 

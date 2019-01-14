@@ -1,4 +1,4 @@
-import { IZIRServerUpdate } from "./IServerUpdate";
+import { IZIRServerUpdate, IZIRUpdateResult, IZIRResetResult } from "./IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./RenderingInterfaces";
 
 export interface IZIRClient {
@@ -19,4 +19,22 @@ export interface IZIRClient {
      * Sets the current view size so the client will know what needs to be rendered
      */
     setViewSize: (width: number, height: number) => void;
+}
+
+export interface IZIRServerCommunications {
+    setUpdateHandler: (handler: (data: IZIRUpdateResult) => void) => void;
+
+    setResetHandler: (handler: (data: IZIRResetResult) => void) => void;
+
+    setMessageHandler: (handler: (message) => void) => void;
+    
+    setUsernameHandler: (handler: () => void) => void;
+    
+    sendInfoToServer: (type: string, message: string) => void;
+
+    getPlayersOnline: () => string[];
+}
+
+export interface IZIREntity extends IZIRRenderable {
+    getEntityId: () => number;
 }

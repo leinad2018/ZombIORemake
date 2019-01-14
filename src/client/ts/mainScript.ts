@@ -1,9 +1,10 @@
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRTestClient } from "./unitTesting/TestClient";
 import { ZIRAssetLoader } from "./AssetLoader";
-import { IZIRClient } from "./globalInterfaces/MainInterfaces";
+import { IZIRClient, IZIRServerCommunications } from "./globalInterfaces/MainInterfaces";
 import { ZIRServerCommunications } from "./ServerComms";
 import { ZIRClient } from "./Client";
+import { TestServer } from "./unitTesting/TestServer";
 declare function io();
 
 var mainCanvas = document.getElementById("mainCanvas");
@@ -33,8 +34,9 @@ function loadAssets() {
 }
 
 function runAfterLoaded() {
-    var serverLink: ZIRServerCommunications = new ZIRServerCommunications();
+    var serverLink: IZIRServerCommunications = new TestServer();
     var client: IZIRClient = new ZIRClient(serverLink);
     var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
-    console.log("Ran");
+    console.log("Constructed Objects");
+    (serverLink as TestServer).runTests();
 }

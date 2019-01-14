@@ -1,7 +1,7 @@
 import { Point } from "./UtilityInterfaces";
 
 export interface IZIRRenderable {
-    position: Point;
+    getPosition: () => Point;
     getImageToRender: () => IZIRAsset;
 }
 

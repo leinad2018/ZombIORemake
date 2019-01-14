@@ -1,0 +1,103 @@
+ZIR Protocal Documentation
+
+Server to Client messages
+
+update
+desc: Sends the client a list of updates to apply 
+content: 
+	updates -> A list of updates to apply
+		properties:
+			id -> the id of the entity to be updated
+			type -> the type of the update (create, update, delete)
+			//Following properties only exist on update and create types
+			asset -> the name of the asset to use in rendering
+			x -> the x coordinate of the entity
+			y -> the y coordinate of the entity
+			xspeed -> the speed in the x direction
+			yspeed -> the speed in the y direction
+example: 
+"update": {
+	updates: [
+		{
+			id: 0,
+			type: "delete"
+		},
+		{
+			id: 5,
+			type: "update",
+			asset: "circle",
+			x: 450,
+			y: 300,
+			xspeed: 5,
+			yspeed: 0
+		}
+	]
+}
+
+reset
+desc: Sends the client a list of entities. The client will completely clear its data and use the server reset data.	
+content:
+	entities -> A list of the entities to create
+		properties:
+			id -> the id of the entitiy
+			asset -> the name of the asset to use in rendering
+			x -> the x coordinate of the entity
+			y -> the y coordinate of the entity
+			xspeed -> the speed in the x direction
+			yspeed -> the speed in the y direction
+example:
+"reset": {
+	entities: [
+		{
+			id: 0,
+			asset: "circle",
+			x: 1000,
+			y: 100,
+			xspeed: 0,
+			yspeed: 0
+		},
+		{
+			id: 1,
+			asset: "blob",
+			x: 140,
+			y: 203,
+			xspeed: 4,
+			yspeed: 1
+		}
+	]
+}
+
+message
+desc: Sends a message to the client for the client to print.
+content:
+	message -> the message to print
+example:
+"message": "This is a message"
+
+
+Client to Server messages
+
+rename
+desc: Sends the server the name of this player
+content:
+	name -> a string that is the name of the player
+example:
+"rename": "name"
+
+input
+desc: Sends input to the server.
+content:
+	inputs -> A list of inputs to the server.
+		properties:
+			keycode -> The keycode or something
+example:
+"input": {
+	inputs: [
+		{
+			keycode: "code1"
+		},
+		{
+			keycode: "code2"
+		}
+	]
+}

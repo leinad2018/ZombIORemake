@@ -1,0 +1,27 @@
+import { IZIRServerCommunications } from "../globalInterfaces/MainInterfaces";
+
+export abstract class ZIRServerBase implements IZIRServerCommunications {
+    protected updateHandler: (data) => void;
+    protected resetHandler: (data) => void;
+    protected messageHandler: (message) => void;
+    protected usernameHandler: () => void;
+
+    public setUpdateHandler(handler: (data) => void) {
+        this.updateHandler = handler;
+    }
+
+    public setResetHandler(handler: (data) => void) {
+        this.resetHandler = handler;
+    }
+
+    public setMessageHandler(hander: (message) => void) {
+        this.messageHandler = hander
+    }
+
+    public setUsernameHandler(handler: () => void) {
+        this.usernameHandler = handler;
+    }
+
+    public abstract sendInfoToServer(type: string, message: string): void;
+    public abstract getPlayersOnline(): string[];
+}

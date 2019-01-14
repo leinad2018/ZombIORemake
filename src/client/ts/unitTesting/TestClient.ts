@@ -49,6 +49,10 @@ class TestEntity implements IZIRRenderable {
         this.asset = ZIRAssetLoader.getAsset("circle");
     }
 
+    public getPosition(){
+        return this.position;
+    }
+
     getImageToRender() {
         return this.asset;
     }

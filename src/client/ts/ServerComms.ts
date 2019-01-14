@@ -1,42 +1,47 @@
+import { ZIRServerBase } from "./baseObjects/ServerBase";
+import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
+
 declare function io();
 
-export class ZIRServerCommunications {
-    private updateHandler: () => void;
-    private usernameHandler: () => void;
+export class ZIRServerCommunications extends ZIRServerBase {
     private socket;
     public playersOnline: string[] = [];
 
     constructor() {
+        super();
         this.registerServerListener();
     }
 
     private registerServerListener() {
         var socket = io();
         socket.emit('login');
-        socket.on('update', ((data) => {
-            this.updateClient();
-        }).bind(this));
-        socket.on('requestUsername', ((data) => {
-            this.usernameHandler();
-        }).bind(this));
         socket.on('players', ((data) => {
             this.playersOnline = JSON.parse(data)
         }).bind(this));
+        socket.on('update', this.updateClient.bind(this));
+        socket.on('reset', this.resetClient.bind(this));
+        socket.on('message', this.messageClient.bind(this));
+        socket.on('requestUsername', this.setUsernameHandler.bind(this));
         this.socket = socket;
     }
 
-    public setUpdateHandler(handler: () => void) {
-        this.updateHandler = handler;
-    }
-    public setUsernameHandler(handler: () => void) {
-        this.usernameHandler = handler;
+    public sendInfoToServer(type: string, message: string) {
+        this.socket.emit(type, message);
     }
 
-    public sendMessageToServer(message: string) {
-        this.socket.emit('rename', message);
+    public getPlayersOnline(){
+        return this.playersOnline;
     }
 
-    private updateClient() {
-        this.updateHandler();
+    private updateClient(data:IZIRUpdateResult) {
+        this.updateHandler(data);
+    }
+
+    private resetClient(data: IZIRResetResult){
+        this.resetHandler(data);
+    }
+
+    private messageClient(message: string){
+        this.messageHandler(message);
     }
 }
