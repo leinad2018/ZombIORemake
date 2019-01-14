@@ -5,23 +5,31 @@ import { ZIREntityBase } from "./baseObjects/EntityBase";
 import { Point } from "./globalInterfaces/UtilityInterfaces";
 import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
 import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult } from "./globalInterfaces/IServerUpdate";
+import { ZIRInput } from "./Input";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
     private serverComms: IZIRServerCommunications;
     private entities: IZIREntity[];
+    private input: ZIRInput;
 
-    constructor(comms: IZIRServerCommunications) {
+    constructor(comms: IZIRServerCommunications, input: ZIRInput) {
         super();
         this.serverComms = comms;
+        this.input = input;
         this.entities = [];
         this.playersOnline = [];
         this.setUpdateHandler();
         this.setResetHandler();
         this.setMessageHandler();
         this.setUsernameHandler();
+        this.setInputHandler();
         var name = prompt("Enter name");
         this.serverComms.sendInfoToServer("rename", name);
+    }
+
+    private setInputHandler(){
+        this.input.setInputHandler(this.handleInput.bind(this));
     }
 
     private setUpdateHandler() {
@@ -59,7 +67,6 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
-        //console.log(data.updates);
         for (var enitity of data.updates) {
             var id = enitity.id;
             for (var i = 0; i < this.entities.length; i++) {
@@ -84,6 +91,14 @@ export class ZIRClient extends ZIRClientBase {
         }
         this.playersOnline = this.serverComms.getPlayersOnline();
         this.updateObjects();
+    }
+
+    private handleInput(keycode: string, state: boolean){
+        this.serverComms.sendInfoToServer("input", {
+            keycode: keycode,
+            state: state
+        });
+        console.log(keycode + ": " + state);
     }
 
     private parseEntityResult(result: IZIREntityResult) {

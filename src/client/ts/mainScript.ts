@@ -4,6 +4,7 @@ import { IZIRClient, IZIRServerCommunications } from "./globalInterfaces/MainInt
 import { ZIRServerCommunications } from "./ServerComms";
 import { ZIRClient } from "./Client";
 import { TestServer } from "./unitTesting/TestServer";
+import { ZIRInput } from "./Input";
 declare function io();
 
 var mainCanvas = document.getElementById("mainCanvas");
@@ -34,7 +35,8 @@ function loadAssets() {
 
 function runAfterLoaded() {
     var serverLink: IZIRServerCommunications = new ZIRServerCommunications();
-    var client: IZIRClient = new ZIRClient(serverLink);
+    var input: ZIRInput = new ZIRInput();
+    var client: IZIRClient = new ZIRClient(serverLink, input);
     var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
     console.log("Constructed Objects");
     //(serverLink as TestServer).runTests();

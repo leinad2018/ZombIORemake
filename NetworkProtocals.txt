@@ -87,17 +87,10 @@ example:
 input
 desc: Sends input to the server.
 content:
-	inputs -> A list of inputs to the server.
-		properties:
-			keycode -> The keycode or something
+	keycode -> The name of the key that is updating
+	state -> The state of the input
 example:
 "input": {
-	inputs: [
-		{
-			keycode: "code1"
-		},
-		{
-			keycode: "code2"
-		}
-	]
+	keycode: "upArrow",
+	state: true
 }
