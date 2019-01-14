@@ -1,5 +1,6 @@
 import { Socket } from "net";
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
+import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 
 //declare function io();
 
@@ -7,7 +8,6 @@ export class ZIRSessionManager {
     sessions : Session[] = [];
     listeners : {[header: string]: Function} = {};
     io : any;
-
 
     constructor() {
         var express = require('express');
@@ -59,10 +59,8 @@ export class ZIRSessionManager {
     }
 
     private handleInput = (socket, data) : void => {
-        //keycode: string state: boolean
-        const inputs = data;
-        for(const input of inputs) {
-            console.log(input);
+        if(data.keycode) {
+            this.getSessionBySocket(socket).inputs[data.keycode] = data.state;
         }
     }
 
@@ -72,6 +70,10 @@ export class ZIRSessionManager {
      */
     private handleDisconnection = (socket, data) : void => {
         console.log("Disconnecting " + socket.id)
+        let session = this.getSessionBySocket(socket);
+
+        session.deactivate();
+
         for(let i=0; i < this.sessions.length; i++){
             let session = this.sessions[i];
             if(session.socket == socket.id) {
@@ -85,12 +87,20 @@ export class ZIRSessionManager {
      * a new Session object storing the user's
      * socket for future reference
      */
-
     private handleRename = (socket, data) : void => {
+        this.getSessionBySocket(socket).setUsername(data);
+    }
+
+    /**
+     * Finds session in SessionManager.sessions
+     * that corresponds to a given socket, based
+     * on socket id
+     */
+    private getSessionBySocket = (socket) : Session => {
         for(let i=0; i < this.sessions.length; i++){
             let session = this.sessions[i];
             if(session.socket == socket.id) {
-                this.sessions[i].username = data;
+                return session;
             }
         }
     }
@@ -113,6 +123,10 @@ export class ZIRSessionManager {
         return usernames;
     }
 
+    public getInputs = (session : Session) : {[input: string]: boolean} => {
+        return session.inputs;
+    }
+
     public broadcast = (header : string, data : any) : void => {
         this.io.sockets.emit(header, data)
     }
@@ -132,13 +146,28 @@ export class ZIRSessionManager {
 
 export class Session {
     static sessionCount : number = 0;
+    active : boolean;
     username : string;
     socket : string;
+    inputs : Inputs = {};
 
     constructor(socket : string) {
         this.socket = socket;
+        this.active = true;
         this.username = "Player" + Session.sessionCount;
         Session.sessionCount++;
+    }
+
+    public deactivate = () : void => {
+        this.active = false;
+    }
+
+    public getInputs = () : Inputs => {
+        return this.inputs;
+    } 
+
+    public setUsername(username : string) : void {
+        this.username = username;
     }
 
     public toString = () : string => {

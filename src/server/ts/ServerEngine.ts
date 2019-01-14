@@ -19,7 +19,8 @@ export class ZIRServerEngine {
     }
 
     /**
-     * Called each game tick
+     * Regulates game ticks and other
+     * core engine functions
      */
     private gameLoop = () : void => {
         const t = Date.now()
@@ -29,6 +30,9 @@ export class ZIRServerEngine {
         this.dt = Date.now() - t + (1000 / this.TPS);
     }
 
+    /**
+     * Triggers calculation of all game mechanics
+     */
     private tick = () : void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
         this.sessionManager.broadcast("update", {updates:[]});
