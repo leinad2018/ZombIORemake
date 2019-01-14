@@ -1,4 +1,5 @@
 import { Socket } from "net";
+import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 
 //declare function io();
 
@@ -16,7 +17,7 @@ export class ZIRSessionManager {
         var app = express();
         var server = http.Server(app);
         this.io = socketIO(server);
-        const PORT = 5000;
+        const PORT : number = 5000;
 
         app.set('port', PORT);
         app.use('/static', express.static(__dirname + '/static'));
@@ -39,44 +40,38 @@ export class ZIRSessionManager {
             this.io.sockets.emit('message', 'hi!');
             this.io.sockets.emit('message', JSON.stringify(this.sessions));
         }, 1000);
-        
 
+        this.addHandler("rename", this.handleRename);
+        this.addHandler("disconnect", this.handleDisconnection);
+        this.addHandler("input", this.handleInput);
     }
 
     private onConnection = function(socket) : void {
-        socket.emit("requestUsername")
-
-        this.handleLogin(socket)
         
+        this.handleLogin(socket)
+
         for(var listener in this.listeners) {
             const listenerHandler = this.listeners[listener];
             socket.on(listener, (data) => {
-                listenerHandler(data)
+                listenerHandler(socket, data)
             });
         }
+    }
 
-        socket.on('rename', (data) => {
-            console.log(data);
-            for(let i=0; i < this.sessions.length; i++){
-                let session = this.sessions[i];
-                if(session.socket == socket.id) {
-                    console.log("found");
-                    this.sessions[i].username = data;
-                }
-            }
-        });
-
-        socket.on('disconnect', () => {
-            this.onDisconnection(socket);
-        });
+    private handleInput = (socket, data) : void => {
+        //keycode: string state: boolean
+        const inputs = data;
+        for(const input of inputs) {
+            console.log(input);
+        }
     }
 
     /**
      * Handle dropped connection by removing
      * any sessions corresponding to the connection
      */
-    private onDisconnection = function(socket) : void {
-        console.log("Attempting to disconnect " + socket.id)
+    private handleDisconnection = (socket, data) : void => {
+        console.log("Disconnecting " + socket.id)
         for(let i=0; i < this.sessions.length; i++){
             let session = this.sessions[i];
             if(session.socket == socket.id) {
@@ -90,15 +85,23 @@ export class ZIRSessionManager {
      * a new Session object storing the user's
      * socket for future reference
      */
-    private handleLogin = (socket) : void => {
-        console.log("Detected new login");
-        console.log(socket.id);
-        const s = new Session(socket.id);
-        this.sessions.push(s);
-        console.log("Added session: " + this.sessions);
+
+    private handleRename = (socket, data) : void => {
+        for(let i=0; i < this.sessions.length; i++){
+            let session = this.sessions[i];
+            if(session.socket == socket.id) {
+                this.sessions[i].username = data;
+            }
+        }
     }
 
-    private addSocketListener(key:string, callback: Function) {
+    private handleLogin = (socket) : void => {
+        const s = new Session(socket.id);
+        this.sessions.push(s);
+        socket.emit("requestUsername");
+    }
+
+    private addHandler = (key : string, callback : Function) : void => {
         this.listeners[key] = callback;
     }
 
@@ -112,6 +115,18 @@ export class ZIRSessionManager {
 
     public broadcast = (header : string, data : any) : void => {
         this.io.sockets.emit(header, data)
+    }
+
+    public resetClients = (entitiesReset : IZIRResetResult) : void => {
+        this.io.sockets.emit("reset", entitiesReset)
+    }
+
+    public updateClients = (entitiesUpdate : IZIREntityUpdateResult) : void => {
+        this.io.sockets.emit("update", entitiesUpdate);
+    }
+
+    public messageClients = (message : any) : void => {
+        this.io.sockets.emit("message", message);
     }
 }
 
