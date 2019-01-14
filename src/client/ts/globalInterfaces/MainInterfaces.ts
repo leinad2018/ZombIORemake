@@ -30,7 +30,7 @@ export interface IZIRServerCommunications {
     
     setUsernameHandler: (handler: () => void) => void;
     
-    sendInfoToServer: (type: string, message: string) => void;
+    sendInfoToServer: (type: string, message: any) => void;
 
     getPlayersOnline: () => string[];
 }

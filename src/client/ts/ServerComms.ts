@@ -25,7 +25,7 @@ export class ZIRServerCommunications extends ZIRServerBase {
         this.socket = socket;
     }
 
-    public sendInfoToServer(type: string, message: string) {
+    public sendInfoToServer(type: string, message: any) {
         this.socket.emit(type, message);
     }
 

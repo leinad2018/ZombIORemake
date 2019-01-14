@@ -22,6 +22,6 @@ export abstract class ZIRServerBase implements IZIRServerCommunications {
         this.usernameHandler = handler;
     }
 
-    public abstract sendInfoToServer(type: string, message: string): void;
+    public abstract sendInfoToServer(type: string, message: any): void;
     public abstract getPlayersOnline(): string[];
 }
