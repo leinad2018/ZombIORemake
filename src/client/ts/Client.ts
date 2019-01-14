@@ -15,6 +15,7 @@ export class ZIRClient extends ZIRClientBase {
         super();
         this.serverComms = comms;
         this.entities = [];
+        this.playersOnline = [];
         this.setUpdateHandler();
         this.setResetHandler();
         this.setMessageHandler();
