@@ -31,28 +31,28 @@ export class ZIRClient extends ZIRClientBase {
         this.setDebugMessageHandler();
     }
 
-    private setInputHandler(){
+    private setInputHandler() {
         this.input.setInputHandler(this.handleInput.bind(this));
     }
 
     private setUpdateHandler() {
-        this.serverComms.setUpdateHandler(this.handleServerUpdate.bind(this));
+        this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
     }
 
     private setMessageHandler() {
-        this.serverComms.setMessageHandler(this.handleMessage.bind(this));
+        this.serverComms.setHandler('message', this.handleMessage.bind(this));
     }
 
     private setResetHandler() {
-        this.serverComms.setResetHandler(this.handleReset.bind(this));
+        this.serverComms.setHandler('reset', this.handleReset.bind(this));
     }
 
     private setUsernameHandler() {
-        this.serverComms.setUsernameHandler(this.fetchUsername.bind(this));
+        this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
     }
 
     private setDebugMessageHandler() {
-        this.serverComms.setDebugMessageHandler(this.handleDebugMessage.bind(this));
+        this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
     }
 
     private fetchUsername() {
@@ -90,7 +90,7 @@ export class ZIRClient extends ZIRClientBase {
                         }
                         break;
                     case "delete":
-                        this.entities.splice(i,1);
+                        this.entities.splice(i, 1);
                         break;
                     case "create":
                         var newEntity = this.parseEntityResult(enitity);
@@ -104,7 +104,7 @@ export class ZIRClient extends ZIRClientBase {
         this.updateObjects();
     }
 
-    private handleInput(keycode: string, state: boolean){
+    private handleInput(keycode: string, state: boolean) {
         this.serverComms.sendInfoToServer("input", {
             keycode: keycode,
             state: state
@@ -137,7 +137,7 @@ export class ZIRClient extends ZIRClientBase {
         return this.entities;
     }
 
-    public setUsername(name: string){
+    public setUsername(name: string) {
         this.username = name;
     }
 }

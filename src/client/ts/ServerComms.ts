@@ -1,5 +1,4 @@
 import { ZIRServerBase } from "./baseObjects/ServerBase";
-import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 
 declare function io();
 
@@ -17,11 +16,11 @@ export class ZIRServerCommunications extends ZIRServerBase {
         socket.on('players', ((data) => {
             this.playersOnline = JSON.parse(data)
         }).bind(this));
-        socket.on('update', this.updateClient.bind(this));
-        socket.on('reset', this.resetClient.bind(this));
-        socket.on('message', this.messageClient.bind(this));
-        socket.on('requestUsername', this.usernameHandler.bind(this));
-        socket.on('debug', this.debugClient.bind(this));
+        socket.on('update', (data) => { this.handlers['update'](data) });
+        socket.on('reset', (data) => { this.handlers['reset'](data) });
+        socket.on('message',(data) => { this.handlers['message'](data) });
+        socket.on('requestUsername', () => { this.handlers['requestUsername']() });
+        socket.on('debug', (data) => { this.handlers['debug'](data) });
         this.socket = socket;
     }
 
@@ -29,24 +28,11 @@ export class ZIRServerCommunications extends ZIRServerBase {
         this.socket.emit(type, message);
     }
 
-    public getPlayersOnline(){
+    public getPlayersOnline() {
         return this.playersOnline;
     }
 
-    private updateClient(data:IZIRUpdateResult) {
-        this.updateHandler(data);
-    }
-
-    private debugClient(data: string[]) {
-        console.log("We received a debug packet")
-        this.debugMessageHandler(data);
-    }
-
-    private resetClient(data: IZIRResetResult){
-        this.resetHandler(data);
-    }
-
-    private messageClient(message: string){
-        this.messageHandler(message);
+    private callHandler(type: string, data?: any) {
+        this.handlers[type](data);
     }
 }
