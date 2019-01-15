@@ -6,11 +6,11 @@ export class ZIREntity implements IZIREntity {
     protected id: number;
     protected isPhysical: boolean;
     protected position: Vector;
-    protected velocity: Vector;
-    protected acceleration: Vector;
-    protected friction: number;
-    protected mass: number;
-    protected maxMovement : number;
+    protected velocity: Vector = new Vector(0,0);
+    protected acceleration: Vector = new Vector(0,0);
+    protected friction: number = 0.2;
+    protected mass: number = 10;
+    protected maxMovement : number = 10;
     protected asset: string;
 
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
