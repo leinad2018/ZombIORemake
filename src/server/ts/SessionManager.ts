@@ -1,6 +1,8 @@
 import { Socket } from "net";
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
+import { ZIRPlayer } from "./baseObjects/Player";
+import { Vector } from "./utilityObjects/Math";
 
 //declare function io();
 
@@ -108,6 +110,7 @@ export class ZIRSessionManager {
         const s = new Session(socket.id);
         this.sessions.push(s);
         socket.emit("requestUsername");
+        socket.emit("playerID",s.player.getEntityId());
     }
 
     private addHandler = (key : string, callback : Function) : void => {
@@ -158,11 +161,13 @@ export class Session {
     socket : string;
     inputs : Inputs = {};
     debugMessages : string[] = [];
+    player : ZIRPlayer;
 
     constructor(socket : string) {
         this.socket = socket;
         this.active = true;
         this.username = "Player" + Session.sessionCount;
+        this.player = new ZIRPlayer();
         Session.sessionCount++;
     }
 
