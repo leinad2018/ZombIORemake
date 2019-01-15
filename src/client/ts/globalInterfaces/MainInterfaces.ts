@@ -1,31 +1,4 @@
-import { IZIRServerUpdate, IZIRUpdateResult, IZIRResetResult } from "./IServerUpdate";
-import { IZIRAsset, IZIRRenderable } from "./RenderingInterfaces";
-
-export interface IZIRClient {
-    getPlayersOnline: () => string[];
-    /**
-     * Registers a handler to be called when the the client is updated
-     */
-    registerUpdateHandler: (objectToUpdate: IZIRServerUpdate) => void;
-    /**
-     * Gets the current background image
-     */
-    getBackgroundImage: () => IZIRAsset;
-    /**
-     * Gets a list of all of the entities to render
-     */
-    getEntitiesToRender: () => IZIRRenderable[];
-
-    /**
-     * Gets a list of server-supplied debug strings
-     */
-    getDebugMessages: () => string[];
-
-    /**
-     * Sets the current view size so the client will know what needs to be rendered
-     */
-    setViewSize: (width: number, height: number) => void;
-}
+import { IZIRRenderable } from "./RenderingInterfaces";
 
 export interface IZIRServerCommunications {
     registerServerListeners: () => void;
@@ -38,5 +11,5 @@ export interface IZIRServerCommunications {
 }
 
 export interface IZIREntity extends IZIRRenderable {
-    getEntityId: () => number;
+    getEntityId: () => string;
 }

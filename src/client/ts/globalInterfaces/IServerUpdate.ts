@@ -11,7 +11,7 @@ export interface IZIRUpdateResult {
 }
 
 export interface IZIREntityResult {
-    id: number;
+    id: string;
     asset: string;
     x: number;
     y: number;

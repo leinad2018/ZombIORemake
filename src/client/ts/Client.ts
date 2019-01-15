@@ -14,6 +14,7 @@ export class ZIRClient extends ZIRClientBase {
     private input: ZIRInput;
     private username: string;
     private debugMessages: string[] = ["hello world"];
+    private playerId: string;
 
     constructor(comms: IZIRServerCommunications, input: ZIRInput, name: string) {
         super();
@@ -22,41 +23,22 @@ export class ZIRClient extends ZIRClientBase {
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
-        this.setUpdateHandler();
-        this.setResetHandler();
-        this.setMessageHandler();
-        this.setUsernameHandler();
-        this.setInputHandler();
-        this.serverComms.registerServerListeners();
-        this.setDebugMessageHandler();
-    }
-
-    private setInputHandler() {
-        this.input.setInputHandler(this.handleInput.bind(this));
-    }
-
-    private setUpdateHandler() {
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
-    }
-
-    private setMessageHandler() {
-        this.serverComms.setHandler('message', this.handleMessage.bind(this));
-    }
-
-    private setResetHandler() {
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
-    }
-
-    private setUsernameHandler() {
+        this.serverComms.setHandler('message', this.handleMessage.bind(this));
         this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
-    }
-
-    private setDebugMessageHandler() {
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
+        this.serverComms.setHandler('playerId', this.handlePlayerId.bind(this));
+        this.input.setInputHandler(this.handleInput.bind(this));
+        this.serverComms.registerServerListeners();
     }
 
     private fetchUsername() {
         this.serverComms.sendInfoToServer('rename', this.username);
+    }
+
+    private handlePlayerId(id: string) {
+        this.playerId = id;
     }
 
     private handleMessage(message) {
@@ -67,7 +49,7 @@ export class ZIRClient extends ZIRClientBase {
         this.entities = [];
         for (var enitity of data.entities) {
             var newEntity = this.parseEntityResult(enitity);
-            this.entities.push(newEntity);
+            this.entities[enitity.id] = newEntity;
         }
         this.updateObjects();
     }
@@ -78,26 +60,18 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
-        for (var enitity of data.updates) {
-            var id = enitity.id;
-            for (var i = 0; i < this.entities.length; i++) {
-                switch (enitity.type) {
-                    case "update":
-                        var oldEntity = this.entities[i];
-                        if (oldEntity.getEntityId() == id) {
-                            var newEntity = this.parseEntityResult(enitity);
-                            this.entities[i] = newEntity;
-                        }
-                        break;
-                    case "delete":
-                        this.entities.splice(i, 1);
-                        break;
-                    case "create":
-                        var newEntity = this.parseEntityResult(enitity);
-                        this.entities.push(newEntity);
-                        break;
-
-                }
+        for (var entity of data.updates) {
+            var id = entity.id;
+            switch (entity.type) {
+                case 'update':
+                    var newEntity = this.parseEntityResult(entity);
+                    this.entities[id] = newEntity;
+                    break;
+                case 'delete':
+                    if(this.entities[id]){
+                        this.entities[id] = undefined;
+                    }
+                    break;
             }
         }
         this.playersOnline = this.serverComms.getPlayersOnline();
@@ -139,5 +113,16 @@ export class ZIRClient extends ZIRClientBase {
 
     public setUsername(name: string) {
         this.username = name;
+    }
+
+    public getPlayerPosition() {
+        var player: IZIREntity = this.entities[this.playerId];
+        if(player){
+            return player.getPosition();
+        }
+        return {
+            x: 0,
+            y: 0
+        }
     }
 }

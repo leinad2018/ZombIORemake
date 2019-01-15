@@ -1,14 +1,13 @@
 import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
-import { IZIRClient } from "./globalInterfaces/MainInterfaces";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
-import { createContext } from "vm";
+import { ZIRClientBase } from "./baseObjects/ClientBase";
 
 export class ZIRCanvasController implements IZIRServerUpdate {
     private canvas: HTMLCanvasElement;
-    private client: IZIRClient;
+    private client: ZIRClientBase;
     private DEBUG_RENDER: boolean = true;
 
-    constructor(canvas: HTMLCanvasElement, client: IZIRClient) {
+    constructor(canvas: HTMLCanvasElement, client: ZIRClientBase) {
         this.canvas = canvas;
         window.addEventListener("resize", this.handleResize.bind(this));
         this.client = client;
@@ -30,20 +29,29 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         var background: IZIRAsset = this.client.getBackgroundImage();
         this.renderBackground(ctx, background);
 
+        let playerPosition = this.client.getPlayerPosition();
+        let xOffset = playerPosition.x - this.canvas.width / 2;
+        let yOffset = playerPosition.y - this.canvas.height / 2;
+
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, xOffset, yOffset);
+
         var entities: IZIRRenderable[] = this.client.getEntitiesToRender();
         this.renderEntities(ctx, entities);
+        ctx.restore();
+
         this.renderPlayerBox(ctx, this.client.getPlayersOnline());
-        if(this.DEBUG_RENDER) this.renderDebugBox(ctx, this.client.getDebugMessages());
+        if (this.DEBUG_RENDER) this.renderDebugBox(ctx, this.client.getDebugMessages());
     }
 
     private renderPlayerBox(ctx: CanvasRenderingContext2D, players: string[]) {
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-        ctx.fillRect(this.canvas.width-150, 0, 150, players.length*10+30);
+        ctx.fillRect(this.canvas.width - 150, 0, 150, players.length * 10 + 30);
         ctx.fillStyle = "white";
-        ctx.fillText("Players Online:\n",this.canvas.width-145,15);
-        for(var i = 0; i < players.length; i++) {
-            ctx.fillText(players[i],this.canvas.width-145,25+i*10);
+        ctx.fillText("Players Online:\n", this.canvas.width - 145, 15);
+        for (var i = 0; i < players.length; i++) {
+            ctx.fillText(players[i], this.canvas.width - 145, 25 + i * 10);
         }
 
         ctx.restore();
@@ -51,14 +59,14 @@ export class ZIRCanvasController implements IZIRServerUpdate {
 
     private renderDebugBox(ctx: CanvasRenderingContext2D, messages: string[]) {
         let boxHeight = (messages.length * 10) + 30;
-        let vOffset = this.canvas.height-boxHeight;
+        let vOffset = this.canvas.height - boxHeight;
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(0, vOffset, this.canvas.width, boxHeight);
         ctx.fillStyle = "white";
         ctx.fillText("Debug:\n", 5, vOffset + 15);
-        for(var i = 0; i < messages.length; i++) {
-            ctx.fillText(messages[i], 5, vOffset+ 25+i*10);
+        for (var i = 0; i < messages.length; i++) {
+            ctx.fillText(messages[i], 5, vOffset + 25 + i * 10);
         }
 
         ctx.restore();

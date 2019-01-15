@@ -1,9 +1,10 @@
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRAssetLoader } from "./AssetLoader";
-import { IZIRClient, IZIRServerCommunications } from "./globalInterfaces/MainInterfaces";
+import { IZIRServerCommunications } from "./globalInterfaces/MainInterfaces";
 import { ZIRServerCommunications } from "./ServerComms";
 import { ZIRClient } from "./Client";
 import { ZIRInput } from "./Input";
+import { ZIRClientBase } from "./baseObjects/ClientBase";
 
 var waitForLoad = () => new Promise(() => {
     var check = () => {
@@ -37,7 +38,7 @@ function runAfterLoaded() {
     mainCanvas.hidden = false;
     var serverLink: IZIRServerCommunications = new ZIRServerCommunications();
     var input: ZIRInput = new ZIRInput();
-    var client: IZIRClient = new ZIRClient(serverLink, input, playerName);
+    var client: ZIRClientBase = new ZIRClient(serverLink, input, playerName);
     var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
     console.log("Started Game");
 }

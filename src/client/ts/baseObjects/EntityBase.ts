@@ -3,11 +3,11 @@ import { Point } from "../globalInterfaces/UtilityInterfaces";
 import { IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
 
 export class ZIREntityBase implements IZIREntity {
-    protected id: number;
+    protected id: string;
     protected position: Point;
     protected asset: IZIRAsset;
 
-    constructor(id: number, position: Point, asset: IZIRAsset){
+    constructor(id: string, position: Point, asset: IZIRAsset){
         this.id = id;
         this.position = position;
         this.asset = asset;

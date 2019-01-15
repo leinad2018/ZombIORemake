@@ -1,9 +1,8 @@
-import { IZIRClient } from "../globalInterfaces/MainInterfaces";
 import { IZIRServerUpdate } from "../globalInterfaces/IServerUpdate";
 import { Point } from "../globalInterfaces/UtilityInterfaces";
 import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
 
-export abstract class ZIRClientBase implements IZIRClient {
+export abstract class ZIRClientBase {
     private objectsToUpdate: IZIRServerUpdate[];
     protected sizeVector: Point;
 
@@ -38,4 +37,6 @@ export abstract class ZIRClientBase implements IZIRClient {
     abstract getDebugMessages();
 
     abstract getBackgroundImage(): IZIRAsset;
+
+    abstract getPlayerPosition(): Point;
 }

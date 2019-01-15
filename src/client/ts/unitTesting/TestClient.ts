@@ -1,65 +1,65 @@
-import { ZIRClientBase } from "../baseObjects/ClientBase";
-import { ZIRAssetLoader } from "../AssetLoader";
-import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
-import { Point } from "../globalInterfaces/UtilityInterfaces";
+// import { ZIRClientBase } from "../baseObjects/ClientBase";
+// import { ZIRAssetLoader } from "../AssetLoader";
+// import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
+// import { Point } from "../globalInterfaces/UtilityInterfaces";
 
-export class ZIRTestClient extends ZIRClientBase {
-    private entities: IZIRRenderable[];
+// export class ZIRTestClient extends ZIRClientBase {
+//     private entities: IZIRRenderable[];
 
-    constructor() {
-        super();
-        this.entities = [];
-    }
+//     constructor() {
+//         super();
+//         this.entities = [];
+//     }
 
-    public getPlayersOnline() {
-        return [];
-    }
+//     public getPlayersOnline() {
+//         return [];
+//     }
 
-    public getDebugMessages() {
-        return [];
-    }
+//     public getDebugMessages() {
+//         return [];
+//     }
 
-    public runTest() {
-        this.loadTestEntities();
-        this.updateObjects();
-    }
+//     public runTest() {
+//         this.loadTestEntities();
+//         this.updateObjects();
+//     }
 
-    public getBackgroundImage() {
-        return ZIRAssetLoader.getAsset("grass");
-    }
+//     public getBackgroundImage() {
+//         return ZIRAssetLoader.getAsset("grass");
+//     }
 
-    public getEntitiesToRender() {
-        return this.entities;
-    }
+//     public getEntitiesToRender() {
+//         return this.entities;
+//     }
 
-    private loadTestEntities() {
-        for (var i = 0; i < 10; i++) {
-            this.entities.push(new TestEntity(20 * i, 5 * i));
-        }
-    }
+//     private loadTestEntities() {
+//         for (var i = 0; i < 10; i++) {
+//             this.entities.push(new TestEntity(20 * i, 5 * i));
+//         }
+//     }
 
-}
+// }
 
-class TestEntity implements IZIRRenderable {
-    public position: Point;
-    private asset: IZIRAsset;
+// class TestEntity implements IZIRRenderable {
+//     public position: Point;
+//     private asset: IZIRAsset;
 
-    constructor(x: number, y: number) {
-        this.position = {
-            x: x,
-            y: y
-        }
+//     constructor(x: number, y: number) {
+//         this.position = {
+//             x: x,
+//             y: y
+//         }
 
-        this.asset = ZIRAssetLoader.getAsset("circle");
-    }
+//         this.asset = ZIRAssetLoader.getAsset("circle");
+//     }
 
-    public getPosition(){
-        return this.position;
-    }
+//     public getPosition(){
+//         return this.position;
+//     }
 
-    getImageToRender() {
-        return this.asset;
-    }
+//     getImageToRender() {
+//         return this.asset;
+//     }
 
 
-}
+// }
