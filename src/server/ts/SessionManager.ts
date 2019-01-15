@@ -10,8 +10,10 @@ export class ZIRSessionManager {
     sessions : Session[] = [];
     listeners : {[header: string]: Function} = {};
     io : any;
+    registerEntityHandler : (ZIREntity) => void; 
 
-    constructor() {
+    constructor(registerEntityHandler) {
+        this.registerEntityHandler = registerEntityHandler;
         var express = require('express');
         var http = require('http');
         var path = require('path');
@@ -109,8 +111,9 @@ export class ZIRSessionManager {
     private handleLogin = (socket) : void => {
         const s = new Session(socket.id);
         this.sessions.push(s);
+        this.registerEntityHandler(s.getPlayer());
         socket.emit("requestUsername");
-        socket.emit("playerID",s.player.getEntityId());
+        socket.emit("playerID", s.getPlayer().getEntityId());
     }
 
     private addHandler = (key : string, callback : Function) : void => {
@@ -173,6 +176,10 @@ export class Session {
 
     public deactivate = () : void => {
         this.active = false;
+    }
+
+    public getPlayer = () : ZIRPlayer => {
+        return this.player;
     }
 
     public getInputs = () : Inputs => {

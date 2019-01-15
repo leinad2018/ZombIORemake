@@ -79,4 +79,8 @@ export class ZIREntity implements IZIREntity {
     public getMaxMovement() : number {
         return this.maxMovement;
     }
+
+    public toString() : string {
+        return "Entity" + this.id + "@" + this.position;
+    }
 }
