@@ -22,14 +22,16 @@ export interface IZIRClient {
 }
 
 export interface IZIRServerCommunications {
+    registerServerListeners: () => void;
+
     setUpdateHandler: (handler: (data: IZIRUpdateResult) => void) => void;
 
     setResetHandler: (handler: (data: IZIRResetResult) => void) => void;
 
     setMessageHandler: (handler: (message) => void) => void;
-    
+
     setUsernameHandler: (handler: () => void) => void;
-    
+
     sendInfoToServer: (type: string, message: any) => void;
 
     getPlayersOnline: () => string[];

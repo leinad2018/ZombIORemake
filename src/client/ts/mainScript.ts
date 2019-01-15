@@ -3,13 +3,7 @@ import { ZIRAssetLoader } from "./AssetLoader";
 import { IZIRClient, IZIRServerCommunications } from "./globalInterfaces/MainInterfaces";
 import { ZIRServerCommunications } from "./ServerComms";
 import { ZIRClient } from "./Client";
-import { TestServer } from "./unitTesting/TestServer";
 import { ZIRInput } from "./Input";
-declare function io();
-
-var mainCanvas = document.getElementById("mainCanvas");
-console.log("step1");
-loadAssets();
 
 var waitForLoad = () => new Promise(() => {
     var check = () => {
@@ -23,10 +17,15 @@ var waitForLoad = () => new Promise(() => {
     setTimeout(check, 100);
 });
 
-(async () => {
-    console.log("Loading...");
-    waitForLoad();
-})();
+function playGame(){
+    var nameField = document.getElementById('name') as HTMLInputElement;
+    playerName = nameField.value;
+    document.getElementById("startingScreen").hidden = true;
+    (async () => {
+        console.log("Loading...");
+        waitForLoad();
+    })();
+}
 
 function loadAssets() {
     ZIRAssetLoader.loadAsset("grass", "../static/assets/grass.png");
@@ -34,9 +33,21 @@ function loadAssets() {
 }
 
 function runAfterLoaded() {
+    console.log("Finished Loading");
+    mainCanvas.hidden = false;
     var serverLink: IZIRServerCommunications = new ZIRServerCommunications();
     var input: ZIRInput = new ZIRInput();
-    var client: IZIRClient = new ZIRClient(serverLink, input);
+    var client: IZIRClient = new ZIRClient(serverLink, input, playerName);
     var controller: ZIRCanvasController = new ZIRCanvasController(mainCanvas as HTMLCanvasElement, client);
-    console.log("Constructed Objects");
+    console.log("Started Game");
 }
+var mainCanvas = document.getElementById("mainCanvas");
+console.log("step1");
+loadAssets();
+
+var playButton = document.getElementById("play") as HTMLButtonElement;
+playButton.addEventListener("click", playGame);
+
+var playerName = "";
+
+

@@ -9,10 +9,9 @@ export class ZIRServerCommunications extends ZIRServerBase {
 
     constructor() {
         super();
-        this.registerServerListener();
     }
 
-    private registerServerListener() {
+    public registerServerListeners() {
         var socket = io();
         socket.emit('login');
         socket.on('players', ((data) => {
@@ -21,7 +20,7 @@ export class ZIRServerCommunications extends ZIRServerBase {
         socket.on('update', this.updateClient.bind(this));
         socket.on('reset', this.resetClient.bind(this));
         socket.on('message', this.messageClient.bind(this));
-        socket.on('requestUsername', this.setUsernameHandler.bind(this));
+        socket.on('requestUsername', this.usernameHandler.bind(this));
         this.socket = socket;
     }
 

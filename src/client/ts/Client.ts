@@ -12,20 +12,21 @@ export class ZIRClient extends ZIRClientBase {
     private serverComms: IZIRServerCommunications;
     private entities: IZIREntity[];
     private input: ZIRInput;
+    private username: string;
 
-    constructor(comms: IZIRServerCommunications, input: ZIRInput) {
+    constructor(comms: IZIRServerCommunications, input: ZIRInput, name: string) {
         super();
         this.serverComms = comms;
         this.input = input;
         this.entities = [];
+        this.username = name;
         this.playersOnline = [];
         this.setUpdateHandler();
         this.setResetHandler();
         this.setMessageHandler();
         this.setUsernameHandler();
         this.setInputHandler();
-        var name = prompt("Enter name");
-        this.serverComms.sendInfoToServer("rename", name);
+        this.serverComms.registerServerListeners();
     }
 
     private setInputHandler(){
@@ -49,8 +50,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private fetchUsername() {
-        var message = prompt("Enter some text");
-        this.serverComms.sendInfoToServer("rename",message);
+        this.serverComms.sendInfoToServer('rename', this.username);
     }
 
     private handleMessage(message) {
@@ -120,5 +120,9 @@ export class ZIRClient extends ZIRClientBase {
 
     public getEntitiesToRender() {
         return this.entities;
+    }
+
+    public setUsername(name: string){
+        this.username = name;
     }
 }

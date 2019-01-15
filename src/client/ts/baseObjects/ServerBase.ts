@@ -24,4 +24,5 @@ export abstract class ZIRServerBase implements IZIRServerCommunications {
 
     public abstract sendInfoToServer(type: string, message: any): void;
     public abstract getPlayersOnline(): string[];
+    public abstract registerServerListeners(): void;
 }
