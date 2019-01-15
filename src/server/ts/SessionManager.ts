@@ -1,6 +1,8 @@
 import { Socket } from "net";
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
+import { ZIRPlayer } from "./baseObjects/Player";
+import { Vector } from "./utilityObjects/Math";
 
 //declare function io();
 
@@ -8,8 +10,10 @@ export class ZIRSessionManager {
     sessions : Session[] = [];
     listeners : {[header: string]: Function} = {};
     io : any;
+    registerEntityHandler : (ZIREntity) => void; 
 
-    constructor() {
+    constructor(registerEntityHandler) {
+        this.registerEntityHandler = registerEntityHandler;
         var express = require('express');
         var http = require('http');
         var path = require('path');
@@ -107,7 +111,9 @@ export class ZIRSessionManager {
     private handleLogin = (socket) : void => {
         const s = new Session(socket.id);
         this.sessions.push(s);
+        this.registerEntityHandler(s.getPlayer());
         socket.emit("requestUsername");
+        socket.emit("playerID", s.getPlayer().getEntityId());
     }
 
     private addHandler = (key : string, callback : Function) : void => {
@@ -158,16 +164,22 @@ export class Session {
     socket : string;
     inputs : Inputs = {};
     debugMessages : string[] = [];
+    player : ZIRPlayer;
 
     constructor(socket : string) {
         this.socket = socket;
         this.active = true;
         this.username = "Player" + Session.sessionCount;
+        this.player = new ZIRPlayer();
         Session.sessionCount++;
     }
 
     public deactivate = () : void => {
         this.active = false;
+    }
+
+    public getPlayer = () : ZIRPlayer => {
+        return this.player;
     }
 
     public getInputs = () : Inputs => {

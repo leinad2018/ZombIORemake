@@ -1,10 +1,12 @@
 import { addListener } from "cluster";
 import { ZIRSessionManager } from "./SessionManager";
+import {ZIREntity} from "./baseObjects/EntityBase"
 
 export class ZIRServerEngine {
     dt: number = 0;
-    sessionManager: ZIRSessionManager = new ZIRSessionManager();
+    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerEntity.bind(this));
     TPS: number = 30;
+    entities: ZIREntity[] = [];
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
@@ -16,6 +18,10 @@ export class ZIRServerEngine {
      */
     public getDT = () : number => {
         return this.dt;
+    }
+
+    public registerEntity(e : ZIREntity) {
+        this.entities.push(e);
     }
 
     /**
@@ -35,7 +41,22 @@ export class ZIRServerEngine {
      */
     private tick = () : void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
-        this.sessionManager.broadcast("update", {updates:[]});
+        
+        let calculatedUpdates = [];
+        for (let entity of this.entities) {
+            let update = {
+                id: entity.getEntityId(),
+                type: "update",
+                asset: "player",
+                x: entity.getPosition().getX(),
+                y: entity.getPosition().getY(),
+                xspeed: null,
+                yspeed: null
+            }
+            calculatedUpdates.push(update);
+        }
+
+        this.sessionManager.broadcast("update", {updates:calculatedUpdates});
 
         this.sendDebugInfo();
     }
@@ -50,6 +71,7 @@ export class ZIRServerEngine {
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
             debugMessages.push("Current Session: " + session);
+            debugMessages.push("Entities: " + this.entities);
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
         }

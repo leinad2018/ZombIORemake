@@ -1,26 +1,86 @@
 import { IZIREntity } from "../globalInterfaces/MainInterfaces";
-import { Point } from "../globalInterfaces/UtilityInterfaces";
+import { Vector } from "../utilityObjects/Math";
 
-export class ZIREntityBase implements IZIREntity {
+export class ZIREntity implements IZIREntity {
+    static entityCount = 0;
     protected id: number;
-    protected position: Point;
+    protected isPhysical: boolean;
+    protected position: Vector;
+    protected velocity: Vector;
+    protected acceleration: Vector;
+    protected friction: number;
+    protected mass: number;
+    protected maxMovement : number;
     protected asset: string;
 
-    constructor(id: number, position: Point, asset: string){
-        this.id = id;
+    constructor(position: Vector, asset: string, isPhysical: boolean = true){
+        this.id = ZIREntity.entityCount;
         this.position = position;
         this.asset = asset;
+        ZIREntity.entityCount++;
     }
 
     public getEntityId() {
         return this.id;
     }
 
-    public getPosition() {
+    public getAssetName() {
+        return this.asset;
+    }
+
+    public setFriction(friction : number) {
+        this.friction = friction;
+    }
+
+    public getMass() : number {
+        return this.mass;
+    }
+
+    public getFriction() : number {
+        return this.friction;
+    }
+
+    public getPosition() : Vector {
         return this.position;
     }
 
-    public getAssetName() {
-        return this.asset;
+    public getVelocity() : Vector {
+        return this.velocity;
+    }
+
+    public getAcceleration() : Vector {
+        return this.acceleration;
+    }
+
+    public setPosition(position : Vector) : void {
+        this.position = position;
+    }
+
+    public setVelocity(velocity : Vector) : void {
+        this.velocity = velocity;
+    }
+
+    public setAcceleration(acceleration : Vector) : void {
+        this.acceleration = acceleration;
+    }
+
+    public setIsPhysical(isPhysical : boolean) : void {
+        this.isPhysical = isPhysical;
+    }
+
+    public getIsPhysical() : boolean {
+        return this.isPhysical;
+    }
+
+    public setMaxMovement(movement : number) {
+        this.maxMovement = movement;
+    }
+
+    public getMaxMovement() : number {
+        return this.maxMovement;
+    }
+
+    public toString() : string {
+        return "Entity" + this.id + "@" + this.position;
     }
 }
