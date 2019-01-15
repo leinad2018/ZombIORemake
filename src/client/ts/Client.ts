@@ -28,7 +28,7 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
         this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('playerId', this.handlePlayerId.bind(this));
+        this.serverComms.setHandler('playerID', this.handlePlayerId.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.serverComms.registerServerListeners();
     }

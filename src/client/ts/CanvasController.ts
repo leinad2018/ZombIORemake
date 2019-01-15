@@ -30,8 +30,8 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         this.renderBackground(ctx, background);
 
         let playerPosition = this.client.getPlayerPosition();
-        let xOffset = playerPosition.x - this.canvas.width / 2;
-        let yOffset = playerPosition.y - this.canvas.height / 2;
+        let xOffset = this.canvas.width / 2 - playerPosition.x;
+        let yOffset = this.canvas.height / 2 - playerPosition.y;
 
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, xOffset, yOffset);
@@ -82,9 +82,11 @@ export class ZIRCanvasController implements IZIRServerUpdate {
     }
 
     private renderEntities(ctx: CanvasRenderingContext2D, entities: IZIRRenderable[]) {
-        for (var entity of entities) {
-            var asset = entity.getImageToRender();
-            var position = entity.getPosition();
+        for (let entity of entities) {
+            let asset = entity.getImageToRender();
+            let position = entity.getPosition();
+            position.x -= asset.getImage().width / 2;
+            position.y -= asset.getImage().height / 2;
             ctx.drawImage(asset.getImage(), position.x, position.y);
         }
     }
