@@ -15,6 +15,12 @@ export interface IZIRClient {
      * Gets a list of all of the entities to render
      */
     getEntitiesToRender: () => IZIRRenderable[];
+
+    /**
+     * Gets a list of server-supplied debug strings
+     */
+    getDebugMessages: () => string[];
+
     /**
      * Sets the current view size so the client will know what needs to be rendered
      */
@@ -30,6 +36,8 @@ export interface IZIRServerCommunications {
 
     setMessageHandler: (handler: (message) => void) => void;
 
+    setDebugMessageHandler: (handler: (data) => void) => void;
+    
     setUsernameHandler: (handler: () => void) => void;
 
     sendInfoToServer: (type: string, message: any) => void;
