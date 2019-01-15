@@ -36,10 +36,10 @@ export class ZIRSessionManager {
             this.onConnection(socket);
         });
         
-        setInterval(() => {
-            this.io.sockets.emit('message', 'hi!');
-            this.io.sockets.emit('message', JSON.stringify(this.sessions));
-        }, 1000);
+        //setInterval(() => {
+        //    this.io.sockets.emit('message', 'hi!');
+        //    this.io.sockets.emit('message', JSON.stringify(this.sessions));
+        //}, 1000);
 
         this.addHandler("rename", this.handleRename);
         this.addHandler("disconnect", this.handleDisconnection);
@@ -47,7 +47,6 @@ export class ZIRSessionManager {
     }
 
     private onConnection = function(socket) : void {
-        
         this.handleLogin(socket)
 
         for(var listener in this.listeners) {
@@ -127,6 +126,10 @@ export class ZIRSessionManager {
         return session.inputs;
     }
 
+    public sendToClient = (socketId : string, header : string, data : any): void => {
+        this.io.to(socketId).emit(header, data);
+    }
+
     public broadcast = (header : string, data : any) : void => {
         this.io.sockets.emit(header, data)
     }
@@ -142,6 +145,10 @@ export class ZIRSessionManager {
     public messageClients = (message : any) : void => {
         this.io.sockets.emit("message", message);
     }
+
+    public getSessions = () : Session[] => {
+        return this.sessions;
+    }
 }
 
 export class Session {
@@ -150,6 +157,7 @@ export class Session {
     username : string;
     socket : string;
     inputs : Inputs = {};
+    debugMessages : string[] = [];
 
     constructor(socket : string) {
         this.socket = socket;
@@ -172,5 +180,9 @@ export class Session {
 
     public toString = () : string => {
         return this.username + "/" + this.socket;
+    }
+
+    public setDebugMessages = (messages : string[]) : void => {
+        this.debugMessages = messages;
     }
 }

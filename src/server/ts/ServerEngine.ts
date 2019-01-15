@@ -36,5 +36,22 @@ export class ZIRServerEngine {
     private tick = () : void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
         this.sessionManager.broadcast("update", {updates:[]});
+
+        this.sendDebugInfo();
+    }
+
+    /**
+     * Emits a packet of debug info for the client
+     * to render if debug rendering is enabled
+     */
+    private sendDebugInfo = () : void => {
+        for (let session of this.sessionManager.getSessions()) {
+            let debugMessages = [];
+            debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
+            debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
+            debugMessages.push("Current Session: " + session);
+            session.setDebugMessages(debugMessages);
+            this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
+        }
     }
 }

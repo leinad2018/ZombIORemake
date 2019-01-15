@@ -15,6 +15,10 @@ export class ZIRTestClient extends ZIRClientBase {
         return [];
     }
 
+    public getDebugMessages() {
+        return [];
+    }
+
     public runTest() {
         this.loadTestEntities();
         this.updateObjects();

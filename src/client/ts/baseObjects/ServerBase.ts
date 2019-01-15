@@ -5,6 +5,7 @@ export abstract class ZIRServerBase implements IZIRServerCommunications {
     protected resetHandler: (data) => void;
     protected messageHandler: (message) => void;
     protected usernameHandler: () => void;
+    protected debugMessageHandler: (message) => void;
 
     public setUpdateHandler(handler: (data) => void) {
         this.updateHandler = handler;
@@ -20,6 +21,11 @@ export abstract class ZIRServerBase implements IZIRServerCommunications {
 
     public setUsernameHandler(handler: () => void) {
         this.usernameHandler = handler;
+    }
+
+    public setDebugMessageHandler(handler: (data) => void) {
+        console.log("This was called too");
+        this.debugMessageHandler = handler;
     }
 
     public abstract sendInfoToServer(type: string, message: any): void;

@@ -12,6 +12,7 @@ export class ZIRClient extends ZIRClientBase {
     private serverComms: IZIRServerCommunications;
     private entities: IZIREntity[];
     private input: ZIRInput;
+    private debugMessages: string[] = ["hello world"];
 
     constructor(comms: IZIRServerCommunications, input: ZIRInput) {
         super();
@@ -24,6 +25,7 @@ export class ZIRClient extends ZIRClientBase {
         this.setMessageHandler();
         this.setUsernameHandler();
         this.setInputHandler();
+        this.setDebugMessageHandler();
         var name = prompt("Enter name");
         this.serverComms.sendInfoToServer("rename", name);
     }
@@ -48,6 +50,10 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setUsernameHandler(this.fetchUsername.bind(this));
     }
 
+    private setDebugMessageHandler() {
+        this.serverComms.setDebugMessageHandler(this.handleDebugMessage.bind(this));
+    }
+
     private fetchUsername() {
         var message = prompt("Enter some text");
         this.serverComms.sendInfoToServer("rename",message);
@@ -64,6 +70,11 @@ export class ZIRClient extends ZIRClientBase {
             this.entities.push(newEntity);
         }
         this.updateObjects();
+    }
+
+    private handleDebugMessage(data: string[]) {
+        console.log("debug message handling is called");
+        this.debugMessages = data;
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
@@ -112,6 +123,10 @@ export class ZIRClient extends ZIRClientBase {
 
     public getPlayersOnline() {
         return this.playersOnline;
+    }
+
+    public getDebugMessages() {
+        return this.debugMessages;
     }
 
     public getBackgroundImage() {

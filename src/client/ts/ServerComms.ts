@@ -21,6 +21,7 @@ export class ZIRServerCommunications extends ZIRServerBase {
         socket.on('update', this.updateClient.bind(this));
         socket.on('reset', this.resetClient.bind(this));
         socket.on('message', this.messageClient.bind(this));
+        socket.on('debug', this.debugClient.bind(this));
         socket.on('requestUsername', this.setUsernameHandler.bind(this));
         this.socket = socket;
     }
@@ -35,6 +36,11 @@ export class ZIRServerCommunications extends ZIRServerBase {
 
     private updateClient(data:IZIRUpdateResult) {
         this.updateHandler(data);
+    }
+
+    private debugClient(data: string[]) {
+        console.log("We received a debug packet")
+        this.debugMessageHandler(data);
     }
 
     private resetClient(data: IZIRResetResult){

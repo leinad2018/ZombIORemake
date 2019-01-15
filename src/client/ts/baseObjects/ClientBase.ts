@@ -35,5 +35,7 @@ export abstract class ZIRClientBase implements IZIRClient {
 
     abstract getPlayersOnline();
 
+    abstract getDebugMessages();
+
     abstract getBackgroundImage(): IZIRAsset;
 }
