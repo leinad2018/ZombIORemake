@@ -113,7 +113,7 @@ export class ZIRSessionManager {
         this.sessions.push(s);
         this.registerEntityHandler(s.getPlayer());
         socket.emit("requestUsername");
-        socket.emit("playerID", s.getPlayer().getEntityId());
+        socket.emit("updatePlayer", s.getPlayer().getObject());
     }
 
     private addHandler = (key : string, callback : Function) : void => {

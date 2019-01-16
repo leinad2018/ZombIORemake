@@ -6,6 +6,7 @@ import { Point } from "./globalInterfaces/UtilityInterfaces";
 import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
 import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRInput } from "./Input";
+import { ZIRPlayerData } from "./PlayerData";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
@@ -14,7 +15,7 @@ export class ZIRClient extends ZIRClientBase {
     private input: ZIRInput;
     private username: string;
     private debugMessages: string[] = ["hello world"];
-    private playerId: string;
+    private player: ZIRPlayerData;
 
     constructor(comms: IZIRServerCommunications, input: ZIRInput, name: string) {
         super();
@@ -23,22 +24,19 @@ export class ZIRClient extends ZIRClientBase {
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
+        this.player = new ZIRPlayerData();
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
         this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('playerID', this.handlePlayerId.bind(this));
+        this.serverComms.setHandler('updatePlayer', this.updatePlayer.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.serverComms.registerServerListeners();
     }
 
     private fetchUsername() {
         this.serverComms.sendInfoToServer('rename', this.username);
-    }
-
-    private handlePlayerId(id: string) {
-        this.playerId = id;
     }
 
     private handleMessage(message) {
@@ -68,7 +66,7 @@ export class ZIRClient extends ZIRClientBase {
                     this.entities[id] = newEntity;
                     break;
                 case 'delete':
-                    if(this.entities[id]){
+                    if (this.entities[id]) {
                         this.entities[id] = undefined;
                     }
                     break;
@@ -95,6 +93,11 @@ export class ZIRClient extends ZIRClientBase {
         return new ZIREntityBase(result.id, position, asset);
     }
 
+    private updatePlayer(data) {
+        this.player.setPlayerID(data.playerID);
+        this.player.setInventory(data.inventory);
+    }
+
     public getPlayersOnline() {
         return this.playersOnline;
     }
@@ -116,8 +119,8 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     public getPlayerPosition() {
-        var player: IZIREntity = this.entities[this.playerId];
-        if(player){
+        var player: IZIREntity = this.entities[this.player.getPlayerID()];
+        if (player) {
             return player.getPosition();
         }
         return {
