@@ -79,7 +79,7 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         let offsetX = this.playerPosition.x % bkWidth;
         let offsetY = this.playerPosition.y % bkHeight;
 
-        ctx.setTransform(1, 0, 0, 1, offsetX, offsetY);
+        ctx.setTransform(1, 0, 0, 1, -offsetX, -offsetY);
         ctx.fillRect(-bkWidth, -bkHeight, this.canvas.width + bkWidth * 2, this.canvas.height + bkHeight * 2);
         ctx.restore();
     }

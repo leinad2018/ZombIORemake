@@ -32,6 +32,7 @@ function loadAssets() {
     ZIRAssetLoader.loadAsset("grass", "../static/assets/grass.png");
     ZIRAssetLoader.loadAsset("circle", "../static/assets/circle.png");
     ZIRAssetLoader.loadAsset("player", "../static/assets/newPlayer.png");
+    ZIRAssetLoader.loadAsset("spite", "../static/assets/spite.jpg");
 }
 
 function runAfterLoaded() {

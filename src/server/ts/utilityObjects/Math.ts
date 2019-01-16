@@ -13,7 +13,7 @@ export class Vector {
     }
 
     public scale = (scalar: number): Vector => {
-        return new Vector(this.x / scalar, this.y / scalar);
+        return new Vector(this.x * scalar, this.y * scalar);
     }
 
     public getUnitVector = (): Vector => {

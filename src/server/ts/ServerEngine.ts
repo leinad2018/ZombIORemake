@@ -1,6 +1,6 @@
 import { addListener } from "cluster";
 import { ZIRSessionManager } from "./SessionManager";
-import {ZIREntity} from "./baseObjects/EntityBase"
+import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
@@ -22,11 +22,11 @@ export class ZIRServerEngine {
      * Return delta time from the
      * previous game tick
      */
-    public getDT = () : number => {
-        return this.dt;
+    public getDT = (): number => {
+        return this.dt / 1000;
     }
 
-    public registerEntity(e : ZIREntity) {
+    public registerEntity(e: ZIREntity) {
         this.entities.push(e);
     }
 
@@ -34,7 +34,7 @@ export class ZIRServerEngine {
      * Regulates game ticks and other
      * core engine functions
      */
-    private gameLoop = () : void => {
+    private gameLoop = (): void => {
         const t = Date.now()
 
         this.tick();
@@ -45,18 +45,18 @@ export class ZIRServerEngine {
     /**
      * Triggers calculation of all game mechanics
      */
-    private tick = () : void => {
+    private tick = (): void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
-        
+
         let calculatedUpdates = [];
         for (let entity of this.entities) {
-            
-            this.physicsEngine.applyPhysics(entity,this.dt);
+
+            this.physicsEngine.applyPhysics(entity, this.getDT());
 
             let update = {
                 id: entity.getEntityId(),
                 type: "update",
-                asset: "player",
+                asset: entity.getAssetName(),
                 x: entity.getPosition().getX(),
                 y: entity.getPosition().getY(),
                 xspeed: null,
@@ -68,11 +68,11 @@ export class ZIRServerEngine {
         for (let session of this.sessionManager.getSessions()) {
             let player = session.getPlayer();
             let m = player.getMoveSpeed();
-            let a = new Vector(0,0);
+            let a = new Vector(0, 0);
 
             for (let input in session.getInputs()) {
-                if(session.getInputs()[input]) {
-                    switch(input) {
+                if (session.getInputs()[input]) {
+                    switch (input) {
                         case "upArrow":
                             a.setY(a.getY() + m);
                             break;
@@ -88,11 +88,13 @@ export class ZIRServerEngine {
                     }
                 }
             }
-            a = a.getUnitVector().scale(m);
+            if(a.getMagnitude() != 0){
+                a = a.getUnitVector().scale(m);
+            }
             player.setAcceleration(a);
         }
 
-        this.sessionManager.broadcast("update", {updates:calculatedUpdates});
+        this.sessionManager.broadcast("update", { updates: calculatedUpdates });
 
         this.sendDebugInfo();
     }
@@ -101,7 +103,7 @@ export class ZIRServerEngine {
      * Emits a packet of debug info for the client
      * to render if debug rendering is enabled
      */
-    private sendDebugInfo = () : void => {
+    private sendDebugInfo = (): void => {
         for (let session of this.sessionManager.getSessions()) {
             let debugMessages = [];
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));

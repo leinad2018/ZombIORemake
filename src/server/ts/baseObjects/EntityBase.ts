@@ -10,8 +10,8 @@ export class ZIREntity implements IZIREntity {
     protected acceleration: Vector = new Vector(0,0);
     protected friction: number = .7;
     protected mass: number = 100;
-    protected moveSpeed: number = 7;
-    protected maxMovement : number = 100;
+    protected moveSpeed: number = 1000;
+    protected maxMovement : number = 200;
     protected asset: string;
 
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
