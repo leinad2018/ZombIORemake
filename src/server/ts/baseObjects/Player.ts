@@ -7,6 +7,6 @@ export class ZIRPlayer extends ZIREntity {
     }
 
     public toString() : string {
-        return "Player" + this.id + "@" + this.position;
+        return "Player" + this.id + "@" + this.position +"/V"+this.velocity + "/A"+this.acceleration;
     }
 }

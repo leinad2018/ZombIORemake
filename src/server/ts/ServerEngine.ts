@@ -67,24 +67,29 @@ export class ZIRServerEngine {
 
         for (let session of this.sessionManager.getSessions()) {
             let player = session.getPlayer();
+            let m = player.getMoveSpeed();
+            let a = new Vector(0,0);
+
             for (let input in session.getInputs()) {
                 if(session.getInputs()[input]) {
                     switch(input) {
                         case "upArrow":
-                            player.setAcceleration(player.getAcceleration().add(new Vector(0,1)));
+                            a.setY(a.getY() + m);
                             break;
                         case "downArrow":
-                            player.setAcceleration(player.getAcceleration().add(new Vector(0,-1)));
+                            a.setY(a.getY() - m);
                             break;
                         case "leftArrow":
-                            player.setAcceleration(player.getAcceleration().add(new Vector(-1,0)));
+                            a.setX(a.getX() - m);
                             break;
                         case "rightArrow":
-                            player.setAcceleration(player.getAcceleration().add(new Vector(1,0)));
+                            a.setX(a.getX() + m);
                             break;
                     }
                 }
             }
+            a = a.getUnitVector().scale(m);
+            player.setAcceleration(a);
         }
 
         this.sessionManager.broadcast("update", {updates:calculatedUpdates});
