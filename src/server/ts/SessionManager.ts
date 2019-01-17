@@ -114,6 +114,17 @@ export class ZIRSessionManager {
         this.registerEntityHandler(s.getPlayer());
         socket.emit("requestUsername");
         socket.emit("updatePlayer", s.getPlayer().getObject());
+        socket.emit("updateWorld", {
+            zones: [
+                {
+                    terrain: 'snow',
+                    x0: 0,
+                    x1: 100,
+                    y0: 0,
+                    y1: 200
+                }
+            ]
+        });
     }
 
     private addHandler = (key : string, callback : Function) : void => {

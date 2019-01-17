@@ -33,11 +33,18 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         let background: IZIRAsset = this.client.getBackgroundImage();
         this.renderBackground(ctx, background);
 
+        let worldData: IZIRRenderable[] = this.client.getWorldData();
+        this.renderWorld(ctx, worldData);
+
         let entities: IZIRRenderable[] = this.client.getEntitiesToRender();
         this.renderEntities(ctx, entities);
 
         this.renderPlayerBox(ctx, this.client.getPlayersOnline());
         if (this.DEBUG_RENDER) this.renderDebugBox(ctx, this.client.getDebugMessages());
+    }
+
+    private renderWorld(ctx: CanvasRenderingContext2D, worldData: IZIRRenderable[]) {
+        this.renderEntities(ctx, worldData);
     }
 
     private renderPlayerBox(ctx: CanvasRenderingContext2D, players: string[]) {
@@ -94,9 +101,9 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         for (let entity of entities) {
             let asset = entity.getImageToRender();
             let position = entity.getPosition();
-            position.x -= asset.getImage().width / 2;
-            position.y -= asset.getImage().height / 2;
-            ctx.drawImage(asset.getImage(), position.x, position.y);
+            let x = position.x - asset.getImage().width / 2;
+            let y = position.y - asset.getImage().height / 2;
+            ctx.drawImage(asset.getImage(), x, y);
         }
 
         ctx.restore();

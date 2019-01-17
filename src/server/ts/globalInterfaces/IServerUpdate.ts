@@ -20,3 +20,15 @@ export interface IZIREntityResult {
 export interface IZIREntityUpdateResult extends IZIREntityResult{
     type: string;
 }
+
+export interface IZIRWorldUpdate {
+    zones: IZIRWorldZone[];
+}
+
+export interface IZIRWorldZone {
+    terrain: string;
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+}

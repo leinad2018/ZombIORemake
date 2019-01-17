@@ -39,4 +39,6 @@ export abstract class ZIRClientBase {
     abstract getBackgroundImage(): IZIRAsset;
 
     abstract getPlayerPosition(): Point;
+
+    abstract getWorldData(): IZIRRenderable[];
 }

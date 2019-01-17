@@ -18,7 +18,7 @@ var waitForLoad = () => new Promise(() => {
     setTimeout(check, 100);
 });
 
-function playGame(){
+function playGame() {
     var nameField = document.getElementById('name') as HTMLInputElement;
     playerName = nameField.value;
     document.getElementById("startingScreen").hidden = true;
@@ -30,6 +30,7 @@ function playGame(){
 
 function loadAssets() {
     ZIRAssetLoader.loadAsset("grass", "../static/assets/grass.png");
+    ZIRAssetLoader.loadAsset("snow", "../static/assets/snow.png");
     ZIRAssetLoader.loadAsset("circle", "../static/assets/circle.png");
     ZIRAssetLoader.loadAsset("player", "../static/assets/newPlayer.png");
     ZIRAssetLoader.loadAsset("spite", "../static/assets/spite.jpg");

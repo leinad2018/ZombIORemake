@@ -15,5 +15,5 @@ export interface IZIRServerCommunications {
 }
 
 export interface IZIREntity {
-    getEntityId: () => number;
+    getEntityId: () => string;
 }

@@ -9,7 +9,7 @@ export class ZIRPhysicsEngine {
     }
 
     public applyPhysics(entity: ZIREntity, dt: number) {
-        let friction = this.G * entity.getMass() * entity.getFriction();
+        let friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
         let acceleration = entity.getAcceleration();
 
         console.log(friction);

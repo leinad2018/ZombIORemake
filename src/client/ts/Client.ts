@@ -4,9 +4,10 @@ import { IZIRServerCommunications, IZIREntity } from "./globalInterfaces/MainInt
 import { ZIREntityBase } from "./baseObjects/EntityBase";
 import { Point } from "./globalInterfaces/UtilityInterfaces";
 import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
-import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult } from "./globalInterfaces/IServerUpdate";
+import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult, IZIRWorldUpdate } from "./globalInterfaces/IServerUpdate";
 import { ZIRInput } from "./Input";
 import { ZIRPlayerData } from "./PlayerData";
+import { ZIRWorldData } from "./WorldData";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
@@ -16,6 +17,7 @@ export class ZIRClient extends ZIRClientBase {
     private username: string;
     private debugMessages: string[] = ["hello world"];
     private player: ZIRPlayerData;
+    private world: ZIRWorldData;
 
     constructor(comms: IZIRServerCommunications, input: ZIRInput, name: string) {
         super();
@@ -25,12 +27,14 @@ export class ZIRClient extends ZIRClientBase {
         this.username = name;
         this.playersOnline = [];
         this.player = new ZIRPlayerData();
+        this.world = new ZIRWorldData({zones:[]});
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
         this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
         this.serverComms.setHandler('updatePlayer', this.updatePlayer.bind(this));
+        this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.serverComms.registerServerListeners();
     }
@@ -53,7 +57,6 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleDebugMessage(data: string[]) {
-        console.log("debug message handling is called");
         this.debugMessages = data;
     }
 
@@ -76,12 +79,15 @@ export class ZIRClient extends ZIRClientBase {
         this.updateObjects();
     }
 
+    private handleWorldUpdate(data: IZIRWorldUpdate) {
+        this.world = new ZIRWorldData(data);
+    }
+
     private handleInput(keycode: string, state: boolean) {
         this.serverComms.sendInfoToServer("input", {
             keycode: keycode,
             state: state
         });
-        console.log(keycode + ": " + state);
     }
 
     private parseEntityResult(result: IZIREntityResult) {
@@ -127,5 +133,9 @@ export class ZIRClient extends ZIRClientBase {
             x: 0,
             y: 0
         }
+    }
+
+    public getWorldData() {
+        return this.world.getWorldData();
     }
 }

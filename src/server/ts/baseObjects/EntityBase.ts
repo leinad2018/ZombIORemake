@@ -3,20 +3,20 @@ import { Vector } from "../utilityObjects/Math";
 
 export class ZIREntity implements IZIREntity {
     static entityCount = 0;
-    protected id: number;
+    protected id: string;
     protected isPhysical: boolean;
     protected position: Vector;
     protected velocity: Vector = new Vector(0,0);
     protected acceleration: Vector = new Vector(0,0);
-    protected friction: number = .7;
+    protected friction: number = .9;
     protected mass: number = 100;
-    protected readonly PIXELS_PER_METER = 50;
+    public readonly PIXELS_PER_METER = 50;
     protected moveSpeed: number = 40 * this.PIXELS_PER_METER;
     protected maxMovement : number = 4 * this.PIXELS_PER_METER;
     protected asset: string;
 
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
-        this.id = ZIREntity.entityCount;
+        this.id = ZIREntity.entityCount + "";
         this.position = position;
         this.asset = asset;
         this.isPhysical = isPhysical;
