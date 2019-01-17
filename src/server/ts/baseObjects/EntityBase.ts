@@ -10,14 +10,16 @@ export class ZIREntity implements IZIREntity {
     protected acceleration: Vector = new Vector(0,0);
     protected friction: number = .7;
     protected mass: number = 100;
-    protected moveSpeed: number = 1000;
-    protected maxMovement : number = 200;
+    protected readonly PIXELS_PER_METER = 50;
+    protected moveSpeed: number = 40 * this.PIXELS_PER_METER;
+    protected maxMovement : number = 4 * this.PIXELS_PER_METER;
     protected asset: string;
 
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
         this.id = ZIREntity.entityCount;
         this.position = position;
         this.asset = asset;
+        this.isPhysical = isPhysical;
         ZIREntity.entityCount++;
     }
 

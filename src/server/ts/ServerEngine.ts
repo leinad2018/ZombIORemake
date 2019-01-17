@@ -74,10 +74,10 @@ export class ZIRServerEngine {
                 if (session.getInputs()[input]) {
                     switch (input) {
                         case "upArrow":
-                            a.setY(a.getY() + m);
+                            a.setY(a.getY() - m);
                             break;
                         case "downArrow":
-                            a.setY(a.getY() - m);
+                            a.setY(a.getY() + m);
                             break;
                         case "leftArrow":
                             a.setX(a.getX() - m);
