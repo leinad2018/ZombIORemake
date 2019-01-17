@@ -4,18 +4,19 @@ import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
+import { ZIRWorld } from "./baseObjects/World";
+import { ZIRPlayerWorld } from "./PlayerWorld";
 
 export class ZIRServerEngine {
     dt: number = 0;
-    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerEntity.bind(this));
+    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerPlayer.bind(this));
     physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     TPS: number = 30;
     entities: ZIREntity[] = [];
+    universe: ZIRWorld[];
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
-        let spite = new ZIRSpite();
-        this.registerEntity(spite);
     }
 
     /**
@@ -26,8 +27,39 @@ export class ZIRServerEngine {
         return this.dt / 1000;
     }
 
-    public registerEntity(e: ZIREntity) {
-        this.entities.push(e);
+    /**
+     * Registers a player to a world
+     * If the world does not exist, one is created
+     * @param worldID 
+     * @param player 
+     */
+    public registerPlayer(worldID: string, player: ZIREntity){
+        for(let world of this.universe){
+            if(world.getWorldID() == worldID){
+                world.registerEntity(player);
+                return;
+            }
+        }
+        let newWorld = new ZIRPlayerWorld(worldID)
+        newWorld.registerEntity(player);
+        this.universe.push(newWorld);
+    }
+
+    public getAllEntities(){
+        let toReturn: ZIREntity[] = [];
+        for(let world of this.universe){
+            toReturn = toReturn.concat(world.getEntities());
+        }
+        return toReturn;
+    }
+
+    public registerEntity(worldID: string, e: ZIREntity) {
+        for(let world of this.universe){
+            if(world.getWorldID() == worldID){
+                world.registerEntity(e);
+                return;
+            }
+        }
     }
 
     /**
@@ -49,7 +81,7 @@ export class ZIRServerEngine {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
 
         let calculatedUpdates = [];
-        for (let entity of this.entities) {
+        for (let entity of this.getAllEntities()) {
 
             this.physicsEngine.applyPhysics(entity, this.getDT());
 
@@ -109,7 +141,7 @@ export class ZIRServerEngine {
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
             debugMessages.push("Current Session: " + session);
-            debugMessages.push("Entities: " + this.entities);
+            debugMessages.push("Entities: " + this.getAllEntities());
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
         }

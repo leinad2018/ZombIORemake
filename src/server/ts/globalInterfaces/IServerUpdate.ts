@@ -21,11 +21,11 @@ export interface IZIREntityUpdateResult extends IZIREntityResult{
     type: string;
 }
 
-export interface IZIRWorldUpdate {
-    zones: IZIRWorldZone[];
+export interface IZIRTerrainMap {
+    zones: IZIRTerrainZone[];
 }
 
-export interface IZIRWorldZone {
+export interface IZIRTerrainZone {
     terrain: string;
     x0: number;
     x1: number;

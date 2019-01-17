@@ -1,7 +1,15 @@
 import { ZIREntity } from "./EntityBase";
+import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 
-export class World {
+export class ZIRWorld {
+    private worldID: string;
     private entities: ZIREntity[];
+    private terrain: IZIRTerrainMap;
+
+    constructor(id: string) {
+        this.worldID = id;
+        this.terrain = this.generateWorldTerrain();
+    }
 
     public registerEntity(entity: ZIREntity) {
         this.entities.push(entity);
@@ -15,5 +23,21 @@ export class World {
                 return entity;
             }
         }
+    }
+
+    public getEntities() {
+        return this.entities;
+    }
+
+    public getTerrainMap() {
+        return this.terrain;
+    }
+
+    public getWorldID() {
+        return this.worldID;
+    }
+
+    protected generateWorldTerrain(): IZIRTerrainMap {
+        return { zones: [] };
     }
 }

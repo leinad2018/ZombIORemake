@@ -2,15 +2,15 @@ import { Socket } from "net";
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 import { ZIRPlayer } from "./baseObjects/Player";
-import { Vector } from "./utilityObjects/Math";
+import { ZIREntity } from "./baseObjects/EntityBase";
 
 //declare function io();
 
 export class ZIRSessionManager {
-    sessions : Session[] = [];
-    listeners : {[header: string]: Function} = {};
-    io : any;
-    registerEntityHandler : (ZIREntity) => void; 
+    sessions: Session[] = [];
+    listeners: { [header: string]: Function } = {};
+    io: any;
+    registerEntityHandler: (worldID: string, player: ZIRPlayer) => void;
 
     constructor(registerEntityHandler) {
         this.registerEntityHandler = registerEntityHandler;
@@ -21,7 +21,7 @@ export class ZIRSessionManager {
         var app = express();
         var server = http.Server(app);
         this.io = socketIO(server);
-        const PORT : number = 5000;
+        const PORT: number = 5000;
 
         app.set('port', PORT);
         app.use('/static', express.static(__dirname + '/static'));
@@ -39,7 +39,7 @@ export class ZIRSessionManager {
         this.io.on('connection', (socket) => {
             this.onConnection(socket);
         });
-        
+
         //setInterval(() => {
         //    this.io.sockets.emit('message', 'hi!');
         //    this.io.sockets.emit('message', JSON.stringify(this.sessions));
@@ -50,10 +50,10 @@ export class ZIRSessionManager {
         this.addHandler("input", this.handleInput);
     }
 
-    private onConnection = function(socket) : void {
+    private onConnection = function (socket): void {
         this.handleLogin(socket)
 
-        for(var listener in this.listeners) {
+        for (var listener in this.listeners) {
             const listenerHandler = this.listeners[listener];
             socket.on(listener, (data) => {
                 listenerHandler(socket, data)
@@ -61,8 +61,8 @@ export class ZIRSessionManager {
         }
     }
 
-    private handleInput = (socket, data) : void => {
-        if(data.keycode) {
+    private handleInput = (socket, data): void => {
+        if (data.keycode) {
             this.getSessionBySocket(socket).inputs[data.keycode] = data.state;
         }
     }
@@ -71,16 +71,16 @@ export class ZIRSessionManager {
      * Handle dropped connection by removing
      * any sessions corresponding to the connection
      */
-    private handleDisconnection = (socket, data) : void => {
+    private handleDisconnection = (socket, data): void => {
         console.log("Disconnecting " + socket.id)
         let session = this.getSessionBySocket(socket);
 
         session.deactivate();
 
-        for(let i=0; i < this.sessions.length; i++){
+        for (let i = 0; i < this.sessions.length; i++) {
             let session = this.sessions[i];
-            if(session.socket == socket.id) {
-                this.sessions.splice(i,1)
+            if (session.socket == socket.id) {
+                this.sessions.splice(i, 1)
             }
         }
     }
@@ -90,7 +90,7 @@ export class ZIRSessionManager {
      * a new Session object storing the user's
      * socket for future reference
      */
-    private handleRename = (socket, data) : void => {
+    private handleRename = (socket, data): void => {
         this.getSessionBySocket(socket).setUsername(data);
     }
 
@@ -99,19 +99,19 @@ export class ZIRSessionManager {
      * that corresponds to a given socket, based
      * on socket id
      */
-    private getSessionBySocket = (socket) : Session => {
-        for(let i=0; i < this.sessions.length; i++){
+    private getSessionBySocket = (socket): Session => {
+        for (let i = 0; i < this.sessions.length; i++) {
             let session = this.sessions[i];
-            if(session.socket == socket.id) {
+            if (session.socket == socket.id) {
                 return session;
             }
         }
     }
 
-    private handleLogin = (socket) : void => {
+    private handleLogin = (socket): void => {
         const s = new Session(socket.id);
         this.sessions.push(s);
-        this.registerEntityHandler(s.getPlayer());
+        this.registerEntityHandler(s.getPlayer().getEntityId(), s.getPlayer());
         socket.emit("requestUsername");
         socket.emit("updatePlayer", s.getPlayer().getObject());
         socket.emit("updateWorld", {
@@ -127,57 +127,57 @@ export class ZIRSessionManager {
         });
     }
 
-    private addHandler = (key : string, callback : Function) : void => {
+    private addHandler = (key: string, callback: Function): void => {
         this.listeners[key] = callback;
     }
 
-    public getUsernames = () : string[] => {
-        let usernames : string[] = [];
-        for(let session of this.sessions) {
+    public getUsernames = (): string[] => {
+        let usernames: string[] = [];
+        for (let session of this.sessions) {
             usernames.push(session.username);
         }
         return usernames;
     }
 
-    public getInputs = (session : Session) : {[input: string]: boolean} => {
+    public getInputs = (session: Session): { [input: string]: boolean } => {
         return session.inputs;
     }
 
-    public sendToClient = (socketId : string, header : string, data : any): void => {
+    public sendToClient = (socketId: string, header: string, data: any): void => {
         this.io.to(socketId).emit(header, data);
     }
 
-    public broadcast = (header : string, data : any) : void => {
+    public broadcast = (header: string, data: any): void => {
         this.io.sockets.emit(header, data)
     }
 
-    public resetClients = (entitiesReset : IZIRResetResult) : void => {
+    public resetClients = (entitiesReset: IZIRResetResult): void => {
         this.io.sockets.emit("reset", entitiesReset)
     }
 
-    public updateClients = (entitiesUpdate : IZIREntityUpdateResult) : void => {
+    public updateClients = (entitiesUpdate: IZIREntityUpdateResult): void => {
         this.io.sockets.emit("update", entitiesUpdate);
     }
 
-    public messageClients = (message : any) : void => {
+    public messageClients = (message: any): void => {
         this.io.sockets.emit("message", message);
     }
 
-    public getSessions = () : Session[] => {
+    public getSessions = (): Session[] => {
         return this.sessions;
     }
 }
 
 export class Session {
-    static sessionCount : number = 0;
-    active : boolean;
-    username : string;
-    socket : string;
-    inputs : Inputs = {};
-    debugMessages : string[] = [];
-    player : ZIRPlayer;
+    static sessionCount: number = 0;
+    active: boolean;
+    username: string;
+    socket: string;
+    inputs: Inputs = {};
+    debugMessages: string[] = [];
+    player: ZIRPlayer;
 
-    constructor(socket : string) {
+    constructor(socket: string) {
         this.socket = socket;
         this.active = true;
         this.username = "Player" + Session.sessionCount;
@@ -185,27 +185,27 @@ export class Session {
         Session.sessionCount++;
     }
 
-    public deactivate = () : void => {
+    public deactivate = (): void => {
         this.active = false;
     }
 
-    public getPlayer = () : ZIRPlayer => {
+    public getPlayer = (): ZIRPlayer => {
         return this.player;
     }
 
-    public getInputs = () : Inputs => {
+    public getInputs = (): Inputs => {
         return this.inputs;
-    } 
+    }
 
-    public setUsername(username : string) : void {
+    public setUsername(username: string): void {
         this.username = username;
     }
 
-    public toString = () : string => {
+    public toString = (): string => {
         return this.username + "/" + this.socket;
     }
 
-    public setDebugMessages = (messages : string[]) : void => {
+    public setDebugMessages = (messages: string[]): void => {
         this.debugMessages = messages;
     }
 }
