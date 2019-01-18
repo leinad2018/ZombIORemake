@@ -1,18 +1,19 @@
 import { addListener } from "cluster";
-import { ZIRSessionManager } from "./SessionManager";
+import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
+import { ZIRPlayer } from "./baseObjects/Player";
 
 export class ZIRServerEngine {
     dt: number = 0;
-    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerPlayer.bind(this));
+    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerSession.bind(this));
     physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     TPS: number = 30;
-    entities: ZIREntity[] = [];
+    protected sessions: Session[] = [];
     universe: ZIRWorld[] = [];
 
     constructor() {
@@ -33,29 +34,46 @@ export class ZIRServerEngine {
      * @param worldID 
      * @param player 
      */
-    public registerPlayer(worldID: string, player: ZIREntity){
-        for(let world of this.universe){
-            if(world.getWorldID() == worldID){
+    public registerSession(session: Session) {
+        session.setDisconnectHandler(this.disconnectSession.bind(this));
+        let player = new ZIRPlayer();
+        let worldID = player.getEntityId();
+        session.setPlayer(player);
+        session.setWorldID(worldID);
+        this.sessionManager.sendToClient(session.socket, "updatePlayer", player.getObject());
+        for (let world of this.universe) {
+            if (world.getWorldID() == worldID) {
                 world.registerEntity(player);
+                this.sessionManager.sendToClient(session.socket, "updateWorld", world.getTerrainMap());
                 return;
             }
         }
-        let newWorld = new ZIRPlayerWorld(worldID)
+        let newWorld = new ZIRPlayerWorld(worldID);
         newWorld.registerEntity(player);
         this.universe.push(newWorld);
+        this.sessionManager.sendToClient(session.socket, "updateWorld", newWorld.getTerrainMap());
     }
 
-    public getAllEntities(){
+    public disconnectSession(socket: string) {
+        for (let i = 0; i < this.sessions.length; i++) {
+            let sesson = this.sessions[i];
+            if (sesson.socket = socket) {
+                this.sessions.splice(i, 1);
+            }
+        }
+    }
+
+    public getAllEntities() {
         let toReturn: ZIREntity[] = [];
-        for(let world of this.universe){
+        for (let world of this.universe) {
             toReturn = toReturn.concat(world.getEntities());
         }
         return toReturn;
     }
 
     public registerEntity(worldID: string, e: ZIREntity) {
-        for(let world of this.universe){
-            if(world.getWorldID() == worldID){
+        for (let world of this.universe) {
+            if (world.getWorldID() == worldID) {
                 world.registerEntity(e);
                 return;
             }
@@ -78,7 +96,11 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private tick = (): void => {
-        this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
+        let usernames: string[] = [];
+        for (let session of this.sessions) {
+            usernames.push(session.username);
+        }
+        this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
         let calculatedUpdates = [];
         for (let entity of this.getAllEntities()) {
@@ -97,7 +119,7 @@ export class ZIRServerEngine {
             calculatedUpdates.push(update);
         }
 
-        for (let session of this.sessionManager.getSessions()) {
+        for (let session of this.sessions) {
             let player = session.getPlayer();
             let m = player.getMoveSpeed();
             let a = new Vector(0, 0);
@@ -120,7 +142,7 @@ export class ZIRServerEngine {
                     }
                 }
             }
-            if(a.getMagnitude() != 0){
+            if (a.getMagnitude() != 0) {
                 a = a.getUnitVector().scale(m);
             }
             player.setAcceleration(a);
@@ -136,7 +158,7 @@ export class ZIRServerEngine {
      * to render if debug rendering is enabled
      */
     private sendDebugInfo = (): void => {
-        for (let session of this.sessionManager.getSessions()) {
+        for (let session of this.sessions) {
             let debugMessages = [];
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
