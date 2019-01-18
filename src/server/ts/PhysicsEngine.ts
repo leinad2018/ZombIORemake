@@ -12,7 +12,6 @@ export class ZIRPhysicsEngine {
         let friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
         let acceleration = entity.getAcceleration();
 
-        console.log(friction);
         let velocity = entity.getVelocity();
         let frictionVector = new Vector(0, 0);
         if (velocity.getMagnitude() > 0) {
@@ -21,7 +20,6 @@ export class ZIRPhysicsEngine {
                 frictionVector = frictionVector.getUnitVector().scale(velocity.getMagnitude() / dt);
             }
         }
-        console.log("" + frictionVector);
 
         acceleration = acceleration.add(frictionVector);
 
