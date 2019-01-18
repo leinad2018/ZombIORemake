@@ -4,6 +4,7 @@ import { IZIRInventorySlot } from "../globalInterfaces/UtilityInterfaces";
 
 export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];
+    private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
 
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), asset: string = "player", isPhysical: boolean = true) {
         super(position, asset, isPhysical);

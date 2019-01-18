@@ -6,6 +6,7 @@ export class ZIREntity implements IZIREntity {
     protected id: string;
     protected updated: boolean;
     protected isPhysical: boolean;
+    protected dead : boolean;
     protected position: Vector;
     protected velocity: Vector = new Vector(0,0);
     protected acceleration: Vector = new Vector(0,0);
@@ -19,6 +20,7 @@ export class ZIREntity implements IZIREntity {
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
         this.id = ZIREntity.entityCount + "";
         this.updated = false;
+        this.dead = false;
         this.position = position;
         this.asset = asset;
         this.isPhysical = isPhysical;
@@ -27,6 +29,14 @@ export class ZIREntity implements IZIREntity {
 
     public shouldUpdate() {
         return !this.updated;
+    }
+
+    public kill() : void {
+        this.dead = true;
+    }
+
+    public isDead() : boolean {
+        return this.dead;
     }
 
     public setUpdated(updated : boolean) {
