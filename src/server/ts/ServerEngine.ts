@@ -13,7 +13,7 @@ export class ZIRServerEngine {
     physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     TPS: number = 30;
     entities: ZIREntity[] = [];
-    universe: ZIRWorld[];
+    universe: ZIRWorld[] = [];
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);

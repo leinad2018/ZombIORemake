@@ -8,6 +8,7 @@ export class ZIRWorld {
 
     constructor(id: string) {
         this.worldID = id;
+        this.entities = [];
         this.terrain = this.generateWorldTerrain();
     }
 
