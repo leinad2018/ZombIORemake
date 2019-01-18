@@ -4,6 +4,7 @@ import { Vector } from "../utilityObjects/Math";
 export class ZIREntity implements IZIREntity {
     static entityCount = 0;
     protected id: string;
+    protected updated: boolean;
     protected isPhysical: boolean;
     protected position: Vector;
     protected velocity: Vector = new Vector(0,0);
@@ -17,10 +18,19 @@ export class ZIREntity implements IZIREntity {
 
     constructor(position: Vector, asset: string, isPhysical: boolean = true){
         this.id = ZIREntity.entityCount + "";
+        this.updated = false;
         this.position = position;
         this.asset = asset;
         this.isPhysical = isPhysical;
         ZIREntity.entityCount++;
+    }
+
+    public shouldUpdate() {
+        return !this.updated;
+    }
+
+    public setUpdated(updated : boolean) {
+        this.updated = updated;
     }
 
     public getEntityId() {

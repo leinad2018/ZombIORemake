@@ -6,14 +6,15 @@ import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
+import { ZIRProjectile } from "./baseObjects/ProjectileBase"
 
 export class ZIRServerEngine {
     dt: number = 0;
     sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerPlayer.bind(this));
     physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
-    TPS: number = 30;
-    entities: ZIREntity[] = [];
+    TPS: number = 50;
     universe: ZIRWorld[] = [];
+    tickCounter: number = 0;
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
@@ -71,6 +72,8 @@ export class ZIRServerEngine {
 
         this.tick();
 
+        this.tickCounter++;
+
         this.dt = Date.now() - t + (1000 / this.TPS);
     }
 
@@ -80,14 +83,41 @@ export class ZIRServerEngine {
     private tick = (): void => {
         this.sessionManager.broadcast("players", JSON.stringify(this.sessionManager.getUsernames()));
 
-        let calculatedUpdates = [];
-        for (let entity of this.getAllEntities()) {
+        this.sendDebugInfo();
+        
+        this.calculatePhysics();
 
+        this.handleInput();
+
+        let shouldReset = false;
+        if(this.tickCounter % 30 == 0) {
+            shouldReset = true;
+        }
+        this.sendUpdate(shouldReset);
+    }
+
+    private calculatePhysics() {
+        this.getAllEntities().forEach((entity) => {
             this.physicsEngine.applyPhysics(entity, this.getDT());
+            console.log("did a physics");
+        });
+    }
+
+    private sendUpdate(reset : boolean = false) {
+        let calculatedUpdates = [];
+        let entities = this.getAllEntities();
+
+        if(!reset) entities = entities.filter((entity) => {
+            let e = entity.shouldUpdate();
+            entity.setUpdated(true);
+            return e;
+        });
+
+        for (let entity of entities) {
 
             let update = {
                 id: entity.getEntityId(),
-                type: "update",
+                type: reset ? "reset" : "update",
                 asset: entity.getAssetName(),
                 x: entity.getPosition().getX(),
                 y: entity.getPosition().getY(),
@@ -97,6 +127,10 @@ export class ZIRServerEngine {
             calculatedUpdates.push(update);
         }
 
+        this.sessionManager.broadcast("update", { updates: calculatedUpdates });
+    }
+
+    private handleInput = (): void => {
         for (let session of this.sessionManager.getSessions()) {
             let player = session.getPlayer();
             let m = player.getMoveSpeed();
@@ -117,6 +151,10 @@ export class ZIRServerEngine {
                         case "rightArrow":
                             a.setX(a.getX() + m);
                             break;
+                        case "space":
+                            let p = new ZIRProjectile(new Vector(100,0), player.getPosition());
+                            this.registerEntity(player.getEntityId(),p)
+                            break;
                     }
                 }
             }
@@ -125,10 +163,6 @@ export class ZIRServerEngine {
             }
             player.setAcceleration(a);
         }
-
-        this.sessionManager.broadcast("update", { updates: calculatedUpdates });
-
-        this.sendDebugInfo();
     }
 
     /**

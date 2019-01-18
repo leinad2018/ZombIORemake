@@ -34,6 +34,8 @@ export class ZIRPhysicsEngine {
 
         velocity = velocity.add(acceleration.scale(dt));
 
+        if(velocity.getMagnitude() !== 0) entity.setUpdated(false);
+
         let position = entity.getPosition().add(velocity.scale(dt));
 
         entity.setVelocity(velocity);

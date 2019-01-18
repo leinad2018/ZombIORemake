@@ -29,6 +29,9 @@ export class ZIRInput {
     private getKeyFromEvent(event) {
         var keyName: string;
         switch (event.keyCode) {
+            case 32:
+                keyName = "space";
+                break;
             case 37:
                 keyName = "leftArrow";
                 break;
