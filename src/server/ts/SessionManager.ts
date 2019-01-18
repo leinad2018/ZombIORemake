@@ -43,7 +43,7 @@ export class ZIRSessionManager {
         //}, 1000);
     }
 
-    private onConnection (socket): void {
+    private onConnection(socket): void {
         this.handleLogin(socket)
     }
 
@@ -72,7 +72,7 @@ export class ZIRSessionManager {
         this.setUsername(data);
     }
 
-    private handleLogin (socket): void {
+    private handleLogin(socket): void {
         const s = new Session(socket.id);
         socket.on("rename", this.handleRename.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
@@ -124,7 +124,7 @@ export class Session {
         Session.sessionCount++;
     }
 
-    public setDisconnectHandler(handler: (session:Session) => void){
+    public setDisconnectHandler(handler: (session: Session) => void) {
         this.disconnectHandler = handler;
     }
 
@@ -141,15 +141,15 @@ export class Session {
         this.disconnectHandler(this);
     }
 
-    public setPlayer(player: ZIRPlayer){
+    public setPlayer(player: ZIRPlayer) {
         this.player = player;
     }
 
-    public getPlayer = (): ZIRPlayer => {
+    public getPlayer(): ZIRPlayer {
         return this.player;
     }
 
-    public getInputs = (): Inputs => {
+    public getInputs(): Inputs {
         return this.inputs;
     }
 
@@ -157,11 +157,11 @@ export class Session {
         this.username = username;
     }
 
-    public toString = (): string => {
+    public toString(): string {
         return this.username + "/" + this.socket;
     }
 
-    public setDebugMessages = (messages: string[]): void => {
+    public setDebugMessages(messages: string[]): void {
         this.debugMessages = messages;
     }
 }

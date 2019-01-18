@@ -27,7 +27,7 @@ export class ZIRClient extends ZIRClientBase {
         this.username = name;
         this.playersOnline = [];
         this.player = new ZIRPlayerData();
-        this.world = new ZIRWorldData({zones:[]});
+        this.world = new ZIRWorldData({ zones: [] });
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
@@ -51,7 +51,7 @@ export class ZIRClient extends ZIRClientBase {
         this.entities = [];
         for (var enitity of data.entities) {
             var newEntity = this.parseEntityResult(enitity);
-            this.entities[enitity.id] = newEntity;
+            this.entities.push(newEntity);
         }
         this.updateObjects();
     }
@@ -65,12 +65,17 @@ export class ZIRClient extends ZIRClientBase {
             var id = entity.id;
             switch (entity.type) {
                 case 'update':
-                    var newEntity = this.parseEntityResult(entity);
-                    this.entities[id] = newEntity;
+                    let newEntity = this.parseEntityResult(entity);
+                    let index = this.getEntityIndexById(id);
+                    if(index == -1){
+                        this.entities.push(newEntity);
+                    }else{
+                        this.entities[index] = newEntity;
+                    }
                     break;
                 case 'delete':
-                    if (this.entities[id]) {
-                        this.entities[id] = undefined;
+                    if (this.getEntityById(id)) {
+                        this.entities.splice(this.getEntityIndexById(id), 1);
                     }
                     break;
             }
@@ -99,6 +104,18 @@ export class ZIRClient extends ZIRClientBase {
         return new ZIREntityBase(result.id, position, asset);
     }
 
+    private getEntityById(id: string) {
+        for (let entity of this.entities) {
+            if (entity.getEntityId() == id) {
+                return entity;
+            }
+        }
+    }
+
+    private getEntityIndexById(id: string) {
+        return this.entities.indexOf(this.getEntityById(id));
+    }
+
     private updatePlayer(data) {
         this.player.setPlayerID(data.playerID);
         this.player.setInventory(data.inventory);
@@ -125,7 +142,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     public getPlayerPosition() {
-        var player: IZIREntity = this.entities[this.player.getPlayerID()];
+        var player: IZIREntity = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }
