@@ -9,6 +9,7 @@ import { ZIRPlayer } from "./baseObjects/Player";
 import { ZIRProjectile } from "./baseObjects/ProjectileBase"
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
+import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
 
 export class ZIRServerEngine {
     dt: number = 0;
@@ -19,6 +20,7 @@ export class ZIRServerEngine {
     universe: ZIRWorld[] = [];
     tickCounter: number = 0;
     packetLogger: ZIRLogger;
+    protected currentEvents: ZIRTimedEvent[] = [];
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
@@ -95,6 +97,11 @@ export class ZIRServerEngine {
         }
     }
 
+    public registerEvent(event: ZIRTimedEvent) {
+        event.setStartingFrame(this.tickCounter);
+        this.currentEvents.push(event);
+    }
+
     /**
      * Regulates game ticks and other
      * core engine functions
@@ -102,17 +109,17 @@ export class ZIRServerEngine {
     private gameLoop = (): void => {
         const t = Date.now()
 
-        this.tick();
+        this.tick().then(() => {
+            this.tickCounter++;
 
-        this.tickCounter++;
-
-        this.dt = Date.now() - t + (1000 / this.TPS);
+            this.dt = Date.now() - t + (1000 / this.TPS);
+        });
     }
 
     /**
      * Triggers calculation of all game mechanics
      */
-    private tick = (): void => {
+    private async tick() {
         this.packetLogger.log("ticked")
         let usernames: string[] = [];
         for (let session of this.sessions) {
@@ -122,9 +129,11 @@ export class ZIRServerEngine {
 
         this.sendDebugInfo();
 
-        this.calculatePhysics();
+        await this.calculatePhysics();
 
         this.handleInput();
+
+        await this.updateEvents();
 
         let shouldReset = false;
         if (this.tickCounter % 30 == 0) {
@@ -141,10 +150,12 @@ export class ZIRServerEngine {
         );
     }
 
-    private calculatePhysics() {
+    private async calculatePhysics() {
+        let updates: Promise<void>[] = [];
         this.getAllEntities().forEach((entity) => {
-            this.physicsEngine.applyPhysics(entity, this.getDT());
+            updates.push(this.physicsEngine.applyPhysics(entity, this.getDT()));
         });
+        await Promise.all(updates);
     }
 
     private sendUpdate(reset: boolean = false) {
@@ -209,6 +220,22 @@ export class ZIRServerEngine {
                 a = a.getUnitVector().scale(m);
             }
             player.setAcceleration(a);
+        }
+    }
+
+    private async updateEvents() {
+        let events: Promise<void>[] = [];
+        for (let event of this.currentEvents) {
+            events.push(this.updateEvent(event));
+        }
+        await Promise.all(events);
+    }
+
+    private async updateEvent(event) {
+        if (this.tickCounter > event.getEndingFrame()) {
+            this.currentEvents.splice(this.currentEvents.indexOf(event))
+        } else {
+            event.updateEvent(this.tickCounter);
         }
     }
 
