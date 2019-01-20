@@ -88,7 +88,11 @@ export class ZIRClient extends ZIRClientBase {
         this.world = new ZIRWorldData(data);
     }
 
-    private handleInput(keycode: string, state: boolean) {
+    /**
+     * @param renderOffset gets global coordinate of point instead of
+     * screen coordinate when true
+     */
+    private handleInput(keycode: string, state: boolean | Point, renderOffset: boolean=false) {
         this.serverComms.sendInfoToServer("input", {
             keycode: keycode,
             state: state

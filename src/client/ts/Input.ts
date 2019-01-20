@@ -1,11 +1,15 @@
+import { Point } from "./globalInterfaces/UtilityInterfaces";
+
 export class ZIRInput {
-    private handler: (keycode: string, state: boolean) => void;
+    private handler: (keycode: string, state: boolean | Point) => void;
     private activeKeys: boolean[];
+    private cursorState: Point;
 
     constructor(){
         this.activeKeys = [];
         document.addEventListener("keyup", this.handleKeyupEvent.bind(this));
         document.addEventListener("keydown", this.handleKeydownEvent.bind(this));
+        document.addEventListener("mousemove", this.handleMouseMove.bind(this));
     }
 
     public setInputHandler(handler: (keycode: string, state: boolean) => void) {
@@ -24,6 +28,11 @@ export class ZIRInput {
             this.handler(keycode, true);
             this.activeKeys[keycode] = true;
         }
+    }
+
+    private handleMouseMove(event) {
+        this.cursorState = {x: event.pageX, y: event.pageY}
+        //this.handler("mouse", this.cursorState)
     }
 
     private getKeyFromEvent(event) {
@@ -45,6 +54,7 @@ export class ZIRInput {
                 keyName = "downArrow";
                 break;
         }
+        
         return keyName;
     }
 }

@@ -1,4 +1,3 @@
-import { addListener } from "cluster";
 import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
@@ -8,18 +7,24 @@ import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
 import { ZIRPlayer } from "./baseObjects/Player";
 import { ZIRProjectile } from "./baseObjects/ProjectileBase"
+import { ZIRLogger } from "./Logger";
+import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 
 export class ZIRServerEngine {
     dt: number = 0;
-    sessionManager: ZIRSessionManager = new ZIRSessionManager(this.registerSession.bind(this));
+    sessionManager: ZIRSessionManager;
     physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     TPS: number = 30;
     protected sessions: Session[] = [];
     universe: ZIRWorld[] = [];
     tickCounter: number = 0;
+    packetLogger: ZIRLogger;
 
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
+
+        this.packetLogger = new ZIRLogger("packets");
+        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger);
     }
 
     /**
@@ -33,7 +38,7 @@ export class ZIRServerEngine {
     /**
      * Registers a player to a world
      * If the world does not exist, one is created
-     * @param worldID 
+     * @param worldID
      * @param player 
      */
     public registerSession(session: Session) {
@@ -59,8 +64,9 @@ export class ZIRServerEngine {
 
     public disconnectSession(socket: string) {
         for (let i = 0; i < this.sessions.length; i++) {
-            let sesson = this.sessions[i];
-            if (sesson.socket = socket) {
+            let session = this.sessions[i];
+            session.getPlayer().kill();
+            if (session.socket = socket) {
                 this.sessions.splice(i, 1);
             }
         }
@@ -72,6 +78,12 @@ export class ZIRServerEngine {
             toReturn = toReturn.concat(world.getEntities());
         }
         return toReturn;
+    }
+
+    public destroyEntityInWorlds(entity : ZIREntity) {
+        for(let world of this.universe) {
+            world.destroyEntity(entity)
+        }
     }
 
     public registerEntity(worldID: string, e: ZIREntity) {
@@ -101,6 +113,7 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private tick = (): void => {
+        this.packetLogger.log("ticked")
         let usernames: string[] = [];
         for (let session of this.sessions) {
             usernames.push(session.username);
@@ -118,6 +131,14 @@ export class ZIRServerEngine {
             shouldReset = true;
         }
         this.sendUpdate(shouldReset);
+
+        this.collectGarbage();
+    }
+
+    private collectGarbage() {
+        this.getAllEntities().forEach(
+            (entity) => {if (entity.isDead()) this.destroyEntityInWorlds(entity)}
+        );
     }
 
     private calculatePhysics() {
@@ -140,7 +161,7 @@ export class ZIRServerEngine {
 
             let update = {
                 id: entity.getEntityId(),
-                type: "update",
+                type: entity.isDead() ? "delete" : "update",
                 asset: entity.getAssetName(),
                 x: entity.getPosition().getX(),
                 y: entity.getPosition().getY(),
@@ -149,11 +170,10 @@ export class ZIRServerEngine {
             }
             calculatedUpdates.push(update);
         }
-
         if (reset) {
-            this.sessionManager.broadcast("reset", { entities: calculatedUpdates });
+            this.sessionManager.broadcast("reset", { entities: calculatedUpdates } as IZIRResetResult);
         } else {
-            this.sessionManager.broadcast("update", { updates: calculatedUpdates });
+            this.sessionManager.broadcast("update", { updates: calculatedUpdates } as IZIRUpdateResult);
         }
     }
 
@@ -179,7 +199,7 @@ export class ZIRServerEngine {
                             a.setX(a.getX() + m);
                             break;
                         case "space":
-                            let p = new ZIRProjectile(new Vector(100, 0), player.getPosition());
+                            let p = new ZIRProjectile(new Vector(10000, 0), player.getPosition());
                             this.registerEntity(player.getEntityId(), p)
                             break;
                     }
@@ -202,7 +222,7 @@ export class ZIRServerEngine {
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
             debugMessages.push("Current Session: " + session);
-            debugMessages.push("Entities: " + this.getAllEntities());
+            debugMessages.push("Entities (" + this.getAllEntities().length + " total): " + this.getAllEntities());
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
         }

@@ -33,6 +33,7 @@ export class ZIREntity implements IZIREntity {
 
     public kill() : void {
         this.dead = true;
+        this.updated = false;
     }
 
     public isDead() : boolean {

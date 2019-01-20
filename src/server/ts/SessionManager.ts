@@ -1,6 +1,7 @@
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 import { ZIRPlayer } from "./baseObjects/Player";
+import { ZIRLogger } from "./Logger";
 
 //declare function io();
 
@@ -8,9 +9,11 @@ export class ZIRSessionManager {
     listeners: { [header: string]: Function } = {};
     io: any;
     registerSessionHandler: (session: Session) => void;
+    private logger: ZIRLogger;
 
-    constructor(registerSessionHandler) {
+    constructor(registerSessionHandler, logger) {
         this.registerSessionHandler = registerSessionHandler;
+        this.logger = logger;
         var express = require('express');
         var http = require('http');
         var path = require('path');
@@ -69,7 +72,7 @@ export class ZIRSessionManager {
      * socket for future reference
      */
     private handleRename(this: Session, data): void {
-        this.setUsername(data);
+        if(data) this.setUsername(data);
     }
 
     private handleLogin(socket): void {
@@ -90,6 +93,7 @@ export class ZIRSessionManager {
     }
 
     public broadcast = (header: string, data: any): void => {
+        this.logger.logUnpacked(header + " " + data);
         this.io.sockets.emit(header, data)
     }
 

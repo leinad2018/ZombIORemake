@@ -8,5 +8,6 @@ export class ZIRProjectile extends ZIREntity {
         super(position, asset);
         this.velocity = velocity;
         this.cooldown = cooldown;
+        setTimeout(()=>{this.kill()},2000)
     }
 }

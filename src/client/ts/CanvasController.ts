@@ -26,6 +26,14 @@ export class ZIRCanvasController implements IZIRServerUpdate {
         this.render();
     }
 
+    public getRenderToGlobalOffset() : Point {
+        let playerPos = this.client.getPlayerPosition();
+        return {
+            x: playerPos.x - this.canvas.width/2,
+            y: playerPos.y - this.canvas.height/2
+        }
+    }
+
     private render() {
         this.playerPosition = this.client.getPlayerPosition();
         let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');

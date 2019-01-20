@@ -38,6 +38,11 @@ export class ZIRWorld {
         return this.worldID;
     }
 
+    public destroyEntity(entity : ZIREntity) {
+        let entityIndex = this.entities.indexOf(entity);
+        if(entityIndex !== -1) this.entities.splice(entityIndex, 1);
+    }
+
     protected generateWorldTerrain(): IZIRTerrainMap {
         return { zones: [] };
     }
