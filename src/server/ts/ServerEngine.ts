@@ -210,7 +210,7 @@ export class ZIRServerEngine {
                             a.setX(a.getX() + m);
                             break;
                         case "space":
-                            let p = new ZIRProjectile(new Vector(10000, 0), player.getPosition());
+                            let p = new ZIRProjectile(new Vector(100000, 0).add(player.getVelocity()), player.getPosition());
                             this.registerEntity(player.getEntityId(), p)
                             break;
                     }

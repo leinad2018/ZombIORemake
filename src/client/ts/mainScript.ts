@@ -50,8 +50,8 @@ var mainCanvas = document.getElementById("mainCanvas");
 console.log("step1");
 loadAssets();
 
-var playButton = document.getElementById("play") as HTMLButtonElement;
-playButton.addEventListener("click", playGame);
+var loginForm = document.getElementById("loginForm") as HTMLFormElement;
+loginForm.addEventListener("submit", playGame);
 
 var playerName = "";
 
