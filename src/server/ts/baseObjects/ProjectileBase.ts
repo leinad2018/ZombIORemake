@@ -10,6 +10,7 @@ export class ZIRProjectile extends ZIREntity {
         this.mass = 1;
         this.friction = 0;
         this.cooldown = cooldown;
+        this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
         setTimeout(()=>{this.kill()},2000)
     }
 }
