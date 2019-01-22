@@ -25,7 +25,8 @@ export class ZIRServerEngine {
     constructor() {
         setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
 
-        this.packetLogger = new ZIRLogger("packets");
+        this.packetLogger = new ZIRLogger("packets.log");
+        this.packetLogger.disable();
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger);
     }
 
