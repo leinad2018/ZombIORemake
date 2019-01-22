@@ -19,11 +19,8 @@ export abstract class ZIRClientBase {
         return toReturn;
     }
 
-    public setViewSize(width: number, height: number) {
-        this.sizeVector = {
-            x: width,
-            y: height
-        }
+    public setViewSize(size : Point) {
+        this.sizeVector = size;
     }
 
     protected updateObjects() {

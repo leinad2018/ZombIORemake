@@ -3,52 +3,41 @@ import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterface
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { Point } from "./globalInterfaces/UtilityInterfaces";
 
-export class ZIRCanvasController implements IZIRServerUpdate {
+export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
-    private client: ZIRClientBase;
     private DEBUG_RENDER: boolean = true;
     private playerPosition: Point;
 
-    constructor(canvas: HTMLCanvasElement, client: ZIRClientBase) {
+    constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         window.addEventListener("resize", this.handleResize.bind(this));
-        this.client = client;
         this.playerPosition = { x: 0, y: 0 };
         this.resizeWindow();
-        this.render();
-        this.client.registerUpdateHandler(this);
     }
 
-    /**
-     * Updates the canvas when new information is sent from the server
-     */
-    public onServerUpdate() {
-        this.render();
-    }
-
-    public getRenderToGlobalOffset() : Point {
-        let playerPos = this.client.getPlayerPosition();
+    public getRenderToGlobalOffset(state) : Point {
+        let playerPos = state.getPlayerPosition();
         return {
             x: playerPos.x - this.canvas.width/2,
             y: playerPos.y - this.canvas.height/2
         }
     }
 
-    private render() {
-        this.playerPosition = this.client.getPlayerPosition();
+    public render(state : ZIRClientBase) {
+        this.playerPosition = state.getPlayerPosition();
         let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
 
-        let background: IZIRAsset = this.client.getBackgroundImage();
+        let background: IZIRAsset = state.getBackgroundImage();
         this.renderBackground(ctx, background);
 
-        let worldData: IZIRRenderable[] = this.client.getWorldData();
+        let worldData: IZIRRenderable[] = state.getWorldData();
         this.renderWorld(ctx, worldData);
 
-        let entities: IZIRRenderable[] = this.client.getEntitiesToRender();
+        let entities: IZIRRenderable[] = state.getEntitiesToRender();
         this.renderEntities(ctx, entities);
 
-        this.renderPlayerBox(ctx, this.client.getPlayersOnline());
-        if (this.DEBUG_RENDER) this.renderDebugBox(ctx, this.client.getDebugMessages());
+        this.renderPlayerBox(ctx, state.getPlayersOnline());
+        if (this.DEBUG_RENDER) this.renderDebugBox(ctx, state.getDebugMessages());
     }
 
     private renderWorld(ctx: CanvasRenderingContext2D, worldData: IZIRRenderable[]) {
@@ -120,11 +109,13 @@ export class ZIRCanvasController implements IZIRServerUpdate {
     public resizeWindow() {
         this.canvas.width = this.canvas.parentElement.clientWidth;
         this.canvas.height = this.canvas.parentElement.clientHeight - 5;
-        this.client.setViewSize(this.canvas.width, this.canvas.height);
+    }
+
+    public getDimensions() : Point {
+        return({x: this.canvas.width, y: this.canvas.height})
     }
 
     private handleResize(this: ZIRCanvasController) {
         this.resizeWindow();
-        this.render();
     }
 }

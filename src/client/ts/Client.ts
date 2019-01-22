@@ -8,10 +8,13 @@ import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult, IZIRWorldUpdate } 
 import { ZIRInput } from "./Input";
 import { ZIRPlayerData } from "./PlayerData";
 import { ZIRWorldData } from "./WorldData";
+import { ZIRCanvasController } from "./CanvasController";
+import { ZIRServerCommunications } from "./ServerComms";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
     private serverComms: IZIRServerCommunications;
+    private canvas: ZIRCanvasController;
     private entities: IZIREntity[];
     private input: ZIRInput;
     private username: string;
@@ -19,15 +22,16 @@ export class ZIRClient extends ZIRClientBase {
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
 
-    constructor(comms: IZIRServerCommunications, input: ZIRInput, name: string) {
+    constructor(name: string, mainCanvas) {
         super();
-        this.serverComms = comms;
-        this.input = input;
+        this.serverComms = new ZIRServerCommunications;
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
+        this.input = new ZIRInput();
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
+        this.canvas = new ZIRCanvasController(mainCanvas as HTMLCanvasElement);
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
@@ -82,6 +86,8 @@ export class ZIRClient extends ZIRClientBase {
         }
         this.playersOnline = this.serverComms.getPlayersOnline();
         this.updateObjects();
+        this.canvas.render(this);
+        this.setViewSize(this.canvas.getDimensions());
     }
 
     private handleWorldUpdate(data: IZIRWorldUpdate) {

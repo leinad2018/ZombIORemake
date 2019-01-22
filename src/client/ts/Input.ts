@@ -32,7 +32,7 @@ export class ZIRInput {
 
     private handleMouseMove(event) {
         this.cursorState = {x: event.pageX, y: event.pageY}
-        //this.handler("mouse", this.cursorState)
+        this.handler("mouse", this.cursorState)
     }
 
     private getKeyFromEvent(event) {
