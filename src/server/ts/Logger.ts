@@ -7,8 +7,12 @@ export class ZIRLogger {
     private stream;
     constructor(filePath : string, active : boolean = true) {
         this.active = active;
-        this.filePath = filePath;
+        var dir = './logs/';
+        this.filePath = dir + filePath;
         let fs = require('fs');
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
         this.stream = fs.createWriteStream(filePath, {flags:"a"});
     }
 
