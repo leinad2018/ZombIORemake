@@ -102,13 +102,13 @@ export class ZIRCanvasController {
         for (let entity of entities) {
             let asset = entity.getImageToRender();
             let position = entity.getPosition();
-            let x = position.x - asset.getImage().width / 2;
-            let y = position.y - asset.getImage().height / 2;
             let size = entity.getSize();
             let xs = size.x;
             let ys = size.y;
-            ctx.fillRect(x - xs/2, y - ys/2, xs, ys);
+            let x = position.x - xs / 2;
+            let y = position.y - ys / 2;
             ctx.drawImage(asset.getImage(), x, y);            
+            ctx.strokeRect(x, y, xs, ys);
         }
 
         ctx.restore();
