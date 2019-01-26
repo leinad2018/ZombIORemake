@@ -1,5 +1,6 @@
 import { IZIREntity } from "../globalInterfaces/MainInterfaces";
 import { Vector } from "../utilityObjects/Math";
+import { ZIRZone } from "../baseObjects/Hitbox"
 
 export class ZIREntity implements IZIREntity {
     static entityCount = 0;
@@ -16,12 +17,15 @@ export class ZIREntity implements IZIREntity {
     protected moveSpeed: number = 40 * this.PIXELS_PER_METER;
     protected maxMovement : number = 4 * this.PIXELS_PER_METER;
     protected asset: string;
+    protected hitbox: ZIRZone;
+    protected size: Vector;
 
-    constructor(position: Vector, asset: string, isPhysical: boolean = true){
+    constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, isPhysical: boolean = true){
         this.id = ZIREntity.entityCount + "";
         this.updated = false;
         this.dead = false;
         this.position = position;
+        this.size = size;
         this.asset = asset;
         this.isPhysical = isPhysical;
         ZIREntity.entityCount++;
@@ -46,6 +50,10 @@ export class ZIREntity implements IZIREntity {
 
     public setUpdated(updated : boolean) {
         this.updated = updated;
+    }
+
+    public getSize() {
+        return this.size;
     }
 
     public getEntityId() {

@@ -5,8 +5,8 @@ export class ZIRProjectile extends ZIREntity {
     protected behavior: Function;
     protected owner: ZIREntity;
 
-    constructor(owner: ZIREntity, velocity: Vector, position: Vector, asset: string = "rock", expiration: number = 2000) {
-        super(position, asset);
+    constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(25, 25), asset: string = "rock", expiration: number = 2000) {
+        super(position, size, asset);
         this.owner = owner;
         this.velocity = velocity;
         this.mass = 1;

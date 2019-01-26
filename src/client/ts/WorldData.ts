@@ -24,7 +24,11 @@ export class ZIRWorldData {
                     x: area.x0 + x * this.TILE_SIZE,
                     y: area.y0 + y * this.TILE_SIZE
                 }
-                this.tiles.push(new ZIRWorldTile(pos, asset));
+                let size = {
+                    x: this.TILE_SIZE,
+                    y: this.TILE_SIZE
+                }
+                this.tiles.push(new ZIRWorldTile(pos, size, asset));
             }
         }
     }
@@ -36,15 +40,21 @@ export class ZIRWorldData {
 
 class ZIRWorldTile implements IZIRRenderable {
     private position: Point;
+    private size: Point;
     private asset: IZIRAsset;
 
-    constructor(pos: Point, asset: IZIRAsset) {
+    constructor(pos: Point, size: Point, asset: IZIRAsset) {
         this.position = pos;
+        this.size = size;
         this.asset = asset;
     }
 
     public getPosition() {
         return this.position;
+    }
+
+    public getSize() {
+        return this.size;
     }
 
     public getImageToRender() {

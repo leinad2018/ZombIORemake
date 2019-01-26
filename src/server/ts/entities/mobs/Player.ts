@@ -1,13 +1,15 @@
 import { ZIREntity } from "../../baseObjects/EntityBase"
 import { Vector } from "../../utilityObjects/Math"
 import { IZIRInventorySlot } from "../../globalInterfaces/UtilityInterfaces";
+import { ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];
     private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
 
-    constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), asset: string = "player", isPhysical: boolean = true) {
-        super(position, asset, isPhysical);
+    constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
+        super(position, size, asset, isPhysical);
+        this.hitbox = new ZIRRectangularZone(this.position, this.size);
         this.inventory = new Array(12).fill({ itemID: -1, amount: 0 });
     }
 

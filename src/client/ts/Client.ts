@@ -18,7 +18,7 @@ export class ZIRClient extends ZIRClientBase {
     private entities: IZIREntity[];
     private input: ZIRInput;
     private username: string;
-    private debugMessages: string[] = ["hello world"];
+    private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
 
@@ -54,8 +54,8 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleReset(data: IZIRResetResult) {
         this.entities = [];
-        for (var enitity of data.entities) {
-            var newEntity = this.parseEntityResult(enitity);
+        for (var entity of data.entities) {
+            var newEntity = this.parseEntityResult(entity);
             this.entities.push(newEntity);
         }
         this.updateObjects();
@@ -122,8 +122,12 @@ export class ZIRClient extends ZIRClientBase {
             x: result.x,
             y: result.y
         }
+        var size: Point = {
+            x: result.xsize,
+            y: result.ysize
+        }
         var asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
-        return new ZIREntityBase(result.id, position, asset);
+        return new ZIREntityBase(result.id, position, size, asset);
     }
 
     private getEntityById(id: string) {

@@ -15,6 +15,8 @@ export interface IZIREntityResult {
     asset: string;
     x: number;
     y: number;
+    xsize: number;
+    ysize: number;
 }
 
 export interface IZIREntityUpdateResult extends IZIREntityResult{

@@ -171,6 +171,10 @@ export class ZIRServerEngine {
             return e;
         });
 
+        if (reset) entities = entities.filter((entity) => {
+            return !entity.isDead();
+        });
+
         for (let entity of entities) {
 
             let update = {
@@ -180,7 +184,9 @@ export class ZIRServerEngine {
                 x: entity.getPosition().getX(),
                 y: entity.getPosition().getY(),
                 xspeed: null,
-                yspeed: null
+                yspeed: null,
+                xsize: entity.getSize().getX(),
+                ysize: entity.getSize().getY()
             }
             calculatedUpdates.push(update);
         }

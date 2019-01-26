@@ -1,5 +1,4 @@
 import { Vector } from "../utilityObjects/Math";
-import { checkServerIdentity } from "tls";
 
 export abstract class ZIRZone {
     protected position: Vector;
