@@ -1,8 +1,7 @@
-import { IZIREntity } from "../globalInterfaces/MainInterfaces";
 import { Point } from "../globalInterfaces/UtilityInterfaces";
-import { IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
+import { IZIRAsset, IZIRRenderable } from "../globalInterfaces/RenderingInterfaces";
 
-export class ZIREntityBase implements IZIREntity {
+export class ZIREntityBase implements IZIRRenderable {
     protected id: string;
     protected position: Point;
     protected size: Point;

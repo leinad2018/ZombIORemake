@@ -1,6 +1,4 @@
-import { IZIRServerCommunications } from "../globalInterfaces/MainInterfaces";
-
-export abstract class ZIRServerBase implements IZIRServerCommunications {
+export abstract class ZIRServerBase {
     protected handlers: ((data?: any) => void)[];
 
     constructor(){

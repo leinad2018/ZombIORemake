@@ -1,6 +1,9 @@
 import { ZIRAssetLoader } from "./AssetLoader";
 import { ZIRClient } from "./Client";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
+import { ZIRCanvasController } from "./CanvasController";
+import { ZIRServerCommunications } from "./ServerComms";
+import { ZIRInput } from "./Input";
 
 var waitForLoad = () => new Promise(() => {
     var check = () => {
@@ -37,7 +40,10 @@ function loadAssets() {
 function runAfterLoaded() {
     console.log("Finished Loading");
     mainCanvas.hidden = false;
-    var client: ZIRClientBase = new ZIRClient(playerName, mainCanvas);
+    let renderer = new ZIRCanvasController(mainCanvas as HTMLCanvasElement);
+    let serverComms = new ZIRServerCommunications();
+    let keyboardInput = new ZIRInput();
+    var client: ZIRClientBase = new ZIRClient(playerName, renderer, serverComms, keyboardInput);
     console.log("Started Game");
 }
 var mainCanvas = document.getElementById("mainCanvas");

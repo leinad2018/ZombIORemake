@@ -1,6 +1,5 @@
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { ZIRAssetLoader } from "./AssetLoader";
-import { IZIRServerCommunications, IZIREntity } from "./globalInterfaces/MainInterfaces";
 import { ZIREntityBase } from "./baseObjects/EntityBase";
 import { Point } from "./globalInterfaces/UtilityInterfaces";
 import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
@@ -9,29 +8,29 @@ import { ZIRInput } from "./Input";
 import { ZIRPlayerData } from "./PlayerData";
 import { ZIRWorldData } from "./WorldData";
 import { ZIRCanvasController } from "./CanvasController";
-import { ZIRServerCommunications } from "./ServerComms";
+import { ZIRServerBase } from "./baseObjects/ServerBase";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
-    private serverComms: IZIRServerCommunications;
+    private serverComms: ZIRServerBase;
     private canvas: ZIRCanvasController;
-    private entities: IZIREntity[];
+    private entities: ZIREntityBase[];
     private input: ZIRInput;
     private username: string;
     private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
 
-    constructor(name: string, mainCanvas) {
+    constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput) {
         super();
-        this.serverComms = new ZIRServerCommunications;
+        this.serverComms = comms;
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
-        this.input = new ZIRInput();
+        this.input = input;
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
-        this.canvas = new ZIRCanvasController(mainCanvas as HTMLCanvasElement);
+        this.canvas = renderer;
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
@@ -168,7 +167,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     public getPlayerPosition() {
-        var player: IZIREntity = this.getEntityById(this.player.getPlayerID());
+        var player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }

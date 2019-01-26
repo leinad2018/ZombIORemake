@@ -19,13 +19,6 @@ export class ZIRServerCommunications extends ZIRServerBase {
         for (let handler in this.handlers) {
             socket.on(handler, (data) => { this.handlers[handler](data) });
         }
-        // socket.on('update', (data) => { this.handlers['update'](data) });
-        // socket.on('reset', (data) => { this.handlers['reset'](data) });
-        // socket.on('message', (data) => { this.handlers['message'](data) });
-        // socket.on('requestUsername', () => { this.handlers['requestUsername']() });
-        // socket.on('debug', (data) => { this.handlers['debug'](data) });
-        // socket.on('updatePlayer', (data) => { this.handlers['updatePlayer'](data) });
-        // socket.on('updateWorld', (data) => { this.handlers['updateWorld'](data) });
         this.socket = socket;
     }
 
