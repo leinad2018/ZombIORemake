@@ -15,11 +15,15 @@ export class ZIRCanvasController {
         this.resizeWindow();
     }
 
-    public getRenderToGlobalOffset(state) : Point {
-        let playerPos = state.getPlayerPosition();
+    /**
+     * Transforms a rendering coordinate to a
+     * player-relative coordinate
+     * @param cursorPoint 
+     */
+    public transformRenderToPlayer(cursorPoint : Point) : Point {
         return {
-            x: playerPos.x - this.canvas.width/2,
-            y: playerPos.y - this.canvas.height/2
+            x: cursorPoint.x - this.canvas.width/2,
+            y: cursorPoint.y - this.canvas.height/2
         }
     }
 

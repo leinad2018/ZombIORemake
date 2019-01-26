@@ -2,15 +2,26 @@ import {ZIREntity} from "./EntityBase";
 import { Vector } from "../utilityObjects/Math";
 
 export class ZIRProjectile extends ZIREntity {
-    protected cooldown : number;
+    protected behavior: Function;
+    protected owner: ZIREntity;
 
-    constructor(velocity : Vector, position : Vector, asset : string = "rock", cooldown : number = 1) {
+    constructor(owner: ZIREntity, velocity: Vector, position: Vector, asset: string = "rock", expiration: number = 2000) {
         super(position, asset);
+        this.owner = owner;
         this.velocity = velocity;
         this.mass = 1;
         this.friction = 0;
-        this.cooldown = cooldown;
+        this.moveSpeed = 30*this.PIXELS_PER_METER
+        this.behavior = (e : ZIREntity)=>{};
         this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
-        setTimeout(()=>{this.kill()},2000)
+        setTimeout(()=>{this.kill()},expiration)
+    }
+
+    public update() {
+        this.behavior(this.owner);
+    }
+
+    public setBehavior(behavior: Function) {
+        this.behavior = behavior;
     }
 }

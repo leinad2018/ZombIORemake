@@ -1,6 +1,6 @@
-import { ZIREntity } from "./EntityBase"
-import { Vector } from "../utilityObjects/Math"
-import { IZIRInventorySlot } from "../globalInterfaces/UtilityInterfaces";
+import { ZIREntity } from "../../baseObjects/EntityBase"
+import { Vector } from "../../utilityObjects/Math"
+import { IZIRInventorySlot } from "../../globalInterfaces/UtilityInterfaces";
 
 export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];

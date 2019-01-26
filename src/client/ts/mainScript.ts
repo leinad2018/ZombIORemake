@@ -31,6 +31,7 @@ function loadAssets() {
     ZIRAssetLoader.loadAsset("player", "../static/assets/newPlayer.png");
     ZIRAssetLoader.loadAsset("spite", "../static/assets/spite.jpg");
     ZIRAssetLoader.loadAsset("rock", "../static/assets/rock.png");
+    ZIRAssetLoader.loadAsset("boomerang", "../static/assets/boomerang.png");
 }
 
 function runAfterLoaded() {

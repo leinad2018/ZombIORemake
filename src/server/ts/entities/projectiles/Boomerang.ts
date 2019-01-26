@@ -1,0 +1,16 @@
+import {ZIRProjectile} from "../../baseObjects/ProjectileBase";
+import {ZIREntity} from "../../baseObjects/EntityBase";
+import {Vector} from "../../utilityObjects/Math";
+
+export class ZIRBoomerang extends ZIRProjectile {
+    constructor(owner: ZIREntity, velocity: Vector, position: Vector, asset: string = "boomerang", expiration: number = 2000) {
+        super(owner, velocity, position, asset, expiration);
+        setTimeout(()=>{this.setBehavior(this.seek)},200);
+    }
+
+    private seek(target: ZIREntity) {
+        target = this.owner;
+        let direction = (target.getPosition().sub(this.getPosition())).getUnitVector();
+        this.setAcceleration(direction.scale(this.moveSpeed));
+    }
+}

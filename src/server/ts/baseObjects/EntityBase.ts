@@ -31,6 +31,10 @@ export class ZIREntity implements IZIREntity {
         return !this.updated;
     }
 
+    public update() : void {
+
+    }
+
     public kill() : void {
         this.dead = true;
         this.updated = false;

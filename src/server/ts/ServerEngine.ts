@@ -5,8 +5,9 @@ import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
-import { ZIRPlayer } from "./baseObjects/Player";
-import { ZIRProjectile } from "./baseObjects/ProjectileBase"
+import { ZIRPlayer } from "./entities/mobs/Player";
+import { ZIRBoomerang } from "./entities/projectiles/Boomerang";
+import { ZIRThrownRock } from "./entities/projectiles/Rock";
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
@@ -154,6 +155,7 @@ export class ZIRServerEngine {
     private async calculatePhysics() {
         let updates: Promise<void>[] = [];
         this.getAllEntities().forEach((entity) => {
+            entity.update();
             updates.push(this.physicsEngine.applyPhysics(entity, this.getDT()));
         });
         await Promise.all(updates);
@@ -197,26 +199,41 @@ export class ZIRServerEngine {
 
             for (let input in session.getInputs()) {
                 if (session.getInputs()[input]) {
+                    let mouse;
+                    let direction;
+                    let velocity;
+                    let p;
                     switch (input) {
                         case "upArrow":
-                            a.setY(a.getY() - m);
+                            a = a.add(new Vector(0, -m));
                             break;
                         case "downArrow":
-                            a.setY(a.getY() + m);
+                            a = a.add(new Vector(0, m));
                             break;
                         case "leftArrow":
-                            a.setX(a.getX() - m);
+                            a = a.add(new Vector(-m, 0));
                             break;
                         case "rightArrow":
-                            a.setX(a.getX() + m);
+                            a = a.add(new Vector(m, 0));
                             break;
                         case "space":
-                            let p = new ZIRProjectile(new Vector(30*player.PIXELS_PER_METER, 0).add(player.getVelocity()), player.getPosition());
+                            mouse = session.getInputs()["mouse"]
+                            direction = new Vector(mouse.x, mouse.y);
+                            velocity = direction.getUnitVector().scale(30*player.PIXELS_PER_METER)
+                            p = new ZIRBoomerang(player, velocity.add(player.getVelocity()), player.getPosition());
+                            this.registerEntity(player.getEntityId(), p)
+                            break;
+                        case "click":
+                            mouse = session.getInputs()["mouse"]
+                            direction = new Vector(mouse.x, mouse.y);
+                            velocity = direction.getUnitVector().scale(30*player.PIXELS_PER_METER)
+                            p = new ZIRThrownRock(player, velocity.add(player.getVelocity()), player.getPosition());
                             this.registerEntity(player.getEntityId(), p)
                             break;
                     }
                 }
             }
+
             if (a.getMagnitude() != 0) {
                 a = a.getUnitVector().scale(m);
             }

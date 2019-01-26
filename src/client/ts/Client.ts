@@ -40,6 +40,7 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler('updatePlayer', this.updatePlayer.bind(this));
         this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
+        this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
     }
 
@@ -94,11 +95,22 @@ export class ZIRClient extends ZIRClientBase {
         this.world = new ZIRWorldData(data);
     }
 
+
+    private handleInput(keycode: string, state: boolean) {
+        this.serverComms.sendInfoToServer("input", {
+            keycode: keycode,
+            state: state
+        });
+    }
+
     /**
      * @param renderOffset gets global coordinate of point instead of
      * screen coordinate when true
      */
-    private handleInput(keycode: string, state: boolean | Point, renderOffset: boolean=false) {
+    private handlePointInput(keycode: string, state: Point, renderOffset: boolean=true) {
+        if(renderOffset) {
+            state = this.canvas.transformRenderToPlayer(state);
+        }
         this.serverComms.sendInfoToServer("input", {
             keycode: keycode,
             state: state

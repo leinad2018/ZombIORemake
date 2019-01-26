@@ -1,6 +1,6 @@
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
-import { ZIRPlayer } from "./baseObjects/Player";
+import { ZIRPlayer } from "./entities/mobs/Player";
 import { ZIRLogger } from "./Logger";
 
 //declare function io();
@@ -51,7 +51,9 @@ export class ZIRSessionManager {
     }
 
     private handleInput(this: Session, data): void {
+        console.log(data.keycode);
         if (data.keycode) {
+            console.log(data.state);
             this.inputs[data.keycode] = data.state;
         }
     }

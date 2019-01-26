@@ -1,5 +1,5 @@
 export interface Inputs{
-    [input: string]: boolean
+    [input: string]: any
 }
 
 export interface IZIRInventorySlot{
