@@ -1,10 +1,10 @@
 import { IZIRServerUpdate } from "../globalInterfaces/IServerUpdate";
-import { Point } from "../globalInterfaces/UtilityInterfaces";
+import { Vector } from "../utilityObjects/Math";
 import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
 
 export abstract class ZIRClientBase {
     private objectsToUpdate: IZIRServerUpdate[];
-    protected sizeVector: Point;
+    protected sizeVector: Vector;
 
     constructor() {
         this.objectsToUpdate = [];
@@ -19,7 +19,7 @@ export abstract class ZIRClientBase {
         return toReturn;
     }
 
-    public setViewSize(size : Point) {
+    public setViewSize(size : Vector) {
         this.sizeVector = size;
     }
 
@@ -35,7 +35,7 @@ export abstract class ZIRClientBase {
 
     abstract getBackgroundImage(): IZIRAsset;
 
-    abstract getPlayerPosition(): Point;
+    abstract getPlayerPosition(): Vector;
 
     abstract getWorldData(): IZIRRenderable[];
 }

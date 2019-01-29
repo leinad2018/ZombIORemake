@@ -3,7 +3,7 @@ import {ZIREntity} from "../../baseObjects/EntityBase";
 import {Vector} from "../../utilityObjects/Math";
 
 export class ZIRBoomerang extends ZIRProjectile {
-    constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(50, 50), asset: string = "boomerang", expiration: number = 2000) {
+    constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(80, 50), asset: string = "boomerang", expiration: number = 3000) {
         super(owner, velocity, position, size, asset, expiration);
         setTimeout(()=>{this.setBehavior(this.seek)},200);
     }
