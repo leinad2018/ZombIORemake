@@ -1,4 +1,32 @@
 import { Vector } from "../utilityObjects/Math";
+import { ZIREntity } from "./EntityBase";
+
+export class ZIREffectBox{
+    private ownerEntity: ZIREntity;
+    private areas: ZIRZone[];
+
+    constructor(parent: ZIREntity, areas: ZIRZone[]){
+        this.ownerEntity = parent;
+        this.areas = areas;
+    }
+
+    public checkCollision(zone: ZIRZone): boolean{
+        for(let area of this.areas){
+            if(area.checkCollision(zone)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public isMoving(){
+        return Math.abs(this.ownerEntity.getVelocity().getMagnitude()) > 0.1;
+    }
+
+    public getParent(){
+        return this.ownerEntity;
+    }
+}
 
 export abstract class ZIRZone {
     protected position: Vector;

@@ -1,7 +1,6 @@
 import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
-import { ZIRSpite } from "./baseObjects/Spite";
 import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";

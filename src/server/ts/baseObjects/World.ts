@@ -1,11 +1,12 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
-import { Vector } from "../utilityObjects/Math";
+import { ZIREffectBox } from "./Hitbox";
 
 export class ZIRWorld {
     private worldID: string;
     private terrain: IZIRTerrainMap;
     private entities: ZIREntity[];
+    private hurtboxes: ZIREffectBox[];
     private sectorLookup: string[];
     private sectors: ZIRSector[];
     private readonly sectorSize = 500;
@@ -15,6 +16,7 @@ export class ZIRWorld {
         this.worldID = id;
         this.entities = [];
         this.sectors = [];
+        this.hurtboxes = [];
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 this.sectors.push(new ZIRSector());
@@ -47,15 +49,50 @@ export class ZIRWorld {
         }
     }
 
-    public getSectorIDByEntity(entity: ZIREntity) {
+    public runCollisionLogic() {
+        for (let entity of this.entities) {
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+                let baseSectorID = this.getSectorIDByEntity(entity);
+                let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
+                let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
+                for (let check of entitiesToCheck) {
+                    for(let zone of check.getHitbox()){
+                        if (entity.checkCollision(zone)) {
+                            entity.registerEvent(zone);
+                            check.registerEvent(entity);
+                        }
+                    }
+                }
+            }
+        }
+        for(let hurtbox of this.hurtboxes){
+            if(hurtbox.isMoving()){
+                let entity = hurtbox.getParent();
+                let baseSectorID = this.getSectorIDByEntity(entity);
+                let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
+                let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
+                for (let check of entitiesToCheck) {
+                    for(let hitbox of check.getHitbox()){
+                        if(hurtbox.checkCollision(hitbox)){
+                            entity.registerEvent(hitbox);
+                            check.registerEvent(entity);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private getSectorIDByEntity(entity: ZIREntity) {
         return this.sectorLookup[entity.getEntityId()];
     }
 
-    public getThreeByThreeGridOfSectorsByInnerSectorID(sector: number) {
+    private getThreeByThreeGridOfSectorsByInnerSectorID(sector: number) {
         let sectors: ZIRSector[] = [];
         let base = sector - this.width;
-        for(let i = 0; i < 3; i++){
-            for(let offset = -1; offset < 2; offset++){
+        for (let i = 0; i < 3; i++) {
+            for (let offset = -1; offset < 2; offset++) {
                 sectors.push(this.sectors[base + offset]);
             }
             base += this.width;
@@ -63,10 +100,10 @@ export class ZIRWorld {
         return sectors;
     }
 
-    public getEntitiesBySectorIDs(sectorIDs: number[]) {
+    private getEntitiesBySectorIDs(sectors: ZIRSector[]) {
         let toReturn: ZIREntity[] = [];
-        for(let id of sectorIDs){
-            toReturn.push.apply(toReturn, this.sectors[id].getAllEntities());
+        for (let sector of sectors) {
+            toReturn.push.apply(toReturn, sector.getAllEntities());
         }
         return toReturn;
     }
@@ -112,7 +149,7 @@ export class ZIRSector {
         }
     }
 
-    public getAllEntities(){
+    public getAllEntities() {
         return this.entities;
     }
 }
