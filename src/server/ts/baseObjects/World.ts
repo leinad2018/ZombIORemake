@@ -16,6 +16,7 @@ export class ZIRWorld {
         this.worldID = id;
         this.entities = [];
         this.sectors = [];
+        this.sectorLookup = [];
         this.hurtboxes = [];
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
@@ -56,10 +57,12 @@ export class ZIRWorld {
                 let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
                 let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
                 for (let check of entitiesToCheck) {
-                    for(let zone of check.getHitbox()){
-                        if (entity.checkCollision(zone)) {
-                            entity.registerEvent(zone);
-                            check.registerEvent(entity);
+                    for(let zone1 of check.getHitbox()){
+                        for(let zone2 of entity.getHitbox()){
+                            if(zone1.checkCollision(zone2)){
+                                entity.registerEvent(zone1);
+                                check.registerEvent(zone2);
+                            }
                         }
                     }
                 }
@@ -75,7 +78,7 @@ export class ZIRWorld {
                     for(let hitbox of check.getHitbox()){
                         if(hurtbox.checkCollision(hitbox)){
                             entity.registerEvent(hitbox);
-                            check.registerEvent(entity);
+                            check.registerEvent(hurtbox);
                             break;
                         }
                     }

@@ -1,11 +1,26 @@
 import { Vector } from "../utilityObjects/Math";
 import { ZIREntity } from "./EntityBase";
 
-export class ZIREffectBox{
+export abstract class ZIRZone {
+    protected position: Vector;
+
+    constructor(pos: Vector) {
+        this.position = pos;
+    }
+
+    public getPosition() {
+        return this.position;
+    }
+
+    public abstract checkCollision(otherZone: ZIRZone): boolean;
+}
+
+export class ZIREffectBox extends ZIRZone{
     private ownerEntity: ZIREntity;
     private areas: ZIRZone[];
 
     constructor(parent: ZIREntity, areas: ZIRZone[]){
+        super(areas[0].getPosition());
         this.ownerEntity = parent;
         this.areas = areas;
     }
@@ -26,20 +41,6 @@ export class ZIREffectBox{
     public getParent(){
         return this.ownerEntity;
     }
-}
-
-export abstract class ZIRZone {
-    protected position: Vector;
-
-    constructor(pos: Vector) {
-        this.position = pos;
-    }
-
-    public getPosition() {
-        return this.position;
-    }
-
-    public abstract checkCollision(otherZone: ZIRZone): boolean;
 }
 
 export class ZIRCircleZone extends ZIRZone {

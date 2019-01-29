@@ -44,17 +44,6 @@ export class ZIREntity implements IZIREntity {
         return this.hitbox;
     }
 
-    public checkCollision(zones: ZIRZone[]) {
-        for (let zone of zones) {
-            for (let box of this.hitbox) {
-                if (box.checkCollision(zone)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public registerEvent(otherZone: ZIRZone) {
         //TODO register some event to handle later
     }

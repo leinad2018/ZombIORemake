@@ -30,7 +30,6 @@ export class ZIRInput {
     }
 
     private handleKeydownEvent(event){
-        console.log(event);
         var keycode: string = this.getKeyFromEvent(event);
         if(!this.activeKeys[keycode]){
             this.handler(keycode, true);
@@ -57,8 +56,8 @@ export class ZIRInput {
 
     private getKeyFromEvent(event) {
         var keyName: string;
-        //console.log(this.activeKeys)
-        //console.log(String.fromCharCode(event.keyCode));
+        // console.log(this.activeKeys)
+        // console.log(String.fromCharCode(event.keyCode));
         switch (event.keyCode) {
             case 32:
                 keyName = "space";
