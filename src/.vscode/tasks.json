@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compileServer",
+            "type": "typescript",
+            "tsconfig": "tsconfig-server.json",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildServer",
+            "dependsOn": "compileServer",
+            "type": "shell",
+            "command": "${workspaceFolder}/copyServer.bat",
+            "group": "build"
+        },
+        {
+            "label": "compileClient",
+            "type": "typescript",
+            "tsconfig": "tsconfig-client.json",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildClient",
+            "dependsOn": "compileClient",
+            "type": "shell",
+            "command": "${workspaceFolder}/copyClient.bat",
+            "group": "build"
+        },
+        {
+            "label": "buildAssets",
+            "type": "shell",
+            "command": "${workspaceFolder}/copyAssets.bat",
+            "group": "build",
+            "dependsOn": "emptyOutput"
+        },
+        {
+            "label": "emptyOutput",
+            "type": "shell",
+            "command": "${workspaceFolder}/deleteOutput.bat",
+            "group": "build"
+        },
+        {
+            "label": "Build",
+            "dependsOn": [
+                "buildServer",
+                "buildClient",
+                "buildAssets"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

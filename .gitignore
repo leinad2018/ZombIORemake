@@ -1,3 +1,6 @@
+src/output/*
+src/logs/*
+
 *.class
 
 # Mobile Tools for Java (J2ME)
