@@ -1,4 +1,5 @@
 import { Vector } from "../utilityObjects/Math";
+import { ZIREntity } from "./EntityBase";
 
 export abstract class ZIRZone {
     protected position: Vector;
@@ -12,6 +13,34 @@ export abstract class ZIRZone {
     }
 
     public abstract checkCollision(otherZone: ZIRZone): boolean;
+}
+
+export class ZIREffectBox extends ZIRZone{
+    private ownerEntity: ZIREntity;
+    private areas: ZIRZone[];
+
+    constructor(parent: ZIREntity, areas: ZIRZone[]){
+        super(areas[0].getPosition());
+        this.ownerEntity = parent;
+        this.areas = areas;
+    }
+
+    public checkCollision(zone: ZIRZone): boolean{
+        for(let area of this.areas){
+            if(area.checkCollision(zone)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public isMoving(){
+        return Math.abs(this.ownerEntity.getVelocity().getMagnitude()) > 0.1;
+    }
+
+    public getParent(){
+        return this.ownerEntity;
+    }
 }
 
 export class ZIRCircleZone extends ZIRZone {

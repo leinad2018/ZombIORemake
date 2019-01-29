@@ -51,9 +51,9 @@ export class ZIRSessionManager {
     }
 
     private handleInput(this: Session, data): void {
-        console.log(data.keycode);
+        // console.log(data.keycode);
         if (data.keycode) {
-            console.log(data.state);
+            // console.log(data.state);
             this.inputs[data.keycode] = data.state;
         }
     }
