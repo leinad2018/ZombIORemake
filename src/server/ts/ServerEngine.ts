@@ -11,6 +11,7 @@ import { ZIRThrownRock } from "./entities/projectiles/Rock";
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
+import { ZIREnemy } from "./entities/mobs/Enemy";
 
 export class ZIRServerEngine {
     dt: number = 0;
@@ -155,7 +156,7 @@ export class ZIRServerEngine {
     private async calculatePhysics() {
         let updates: Promise<void>[] = [];
         this.getAllEntities().forEach((entity) => {
-            entity.update();
+            entity.update(this);
             updates.push(this.physicsEngine.applyPhysics(entity, this.getDT()));
         });
         await Promise.all(updates);
@@ -236,6 +237,9 @@ export class ZIRServerEngine {
                             p = new ZIRThrownRock(player, velocity.add(player.getVelocity()), player.getPosition());
                             this.registerEntity(player.getEntityId(), p)
                             break;
+                        case "debug":
+                            let e = new ZIREnemy(player.getPosition());
+                            this.registerEntity(player.getEntityId(), e);
                     }
                 }
             }

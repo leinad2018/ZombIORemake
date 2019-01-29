@@ -5,6 +5,7 @@ export class ZIRInput {
     private pointHandler: (keycode: string, state: Vector) => void;
     private activeKeys: boolean[];
     private cursorState: Vector;
+    private debugState: boolean;
 
     constructor(){
         this.activeKeys = [];
@@ -24,7 +25,7 @@ export class ZIRInput {
     }
 
     public getDebug() : boolean {
-        return this.activeKeys["debug"];
+        return this.debugState;
     }
 
     private handleKeyupEvent(event){
@@ -39,6 +40,9 @@ export class ZIRInput {
         if(!this.activeKeys[keycode]){
             this.handler(keycode, true);
             this.activeKeys[keycode] = true;
+        }
+        if(keycode === "debug") {
+            this.debugState = !this.debugState;
         }
     }
 

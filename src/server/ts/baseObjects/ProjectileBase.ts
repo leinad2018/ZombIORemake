@@ -17,7 +17,7 @@ export class ZIRProjectile extends ZIREntity {
         setTimeout(()=>{this.kill()},expiration)
     }
 
-    public update() {
+    public update(state) {
         this.behavior(this.owner);
     }
 

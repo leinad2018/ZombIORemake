@@ -35,7 +35,7 @@ export class ZIREntity implements IZIREntity {
         return !this.updated;
     }
 
-    public update() : void {
+    public update(state) : void {
 
     }
 
