@@ -1,9 +1,9 @@
-import { Point } from "./UtilityInterfaces";
+import { Vector } from "../utilityObjects/Math";
 
 export interface IZIRRenderable {
-    getPosition: () => Point;
+    getPosition: () => Vector;
     getImageToRender: () => IZIRAsset;
-    getSize: () => Point;
+    getSize: () => Vector;
 }
 
 export interface IZIRAsset {

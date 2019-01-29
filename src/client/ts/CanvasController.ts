@@ -1,17 +1,17 @@
 import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
-import { Point } from "./globalInterfaces/UtilityInterfaces";
+import { Vector } from "./utilityObjects/Math";
 
 export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private DEBUG_RENDER: boolean = true;
-    private playerPosition: Point;
+    private playerPosition: Vector;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         window.addEventListener("resize", this.handleResize.bind(this));
-        this.playerPosition = { x: 0, y: 0 };
+        this.playerPosition = new Vector(0, 0);
         this.resizeWindow();
     }
 
@@ -20,11 +20,8 @@ export class ZIRCanvasController {
      * player-relative coordinate
      * @param cursorPoint 
      */
-    public transformRenderToPlayer(cursorPoint : Point) : Point {
-        return {
-            x: cursorPoint.x - this.canvas.width/2,
-            y: cursorPoint.y - this.canvas.height/2
-        }
+    public transformRenderToPlayer(cursorPoint : Vector) : Vector {
+        return new Vector(cursorPoint.getX() - this.canvas.width/2, cursorPoint.getY() - this.canvas.height/2);
     }
 
     public render(state : ZIRClientBase) {
@@ -84,8 +81,8 @@ export class ZIRCanvasController {
 
         let bkWidth = background.width;
         let bkHeight = background.height;
-        let offsetX = this.playerPosition.x % bkWidth;
-        let offsetY = this.playerPosition.y % bkHeight;
+        let offsetX = this.playerPosition.getX() % bkWidth;
+        let offsetY = this.playerPosition.getY() % bkHeight;
 
         ctx.setTransform(1, 0, 0, 1, -offsetX, -offsetY);
         ctx.fillRect(-bkWidth, -bkHeight, this.canvas.width + bkWidth * 2, this.canvas.height + bkHeight * 2);
@@ -93,8 +90,8 @@ export class ZIRCanvasController {
     }
 
     private renderEntities(ctx: CanvasRenderingContext2D, entities: IZIRRenderable[]) {
-        let xOffset = this.canvas.width / 2 - this.playerPosition.x;
-        let yOffset = this.canvas.height / 2 - this.playerPosition.y;
+        let xOffset = this.canvas.width / 2 - this.playerPosition.getX();
+        let yOffset = this.canvas.height / 2 - this.playerPosition.getY();
 
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, xOffset, yOffset);
@@ -103,11 +100,11 @@ export class ZIRCanvasController {
             let asset = entity.getImageToRender();
             let position = entity.getPosition();
             let size = entity.getSize();
-            let xs = size.x;
-            let ys = size.y;
-            let x = position.x - xs / 2;
-            let y = position.y - ys / 2;
-            ctx.drawImage(asset.getImage(), x, y);            
+            let xs = size.getX();
+            let ys = size.getY();
+            let x = position.getX() - xs / 2;
+            let y = position.getY() - ys / 2;
+            ctx.drawImage(asset.getImage(), x, y, xs, ys);            
             ctx.strokeRect(x, y, xs, ys);
         }
 
@@ -119,8 +116,8 @@ export class ZIRCanvasController {
         this.canvas.height = this.canvas.parentElement.clientHeight - 5;
     }
 
-    public getDimensions() : Point {
-        return({x: this.canvas.width, y: this.canvas.height})
+    public getDimensions() : Vector {
+        return(new Vector(this.canvas.width, this.canvas.height));
     }
 
     private handleResize(this: ZIRCanvasController) {

@@ -1,10 +1,10 @@
-import { Point } from "./globalInterfaces/UtilityInterfaces";
+import { Vector } from "./utilityObjects/Math";
 
 export class ZIRInput {
     private handler: (keycode: string, state: boolean) => void;
-    private pointHandler: (keycode: string, state: Point) => void;
+    private pointHandler: (keycode: string, state: Vector) => void;
     private activeKeys: boolean[];
-    private cursorState: Point;
+    private cursorState: Vector;
 
     constructor(){
         this.activeKeys = [];
@@ -19,7 +19,7 @@ export class ZIRInput {
         this.handler = handler;
     }
 
-    public setPointInputHandler(pointHandler: (keycode: string, state: Point) => void) {
+    public setPointInputHandler(pointHandler: (keycode: string, state: Vector) => void) {
         this.pointHandler = pointHandler;
     }
 
@@ -51,7 +51,7 @@ export class ZIRInput {
     }
 
     private handleMouseMove(event) {
-        this.cursorState = {x: event.pageX, y: event.pageY}
+        this.cursorState = new Vector(event.pageX,event.pageY);
         this.pointHandler("mouse", this.cursorState)
     }
 
@@ -63,16 +63,16 @@ export class ZIRInput {
             case 32:
                 keyName = "space";
                 break;
-            case 37:
+            case 65:
                 keyName = "leftArrow";
                 break;
-            case 38:
+            case 87:
                 keyName = "upArrow";
                 break;
-            case 39:
+            case 68:
                 keyName = "rightArrow";
                 break;
-            case 40:
+            case 83:
                 keyName = "downArrow";
                 break;
         }

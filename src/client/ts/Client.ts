@@ -1,7 +1,7 @@
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { ZIRAssetLoader } from "./AssetLoader";
 import { ZIREntityBase } from "./baseObjects/EntityBase";
-import { Point } from "./globalInterfaces/UtilityInterfaces";
+import { Vector } from "./utilityObjects/Math";
 import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
 import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult, IZIRWorldUpdate } from "./globalInterfaces/IServerUpdate";
 import { ZIRInput } from "./Input";
@@ -106,7 +106,7 @@ export class ZIRClient extends ZIRClientBase {
      * @param renderOffset gets global coordinate of point instead of
      * screen coordinate when true
      */
-    private handlePointInput(keycode: string, state: Point, renderOffset: boolean=true) {
+    private handlePointInput(keycode: string, state: Vector, renderOffset: boolean=true) {
         if(renderOffset) {
             state = this.canvas.transformRenderToPlayer(state);
         }
@@ -117,14 +117,8 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private parseEntityResult(result: IZIREntityResult) {
-        var position: Point = {
-            x: result.x,
-            y: result.y
-        }
-        var size: Point = {
-            x: result.xsize,
-            y: result.ysize
-        }
+        var position: Vector = new Vector(result.x, result.y);
+        var size: Vector = new Vector(result.xsize, result.ysize);
         var asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
         return new ZIREntityBase(result.id, position, size, asset);
     }
@@ -166,15 +160,12 @@ export class ZIRClient extends ZIRClientBase {
         this.username = name;
     }
 
-    public getPlayerPosition() {
+    public getPlayerPosition() : Vector {
         var player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }
-        return {
-            x: 0,
-            y: 0
-        }
+        return(undefined);
     }
 
     public getWorldData() {
