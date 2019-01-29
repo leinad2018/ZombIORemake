@@ -29,6 +29,8 @@ export abstract class ZIRClientBase {
         });
     }
 
+    abstract isDebugMode() : boolean;
+
     abstract getPlayersOnline();
 
     abstract getDebugMessages();

@@ -5,7 +5,7 @@ import { Vector } from "./utilityObjects/Math";
 
 export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
-    private DEBUG_RENDER: boolean = true;
+    private shouldRenderDebug: boolean = true;
     private playerPosition: Vector;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -25,6 +25,7 @@ export class ZIRCanvasController {
     }
 
     public render(state : ZIRClientBase) {
+        this.shouldRenderDebug = state.isDebugMode();
         this.playerPosition = state.getPlayerPosition();
         let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
 
@@ -38,7 +39,7 @@ export class ZIRCanvasController {
         this.renderEntities(ctx, entities);
 
         this.renderPlayerBox(ctx, state.getPlayersOnline());
-        if (this.DEBUG_RENDER) this.renderDebugBox(ctx, state.getDebugMessages());
+        if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
     }
 
     private renderWorld(ctx: CanvasRenderingContext2D, worldData: IZIRRenderable[]) {
@@ -105,7 +106,7 @@ export class ZIRCanvasController {
             let x = position.getX() - xs / 2;
             let y = position.getY() - ys / 2;
             ctx.drawImage(asset.getImage(), x, y, xs, ys);            
-            ctx.strokeRect(x, y, xs, ys);
+            if(this.shouldRenderDebug) ctx.strokeRect(x, y, xs, ys);
         }
 
         ctx.restore();

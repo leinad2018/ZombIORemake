@@ -23,6 +23,10 @@ export class ZIRInput {
         this.pointHandler = pointHandler;
     }
 
+    public getDebug() : boolean {
+        return this.activeKeys["debug"];
+    }
+
     private handleKeyupEvent(event){
         var keycode: string = this.getKeyFromEvent(event);
         this.handler(keycode, false);
@@ -74,6 +78,9 @@ export class ZIRInput {
                 break;
             case 83:
                 keyName = "downArrow";
+                break;
+            case 187:
+                keyName = "debug";
                 break;
         }
         

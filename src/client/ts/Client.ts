@@ -43,6 +43,10 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.registerServerListeners();
     }
 
+    public isDebugMode() : boolean {
+        return this.input.getDebug();
+    }
+
     private fetchUsername() {
         this.serverComms.sendInfoToServer('rename', this.username);
     }
