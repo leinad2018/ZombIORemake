@@ -1,5 +1,5 @@
 /** 
- * Deprecated!!! Do not use!
+ * @deprecated
  */
 export interface Point{
     x: number;

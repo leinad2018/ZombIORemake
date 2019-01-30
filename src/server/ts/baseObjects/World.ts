@@ -1,6 +1,8 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { ZIREffectBox } from "./Hitbox";
+import {Vector} from "../utilityObjects/Math";
+import { deprecate } from "util";
 
 export class ZIRWorld {
     private worldID: string;
@@ -11,6 +13,7 @@ export class ZIRWorld {
     private sectors: ZIRSector[];
     private readonly sectorSize = 500;
     private readonly width;
+    private readonly height;
 
     constructor(id: string, width: number, height: number) {
         this.worldID = id;
@@ -24,14 +27,32 @@ export class ZIRWorld {
             }
         }
         this.width = width;
+        this.height = height;
         this.terrain = this.generateWorldTerrain();
+    }
+
+    public getSectorIdByPosition(position : Vector) : number {
+
+        let sectorX = Math.trunc(position.getX() / this.sectorSize);
+        let sectorY = Math.trunc(position.getY() / this.sectorSize);
+
+        if(sectorX >= this.width || sectorX < 1) {
+            return -1;
+        }
+        if(sectorY >= this.height || sectorY < 1) {
+            return -1;
+        }
+
+        return this.width * sectorY + sectorX;
     }
 
     public registerEntity(entity: ZIREntity) {
         let position = entity.getPosition();
-        let sectorX = Math.trunc(position.getX() / this.sectorSize);
-        let sectorY = Math.trunc(position.getY() / this.sectorSize);
-        let sectorID = this.width * sectorY + sectorX;
+        let sectorID = this.getSectorIdByPosition(position);
+        if(sectorID === -1) {
+            entity.kill();
+            return;
+        }
         this.sectorLookup[entity.getEntityId()] = sectorID;
         this.sectors[sectorID].addEntity(entity);
         this.entities.push(entity);
@@ -56,9 +77,13 @@ export class ZIRWorld {
                 let entityID = entity.getEntityId();
                 let currentSectorID: number = this.sectorLookup[entityID];
                 let position = entity.getPosition();
-                let sectorX = Math.trunc(position.getX() / this.sectorSize);
-                let sectorY = Math.trunc(position.getY() / this.sectorSize);
-                let newSectorID = this.width * sectorY + sectorX;
+
+                let newSectorID = this.getSectorIdByPosition(position);
+                if(newSectorID === -1) {
+                    entity.kill();
+                    return;
+                }
+
                 if (newSectorID != currentSectorID) {
                     this.sectorLookup[entityID] = newSectorID;
                     let curSector = this.sectors[currentSectorID];
@@ -71,6 +96,7 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
+        this.sortEntities();
         for (let entity of this.entities) {
             if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
                 let baseSectorID = this.getSectorIDByEntity(entity);
@@ -143,9 +169,11 @@ export class ZIRWorld {
         return this.worldID;
     }
 
+    /**
+     * @deprecated
+     */
     public destroyEntity(entity: ZIREntity) {
-        let entityIndex = this.entities.indexOf(entity);
-        if (entityIndex !== -1) this.entities.splice(entityIndex, 1);
+        this.removeEntity(entity.getEntityId());
     }
 
     protected generateWorldTerrain(): IZIRTerrainMap {
