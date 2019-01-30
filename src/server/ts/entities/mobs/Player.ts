@@ -7,7 +7,7 @@ export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];
     private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
 
-    constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
+    constructor(position: Vector = new Vector(500 + Math.random() * 500, 500 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
         this.inventory = new Array(12).fill({ itemID: -1, amount: 0 });
     }

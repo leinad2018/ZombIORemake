@@ -1,6 +1,5 @@
 import { ZIREntity } from "../../baseObjects/EntityBase"
 import { Vector } from "../../utilityObjects/Math";
-import { ZIRRectangularZone } from "../../baseObjects/Hitbox";
 import { ZIRPlayer } from "./Player";
 
 export class ZIREnemy extends ZIREntity {
@@ -10,7 +9,6 @@ export class ZIREnemy extends ZIREntity {
 
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "enemy", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.hitbox = new ZIRRectangularZone(this.position, this.size);
         this.moveSpeed = 10 * this.PIXELS_PER_METER;
     }
 

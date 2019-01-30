@@ -132,8 +132,10 @@ export class ZIRServerEngine {
         this.sendDebugInfo();
 
         await this.calculatePhysics();
-
+        
         this.handleInput();
+        
+        this.checkCollision();
 
         await this.updateEvents();
 
@@ -144,6 +146,12 @@ export class ZIRServerEngine {
         this.sendUpdate(shouldReset);
 
         this.collectGarbage();
+    }
+
+    private checkCollision(){
+        for(let world of this.universe){
+            world.runCollisionLogic();
+        }
     }
 
     private collectGarbage() {

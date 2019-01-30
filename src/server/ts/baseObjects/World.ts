@@ -7,7 +7,7 @@ export class ZIRWorld {
     private terrain: IZIRTerrainMap;
     private entities: ZIREntity[];
     private hurtboxes: ZIREffectBox[];
-    private sectorLookup: string[];
+    private sectorLookup: number[];
     private sectors: ZIRSector[];
     private readonly sectorSize = 500;
     private readonly width;
@@ -50,6 +50,26 @@ export class ZIRWorld {
         }
     }
 
+    public sortEntities() {
+        for (let entity of this.entities) {
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+                let entityID = entity.getEntityId();
+                let currentSectorID: number = this.sectorLookup[entityID];
+                let position = entity.getPosition();
+                let sectorX = Math.trunc(position.getX() / this.sectorSize);
+                let sectorY = Math.trunc(position.getY() / this.sectorSize);
+                let newSectorID = this.width * sectorY + sectorX;
+                if (newSectorID != currentSectorID) {
+                    this.sectorLookup[entityID] = newSectorID;
+                    let curSector = this.sectors[currentSectorID];
+                    curSector.removeEntity(entityID);
+                    let newSector = this.sectors[newSectorID];
+                    newSector.addEntity(entity);
+                }
+            }
+        }
+    }
+
     public runCollisionLogic() {
         for (let entity of this.entities) {
             if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
@@ -57,9 +77,9 @@ export class ZIRWorld {
                 let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
                 let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
                 for (let check of entitiesToCheck) {
-                    for(let zone1 of check.getHitbox()){
-                        for(let zone2 of entity.getHitbox()){
-                            if(zone1.checkCollision(zone2)){
+                    for (let zone1 of check.getHitbox()) {
+                        for (let zone2 of entity.getHitbox()) {
+                            if (zone1.checkCollision(zone2)) {
                                 entity.registerEvent(zone1);
                                 check.registerEvent(zone2);
                             }
@@ -68,15 +88,15 @@ export class ZIRWorld {
                 }
             }
         }
-        for(let hurtbox of this.hurtboxes){
-            if(hurtbox.isMoving()){
+        for (let hurtbox of this.hurtboxes) {
+            if (hurtbox.isMoving()) {
                 let entity = hurtbox.getParent();
                 let baseSectorID = this.getSectorIDByEntity(entity);
                 let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
                 let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
                 for (let check of entitiesToCheck) {
-                    for(let hitbox of check.getHitbox()){
-                        if(hurtbox.checkCollision(hitbox)){
+                    for (let hitbox of check.getHitbox()) {
+                        if (hurtbox.checkCollision(hitbox)) {
                             entity.registerEvent(hitbox);
                             check.registerEvent(hurtbox);
                             break;
