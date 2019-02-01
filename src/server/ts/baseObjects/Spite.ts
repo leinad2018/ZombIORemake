@@ -9,4 +9,8 @@ export class ZIRSpite extends ZIREntity {
     public toString() : string {
         return "Spite" + this.id + "@" + this.position;
     }
+
+    protected createStaticHitboxes(){
+        return [];
+    }
 }

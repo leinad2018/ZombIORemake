@@ -1,13 +1,13 @@
 import { ZIREntity } from "../../baseObjects/EntityBase"
 import { Vector } from "../../utilityObjects/Math"
 import { IZIRInventorySlot } from "../../globalInterfaces/UtilityInterfaces";
-import { ZIRRectangularZone } from "../../baseObjects/Hitbox";
+import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];
-    private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
+    private cooldownUses: { [ability: string]: number }; // For storing cooldown timestamps
 
-    constructor(position: Vector = new Vector(500 + Math.random() * 500, 500 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
+    constructor(position: Vector = new Vector(1000 + Math.random() * 500, 1000 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
         this.inventory = new Array(12).fill({ itemID: -1, amount: 0 });
     }
@@ -87,14 +87,20 @@ export class ZIRPlayer extends ZIREntity {
         return true;
     }
 
-    public getObject(){
+    public getObject() {
         return {
             playerID: this.id,
             inventory: this.inventory
         };
     }
 
-    public toString() : string {
-        return "Player" + this.id + "@" + this.position +"/V"+this.velocity + "/A"+this.acceleration;
+    protected createStaticHitboxes(): ZIRZone[] {
+        let toReturn: ZIRZone[] = [];
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size);
+        return toReturn;
+    }
+
+    public toString(): string {
+        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/A" + this.acceleration;
     }
 }

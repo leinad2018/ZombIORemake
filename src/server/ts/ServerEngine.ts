@@ -49,7 +49,7 @@ export class ZIRServerEngine {
         this.sessions.push(session);
         session.setDisconnectHandler(this.disconnectSession.bind(this));
         let player = new ZIRPlayer();
-        let worldID = player.getEntityId();
+        let worldID = "wilderness";
         session.setPlayer(player);
         session.setWorldID(worldID);
         this.sessionManager.sendToClient(session.socket, "updatePlayer", player.getObject());
@@ -84,8 +84,8 @@ export class ZIRServerEngine {
         return toReturn;
     }
 
-    public destroyEntityInWorlds(entity : ZIREntity) {
-        for(let world of this.universe) {
+    public destroyEntityInWorlds(entity: ZIREntity) {
+        for (let world of this.universe) {
             world.destroyEntity(entity)
         }
     }
@@ -132,9 +132,9 @@ export class ZIRServerEngine {
         this.sendDebugInfo();
 
         await this.calculatePhysics();
-        
+
         this.handleInput();
-        
+
         this.checkCollision();
 
         await this.updateEvents();
@@ -148,15 +148,15 @@ export class ZIRServerEngine {
         this.collectGarbage();
     }
 
-    private checkCollision(){
-        for(let world of this.universe){
+    private checkCollision() {
+        for (let world of this.universe) {
             world.runCollisionLogic();
         }
     }
 
     private collectGarbage() {
         this.getAllEntities().forEach(
-            (entity) => {if (entity.isDead()) this.destroyEntityInWorlds(entity)}
+            (entity) => { if (entity.isDead()) this.destroyEntityInWorlds(entity) }
         );
     }
 
@@ -233,20 +233,20 @@ export class ZIRServerEngine {
                         case "space":
                             mouse = session.getInputs()["mouse"]
                             direction = new Vector(mouse.x, mouse.y);
-                            velocity = direction.getUnitVector().scale(30*player.PIXELS_PER_METER)
+                            velocity = direction.getUnitVector().scale(30 * player.PIXELS_PER_METER);
                             p = new ZIRBoomerang(player, velocity.add(player.getVelocity()), player.getPosition());
-                            this.registerEntity(player.getEntityId(), p)
+                            this.registerEntity(session.getWorldID(), p);
                             break;
                         case "click":
                             mouse = session.getInputs()["mouse"]
                             direction = new Vector(mouse.x, mouse.y);
-                            velocity = direction.getUnitVector().scale(30*player.PIXELS_PER_METER)
+                            velocity = direction.getUnitVector().scale(30 * player.PIXELS_PER_METER)
                             p = new ZIRThrownRock(player, velocity.add(player.getVelocity()), player.getPosition());
-                            this.registerEntity(player.getEntityId(), p)
+                            this.registerEntity(session.getWorldID(), p);
                             break;
                         case "debug":
                             let e = new ZIREnemy(player.getPosition());
-                            this.registerEntity(player.getEntityId(), e);
+                            this.registerEntity(session.getWorldID(), e);
                     }
                 }
             }

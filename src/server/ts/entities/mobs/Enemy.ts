@@ -1,6 +1,7 @@
 import { ZIREntity } from "../../baseObjects/EntityBase"
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
+import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIREnemy extends ZIREntity {
     private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
@@ -19,7 +20,7 @@ export class ZIREnemy extends ZIREntity {
     public ai(state) : void {
         this.findTarget(state);
         if(this.target) {
-            this.setAcceleration(this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(-this.moveSpeed));
+            this.setAcceleration(this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveSpeed));
         } else {
             this.setAcceleration(Vector.ZERO_VECTOR);
         }
@@ -41,6 +42,12 @@ export class ZIREnemy extends ZIREntity {
         return {
             playerID: this.id,
         };
+    }
+
+    public createStaticHitboxes(){
+        let toReturn: ZIRZone[] = [];
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size);
+        return toReturn;
     }
 
     public toString() : string {
