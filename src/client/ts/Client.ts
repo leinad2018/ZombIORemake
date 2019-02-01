@@ -31,6 +31,7 @@ export class ZIRClient extends ZIRClientBase {
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
         this.canvas = renderer;
+        this.canvas.createTerrainCache(this.world.getWorldData());
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
@@ -96,6 +97,7 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleWorldUpdate(data: IZIRWorldUpdate) {
         this.world = new ZIRWorldData(data);
+        this.canvas.createTerrainCache(this.world.getWorldData());
     }
 
 

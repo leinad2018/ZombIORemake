@@ -7,6 +7,7 @@ export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private shouldRenderDebug: boolean = true;
     private playerPosition: Vector;
+    private terrainCache: ZIRImageCache;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -20,11 +21,11 @@ export class ZIRCanvasController {
      * player-relative coordinate
      * @param cursorPoint 
      */
-    public transformRenderToPlayer(cursorPoint : Vector) : Vector {
-        return new Vector(cursorPoint.getX() - this.canvas.width/2, cursorPoint.getY() - this.canvas.height/2);
+    public transformRenderToPlayer(cursorPoint: Vector): Vector {
+        return new Vector(cursorPoint.getX() - this.canvas.width / 2, cursorPoint.getY() - this.canvas.height / 2);
     }
 
-    public render(state : ZIRClientBase) {
+    public render(state: ZIRClientBase) {
         this.shouldRenderDebug = state.isDebugMode();
         this.playerPosition = state.getPlayerPosition();
         let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
@@ -32,8 +33,7 @@ export class ZIRCanvasController {
         let background: IZIRAsset = state.getBackgroundImage();
         this.renderBackground(ctx, background);
 
-        let worldData: IZIRRenderable[] = state.getWorldData();
-        this.renderWorld(ctx, worldData);
+        this.renderWorld(ctx);
 
         let entities: IZIRRenderable[] = state.getEntitiesToRender();
         this.renderEntities(ctx, entities);
@@ -42,8 +42,10 @@ export class ZIRCanvasController {
         if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
     }
 
-    private renderWorld(ctx: CanvasRenderingContext2D, worldData: IZIRRenderable[]) {
-        this.renderEntities(ctx, worldData);
+    private renderWorld(ctx: CanvasRenderingContext2D) {
+        let xOffset = this.canvas.width / 2 - this.playerPosition.getX() + this.terrainCache.xOffset;
+        let yOffset = this.canvas.height / 2 - this.playerPosition.getY() + this.terrainCache.yOffset;
+        ctx.drawImage(this.terrainCache, xOffset, yOffset);
     }
 
     private renderPlayerBox(ctx: CanvasRenderingContext2D, players: string[]) {
@@ -105,11 +107,48 @@ export class ZIRCanvasController {
             let ys = size.getY();
             let x = position.getX() - xs / 2;
             let y = position.getY() - ys / 2;
-            ctx.drawImage(asset.getImage(), x, y, xs, ys);            
-            if(this.shouldRenderDebug) ctx.strokeRect(x, y, xs, ys);
+            ctx.drawImage(asset.getImage(), x, y, xs, ys);
+            if (this.shouldRenderDebug) ctx.strokeRect(x, y, xs, ys);
         }
 
         ctx.restore();
+    }
+
+    public createTerrainCache(worldData: IZIRRenderable[]) {
+        if (worldData.length > 0) {
+            let firstPos = worldData[0].getPosition();
+            let firstSize = worldData[0].getSize();
+            let minX: number = firstPos.getX();
+            let maxX: number = firstPos.add(firstSize).getX();
+            let minY: number = firstPos.getY();
+            let maxY: number = firstPos.add(firstSize).getY();
+            for (let i = 1; i < worldData.length; i++) {
+                let position = worldData[i].getPosition();
+                let otherCorner = position.add(worldData[i].getSize());
+                minX = Math.min(minX, position.getX());
+                minY = Math.min(minY, position.getY());
+                maxX = Math.max(maxX, otherCorner.getX());
+                maxY = Math.max(maxY, otherCorner.getY());
+            }
+            let canvasWidth = maxX - minX;
+            let canvasHeight = maxY - minY;
+            this.terrainCache = this.createImageCache(canvasWidth, canvasHeight, minX, minY);
+            let cacheCtx = this.terrainCache.getContext('2d');
+            for (let data of worldData) {
+                let pos = data.getPosition();
+                let size = data.getSize();
+                cacheCtx.drawImage(data.getImageToRender().getImage(), pos.getX() - minX, pos.getY() - minY, size.getX(), size.getY());
+            }
+        }
+    }
+
+    private createImageCache(x: number, y: number, xOffset: number, yOffset: number) {
+        let canvas = document.createElement('canvas') as ZIRImageCache;
+        canvas.setAttribute('width', x + '');
+        canvas.setAttribute('height', y + '');
+        canvas.xOffset = xOffset;
+        canvas.yOffset = yOffset;
+        return canvas;
     }
 
     public resizeWindow() {
@@ -117,11 +156,16 @@ export class ZIRCanvasController {
         this.canvas.height = this.canvas.parentElement.clientHeight - 5;
     }
 
-    public getDimensions() : Vector {
-        return(new Vector(this.canvas.width, this.canvas.height));
+    public getDimensions(): Vector {
+        return (new Vector(this.canvas.width, this.canvas.height));
     }
 
     private handleResize(this: ZIRCanvasController) {
         this.resizeWindow();
     }
+}
+
+interface ZIRImageCache extends HTMLCanvasElement {
+    xOffset: number;
+    yOffset: number;
 }
