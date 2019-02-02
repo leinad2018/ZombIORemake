@@ -20,7 +20,7 @@ export abstract class ZIREntity implements IZIREntity {
     protected asset: string;
     protected staticHitboxes: ZIRZone[];
     protected size: Vector;
-    protected hitboxHandlers: (() => void)[];
+    protected hitboxHandlers: ((otherZone: ZIRZone) => void)[];
     protected eventsToExecute: ZIRZone[];
 
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, isPhysical: boolean = true) {
@@ -65,14 +65,18 @@ export abstract class ZIREntity implements IZIREntity {
 
     public runEvents() {
         for (let otherZone of this.eventsToExecute) {
-            let type = otherZone.getType();
+            let types = otherZone.getTypes();
             let owner: ZIREntity = otherZone.getParent();
-            if (this.hitboxHandlers[type] && owner != this) {
+            if (owner != this) {
                 if (owner instanceof ZIRProjectile) {
                     owner = (owner as ZIRProjectile).getParent();
                 }
-                if (owner != this) {
-                    this.hitboxHandlers[type]();
+                if(owner != this){
+                    for (let type of types) {
+                        if (this.hitboxHandlers[type]) {
+                            this.hitboxHandlers[type](otherZone);
+                        }
+                    }
                 }
             }
         }
@@ -92,11 +96,11 @@ export abstract class ZIREntity implements IZIREntity {
         this.updated = updated;
     }
 
-    public setCreating(created: boolean){
+    public setCreating(created: boolean) {
         this.creating = created;
     }
 
-    public isCreating(){
+    public isCreating() {
         return this.creating;
     }
 
@@ -176,7 +180,7 @@ export abstract class ZIREntity implements IZIREntity {
         return "Entity" + this.id + "@" + this.position;
     }
 
-    public getObject(){
+    public getObject() {
         return {
             playerID: this.id
         };

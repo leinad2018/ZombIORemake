@@ -3,13 +3,13 @@ import { ZIREntity } from "./EntityBase";
 
 export abstract class ZIRZone {
     protected position: Vector;
-    protected type: string;
+    protected types: string[];
     protected owner: ZIREntity;
 
-    constructor(pos: Vector, owner: ZIREntity, type: string = "none") {
+    constructor(pos: Vector, owner: ZIREntity, types: string[] = ["none"]) {
         this.position = pos;
         this.owner = owner;
-        this.type = type;
+        this.types = types;
     }
 
     public getPosition() {
@@ -20,8 +20,8 @@ export abstract class ZIRZone {
         this.position = pos;
     }
 
-    public getType(){
-        return this.type;
+    public getTypes(){
+        return this.types;
     }
 
     public getParent() {
@@ -56,7 +56,7 @@ export class ZIREffectBox extends ZIRZone {
 export class ZIRCircleZone extends ZIRZone {
     protected radius: number;
 
-    constructor(pos: Vector, owner: ZIREntity, radius: number, type?: string) {
+    constructor(pos: Vector, owner: ZIREntity, radius: number, type?: string[]) {
         super(pos, owner, type);
         this.radius = radius;
     }
@@ -90,7 +90,7 @@ export class ZIRCircleZone extends ZIRZone {
 export class ZIRRectangularZone extends ZIRZone {
     protected size: Vector;
 
-    constructor(pos: Vector, owner: ZIREntity, size: Vector, type?: string) {
+    constructor(pos: Vector, owner: ZIREntity, size: Vector, type?: string[]) {
         super(pos, owner, type);
         this.size = size;
     }
