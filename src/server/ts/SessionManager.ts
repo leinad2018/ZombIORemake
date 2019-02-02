@@ -130,6 +130,7 @@ export class Session {
     private defaultView: ZIREntity;
     private worldID: string;
     private disconnectHandler: (session: Session) => void;
+    private respawnRequested = false;
     private io;
 
     constructor(socket: string, defaultView: ZIREntity, io) {
@@ -144,14 +145,18 @@ export class Session {
     public update() {
         if(this.player.isDead()) {
             this.setFocus(this.defaultView);
-            this.requestRespawn();
+            if(!this.respawnRequested) {
+                this.requestRespawn();
+            }
         } else {
+            this.respawnRequested = false;
             this.setFocus(this.player);
         }
     }
 
     public requestRespawn() {
         this.io.to(this.socket).emit("requestRespawn");
+        this.respawnRequested = true;
     }
 
     public setDisconnectHandler(handler: (session: Session) => void) {
