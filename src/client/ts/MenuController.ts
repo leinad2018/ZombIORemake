@@ -15,6 +15,7 @@ export class ZIRMenuController{
         button.textContent = "Respawn";
         button.addEventListener('click', handler);
         div.appendChild(button);
+        div.setAttribute('style', 'position:absolute;top:50%;left:50%');
         this.mainDiv.appendChild(div);
     }
 
