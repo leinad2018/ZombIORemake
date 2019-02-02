@@ -4,6 +4,7 @@ import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRServerCommunications } from "./ServerComms";
 import { ZIRInput } from "./Input";
+import { ZIRMenuController } from "./MenuController";
 
 var waitForLoad = () => new Promise(() => {
     var check = () => {
@@ -44,7 +45,9 @@ function runAfterLoaded() {
     let renderer = new ZIRCanvasController(mainCanvas as HTMLCanvasElement);
     let serverComms = new ZIRServerCommunications();
     let keyboardInput = new ZIRInput();
-    var client: ZIRClientBase = new ZIRClient(playerName, renderer, serverComms, keyboardInput);
+    let mainDiv = document.getElementById('baseDiv');
+    let menuController = new ZIRMenuController(mainDiv as HTMLDivElement);
+    var client: ZIRClientBase = new ZIRClient(playerName, renderer, serverComms, keyboardInput, menuController);
     console.log("Started Game");
 }
 var mainCanvas = document.getElementById("mainCanvas");
