@@ -12,10 +12,12 @@ export class ZIRSessionManager {
     io: any;
     defaultView: ZIREntity;
     registerSessionHandler: (session: Session) => void;
+    spawnHandler: (session: Session) => void;
     private logger: ZIRLogger;
 
-    constructor(registerSessionHandler, logger, defaultView : ZIREntity) {
+    constructor(registerSessionHandler, spawnHandler, logger, defaultView : ZIREntity) {
         this.registerSessionHandler = registerSessionHandler;
+        this.spawnHandler = spawnHandler;
         this.logger = logger;
         var express = require('express');
         var http = require('http');
@@ -86,6 +88,7 @@ export class ZIRSessionManager {
         socket.on("rename", this.handleRename.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
+        socket.on("respawn", this.spawnHandler);
         this.registerSessionHandler(s);
         socket.emit("requestRename");
     }

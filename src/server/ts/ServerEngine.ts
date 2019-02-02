@@ -28,7 +28,7 @@ export class ZIRServerEngine {
         this.packetLogger.disable();
         this.defaultView = new ZIRSpite();
 
-        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger, this.defaultView);
+        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.packetLogger, this.defaultView);
     }
 
     /**
@@ -48,23 +48,28 @@ export class ZIRServerEngine {
     public registerSession(session: Session) {
         this.sessions.push(session);
         session.setDisconnectHandler(this.disconnectSession.bind(this));
-        let player = new ZIRPlayer();
         let worldID = "wilderness";
-        session.setPlayer(player);
         session.setWorldID(worldID);
 
         for (let world of this.universe) {
             if (world.getWorldID() == worldID) {
-                world.registerEntity(player);
                 this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
+                this.handleSpawn(session);
                 return;
             }
         }
         let newWorld = new ZIRPlayerWorld(worldID);
         newWorld.registerEntity(this.defaultView);
-        newWorld.registerEntity(player);
         this.universe.push(newWorld);
         this.sessionManager.sendToClient(session.getSocket(), "updateWorld", newWorld.getTerrainMap());
+        this.handleSpawn(session);
+    }
+
+    public handleSpawn(session: Session) {
+        let player = new ZIRPlayer();
+        session.setPlayer(player);
+        let world = this.findWorldById(session.getWorldID());
+        world.registerEntity(player);
     }
 
     public disconnectSession(disconnectedSession: Session) {
