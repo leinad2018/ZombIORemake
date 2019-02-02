@@ -87,7 +87,7 @@ export class ZIRSessionManager {
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
         this.registerSessionHandler(s);
-        socket.emit("requestUsername");
+        socket.emit("requestRename");
     }
 
     private addHandler = (key: string, callback: Function): void => {
@@ -141,9 +141,14 @@ export class Session {
     public update() {
         if(this.player.isDead()) {
             this.setFocus(this.defaultView);
+            this.requestRespawn();
         } else {
             this.setFocus(this.player);
         }
+    }
+
+    public requestRespawn() {
+        this.io.to(this.socket).emit("requestRespawn");
     }
 
     public setDisconnectHandler(handler: (session: Session) => void) {

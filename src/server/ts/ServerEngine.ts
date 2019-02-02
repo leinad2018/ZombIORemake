@@ -1,16 +1,12 @@
 import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
-import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
 import { ZIRPlayer } from "./entities/mobs/Player";
-import { ZIRBoomerang } from "./entities/projectiles/Boomerang";
-import { ZIRThrownRock } from "./entities/projectiles/Rock";
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
-import { ZIREnemy } from "./entities/mobs/Enemy";
 import { ZIRSpite } from "./baseObjects/Spite";
 
 export class ZIRServerEngine {
@@ -92,18 +88,6 @@ export class ZIRServerEngine {
     public destroyEntityInWorlds(entity: ZIREntity) {
         for (let world of this.universe) {
             world.destroyEntity(entity)
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public registerEntity(worldID: string, e: ZIREntity) {
-        for (let world of this.universe) {
-            if (world.getWorldID() == worldID) {
-                world.registerEntity(e);
-                return;
-            }
         }
     }
 
@@ -256,7 +240,7 @@ export class ZIRServerEngine {
         for (let session of this.sessions) {
             let debugMessages = [];
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
-            debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
+            debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
             debugMessages.push("Entities (" + this.getAllEntities().length + " total): " + this.getAllEntities());
             session.setDebugMessages(debugMessages);
