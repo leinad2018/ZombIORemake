@@ -1,14 +1,13 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { ZIREffectBox } from "./Hitbox";
-import {Vector} from "../utilityObjects/Math";
+import { Vector } from "../utilityObjects/Math";
 import { deprecate } from "util";
 
 export class ZIRWorld {
     private worldID: string;
     private terrain: IZIRTerrainMap;
     private entities: ZIREntity[];
-    private hurtboxes: ZIREffectBox[];
     private sectorLookup: number[];
     private sectors: ZIRSector[];
     private readonly sectorSize = 500;
@@ -20,7 +19,6 @@ export class ZIRWorld {
         this.entities = [];
         this.sectors = [];
         this.sectorLookup = [];
-        this.hurtboxes = [];
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 this.sectors.push(new ZIRSector());
@@ -31,15 +29,15 @@ export class ZIRWorld {
         this.terrain = this.generateWorldTerrain();
     }
 
-    public getSectorIdByPosition(position : Vector) : number {
+    public getSectorIdByPosition(position: Vector): number {
 
         let sectorX = Math.trunc(position.getX() / this.sectorSize);
         let sectorY = Math.trunc(position.getY() / this.sectorSize);
 
-        if(sectorX >= this.width || sectorX < 1) {
+        if (sectorX >= this.width || sectorX < 1) {
             return -1;
         }
-        if(sectorY >= this.height || sectorY < 1) {
+        if (sectorY >= this.height || sectorY < 1) {
             return -1;
         }
 
@@ -49,7 +47,7 @@ export class ZIRWorld {
     public registerEntity(entity: ZIREntity) {
         let position = entity.getPosition();
         let sectorID = this.getSectorIdByPosition(position);
-        if(sectorID === -1) {
+        if (sectorID === -1) {
             entity.kill();
             return;
         }
@@ -79,7 +77,7 @@ export class ZIRWorld {
                 let position = entity.getPosition();
 
                 let newSectorID = this.getSectorIdByPosition(position);
-                if(newSectorID === -1) {
+                if (newSectorID === -1) {
                     entity.kill();
                     return;
                 }
@@ -98,13 +96,13 @@ export class ZIRWorld {
     public runCollisionLogic() {
         this.sortEntities();
         for (let entity of this.entities) {
-            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
                 let baseSectorID = this.getSectorIDByEntity(entity);
                 let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
                 let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
                 for (let check of entitiesToCheck) {
-                    for (let zone1 of check.getHitbox()) {
-                        for (let zone2 of entity.getHitbox()) {
+                    for (let zone1 of check.getHitboxes()) {
+                        for (let zone2 of entity.getHitboxes()) {
                             if (zone1.checkCollision(zone2)) {
                                 entity.registerEvent(zone1);
                                 check.registerEvent(zone2);
@@ -114,22 +112,9 @@ export class ZIRWorld {
                 }
             }
         }
-        for (let hurtbox of this.hurtboxes) {
-            if (hurtbox.isMoving()) {
-                let entity = hurtbox.getParent();
-                let baseSectorID = this.getSectorIDByEntity(entity);
-                let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
-                let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
-                for (let check of entitiesToCheck) {
-                    for (let hitbox of check.getHitbox()) {
-                        if (hurtbox.checkCollision(hitbox)) {
-                            entity.registerEvent(hitbox);
-                            check.registerEvent(hurtbox);
-                            break;
-                        }
-                    }
-                }
-            }
+        for(let entity of this.entities){
+            entity.runEvents();
+            entity.setCreating(false);
         }
     }
 

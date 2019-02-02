@@ -1,7 +1,8 @@
-import {ZIREntity} from "./EntityBase";
+import { ZIREntity } from "./EntityBase";
 import { Vector } from "../utilityObjects/Math";
+import { ZIRZone } from "./Hitbox";
 
-export class ZIRProjectile extends ZIREntity {
+export abstract class ZIRProjectile extends ZIREntity {
     protected behavior: Function;
     protected owner: ZIREntity;
 
@@ -11,10 +12,10 @@ export class ZIRProjectile extends ZIREntity {
         this.velocity = velocity;
         this.mass = 1;
         this.friction = 0;
-        this.moveSpeed = 30*this.PIXELS_PER_METER
-        this.behavior = (e : ZIREntity)=>{};
+        this.moveSpeed = 30 * this.PIXELS_PER_METER;
+        this.behavior = (e: ZIREntity) => { };
         this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
-        setTimeout(()=>{this.kill()},expiration)
+        setTimeout(() => { this.kill() }, expiration);
     }
 
     public update(state) {
@@ -24,4 +25,10 @@ export class ZIRProjectile extends ZIREntity {
     public setBehavior(behavior: Function) {
         this.behavior = behavior;
     }
+
+    public getParent() {
+        return this.owner;
+    }
+
+    protected abstract createStaticHitboxes(): ZIRZone[];
 }

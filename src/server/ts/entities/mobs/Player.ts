@@ -1,15 +1,71 @@
 import { ZIREntity } from "../../baseObjects/EntityBase"
 import { Vector } from "../../utilityObjects/Math"
 import { IZIRInventorySlot } from "../../globalInterfaces/UtilityInterfaces";
-import { ZIRRectangularZone } from "../../baseObjects/Hitbox";
+import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
+import { ZIRWorld } from "../../baseObjects/World";
+import { ZIRBoomerang } from "../projectiles/Boomerang";
+import { ZIRThrownRock } from "../projectiles/Rock";
+import { ZIREnemy } from "./Enemy";
 
 export class ZIRPlayer extends ZIREntity {
     private inventory: IZIRInventorySlot[];
-    private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
+    private cooldownUses: { [ability: string]: number }; // For storing cooldown timestamps
 
-    constructor(position: Vector = new Vector(500 + Math.random() * 500, 500 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
+
+    constructor(position: Vector = new Vector(1000 + Math.random() * 500, 1000 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
         this.inventory = new Array(12).fill({ itemID: -1, amount: 0 });
+    }
+
+    public do(inputs: any, worldState: ZIRWorld) {
+        let m = this.moveSpeed;
+        let a = new Vector(0, 0);
+
+        for (let input in inputs) {
+            if (inputs[input]) {
+                let mouse;
+                let direction;
+                let velocity;
+                let p;
+                switch (input) {
+                    case "upArrow":
+                        a = a.add(new Vector(0, -m));
+                        break;
+                    case "downArrow":
+                        a = a.add(new Vector(0, m));
+                        break;
+                    case "leftArrow":
+                        a = a.add(new Vector(-m, 0));
+                        break;
+                    case "rightArrow":
+                        a = a.add(new Vector(m, 0));
+                        break;
+                    case "space":
+                        mouse = inputs["mouse"];
+                        direction = new Vector(mouse.x, mouse.y);
+                        velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
+                        p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
+                        worldState.registerEntity(p);
+                        break;
+                    case "click":
+                        mouse = inputs["mouse"]
+                        direction = new Vector(mouse.x, mouse.y);
+                        velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER)
+                        p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
+                        worldState.registerEntity(p);
+                        break;
+                    case "debug":
+                        let e = new ZIREnemy(this.position);
+                        worldState.registerEntity(e);
+                        break;
+                }
+            }
+        }
+
+        if (a.getMagnitude() != 0) {
+            a = a.getUnitVector().scale(m);
+        }
+        this.acceleration = a;
     }
 
     /**
@@ -87,14 +143,20 @@ export class ZIRPlayer extends ZIREntity {
         return true;
     }
 
-    public getObject(){
+    public getObject() {
         return {
             playerID: this.id,
             inventory: this.inventory
         };
     }
 
-    public toString() : string {
-        return "Player" + this.id + "@" + this.position +"/V"+this.velocity + "/A"+this.acceleration;
+    protected createStaticHitboxes(): ZIRZone[] {
+        let toReturn: ZIRZone[] = [];
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size);
+        return toReturn;
+    }
+
+    public toString(): string {
+        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/A" + this.acceleration;
     }
 }

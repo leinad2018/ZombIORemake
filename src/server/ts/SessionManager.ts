@@ -3,6 +3,7 @@ import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 import { ZIRPlayer } from "./entities/mobs/Player";
 import { ZIREntity } from "./baseObjects/EntityBase";
 import { ZIRLogger } from "./Logger";
+import { ZIRWorld } from "./baseObjects/World";
 
 //declare function io();
 

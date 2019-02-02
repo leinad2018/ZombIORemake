@@ -12,10 +12,10 @@ export class ZIRPlayerWorld extends ZIRWorld{
         }
         let snowBiome: IZIRTerrainZone = {
             terrain: 'snow',
-            x0: 0,
-            y0: 0,
-            x1: 300,
-            y1: 500
+            x0: 500,
+            y0: 500,
+            x1: 5000,
+            y1: 5000
         }
         map.zones.push(snowBiome);
         return map;
