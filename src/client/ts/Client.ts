@@ -37,7 +37,7 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler('message', this.handleMessage.bind(this));
         this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('updatePlayer', this.updatePlayer.bind(this));
+        this.serverComms.setHandler('updateFocus', this.updateFocus.bind(this));
         this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
@@ -141,7 +141,7 @@ export class ZIRClient extends ZIRClientBase {
         return this.entities.indexOf(this.getEntityById(id));
     }
 
-    private updatePlayer(data) {
+    private updateFocus(data) {
         this.player.setPlayerID(data.playerID);
         this.player.setInventory(data.inventory);
     }

@@ -58,7 +58,7 @@ export class ZIRSessionManager {
         // console.log(data.keycode);
         if (data.keycode) {
             // console.log(data.state);
-            this.inputs[data.keycode] = data.state;
+            this.getInputs()[data.keycode] = data.state;
         }
     }
 
@@ -67,7 +67,7 @@ export class ZIRSessionManager {
      * any sessions corresponding to the connection
      */
     private handleDisconnection(this: Session, data): void {
-        console.log("Disconnecting " + this.socket);
+        console.log("Disconnecting " + this.getSocket());
 
         this.deactivate();
     }
@@ -118,13 +118,13 @@ export class ZIRSessionManager {
 
 export class Session {
     static sessionCount: number = 0;
-    active: boolean;
-    username: string;
-    socket: string;
-    inputs: Inputs = {};
-    debugMessages: string[] = [];
-    player: ZIREntity;
-    defaultView: ZIREntity;
+    private active: boolean;
+    private username: string;
+    private socket: string;
+    private inputs: Inputs = {};
+    private debugMessages: string[] = [];
+    private player: ZIREntity;
+    private defaultView: ZIREntity;
     private worldID: string;
     private disconnectHandler: (session: Session) => void;
     private io;
@@ -140,7 +140,9 @@ export class Session {
 
     public update() {
         if(this.player.isDead()) {
-            this.setPlayer(this.defaultView);
+            this.setFocus(this.defaultView);
+        } else {
+            this.setFocus(this.player);
         }
     }
 
@@ -152,6 +154,14 @@ export class Session {
         this.worldID = id;
     }
 
+    public getSocket() {
+        return this.socket;
+    }
+
+    public getUsername() : string {
+        return this.username;
+    }
+
     public getWorldID() {
         return this.worldID;
     }
@@ -161,9 +171,13 @@ export class Session {
         this.disconnectHandler(this);
     }
 
+    public setFocus(entity: ZIREntity) {
+        this.io.to(this.socket).emit("updateFocus", entity.getObject());
+    }
+
     public setPlayer(player: ZIREntity) {
         this.player = player;
-        this.io.to(this.socket).emit("updatePlayer", player.getObject());
+        this.setFocus(this.player);
     }
 
     public getPlayer(): ZIREntity {

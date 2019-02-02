@@ -57,20 +57,18 @@ export class ZIRServerEngine {
         session.setPlayer(player);
         session.setWorldID(worldID);
 
-        this.sessionManager.sendToClient(session.socket, "updatePlayer", player.getObject());
         for (let world of this.universe) {
             if (world.getWorldID() == worldID) {
-                console.log("THIS IS THE DEFAULT VIEW: " + this.defaultView);
-                world.registerEntity(this.defaultView);
                 world.registerEntity(player);
-                this.sessionManager.sendToClient(session.socket, "updateWorld", world.getTerrainMap());
+                this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
                 return;
             }
         }
         let newWorld = new ZIRPlayerWorld(worldID);
+        newWorld.registerEntity(this.defaultView);
         newWorld.registerEntity(player);
         this.universe.push(newWorld);
-        this.sessionManager.sendToClient(session.socket, "updateWorld", newWorld.getTerrainMap());
+        this.sessionManager.sendToClient(session.getSocket(), "updateWorld", newWorld.getTerrainMap());
     }
 
     public disconnectSession(disconnectedSession: Session) {
@@ -135,9 +133,8 @@ export class ZIRServerEngine {
         this.packetLogger.log("ticked")
         let usernames: string[] = [];
         for (let session of this.sessions) {
-            usernames.push(session.username);
+            usernames.push(session.getUsername());
             session.update();
-            this.sessionManager.sendToClient(session.socket, "updatePlayer", session.player.getObject());
         }
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
@@ -263,7 +260,7 @@ export class ZIRServerEngine {
             debugMessages.push("Current Session: " + session);
             debugMessages.push("Entities (" + this.getAllEntities().length + " total): " + this.getAllEntities());
             session.setDebugMessages(debugMessages);
-            this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
+            this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
         }
     }
 }
