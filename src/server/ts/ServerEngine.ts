@@ -11,6 +11,7 @@ import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
 import { ZIREnemy } from "./entities/mobs/Enemy";
+import { ZIRSpite } from "./baseObjects/Spite";
 
 export class ZIRServerEngine {
     dt: number = 0;
@@ -19,6 +20,7 @@ export class ZIRServerEngine {
     TPS: number = 30;
     protected sessions: Session[] = [];
     universe: ZIRWorld[] = [];
+    defaultView: ZIREntity;
     tickCounter: number = 0;
     packetLogger: ZIRLogger;
     protected currentEvents: ZIRTimedEvent[] = [];
@@ -28,7 +30,9 @@ export class ZIRServerEngine {
 
         this.packetLogger = new ZIRLogger("packets.log");
         this.packetLogger.disable();
-        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger);
+        this.defaultView = new ZIRSpite();
+
+        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger, this.defaultView);
     }
 
     /**
@@ -52,9 +56,12 @@ export class ZIRServerEngine {
         let worldID = player.getEntityId();
         session.setPlayer(player);
         session.setWorldID(worldID);
+
         this.sessionManager.sendToClient(session.socket, "updatePlayer", player.getObject());
         for (let world of this.universe) {
             if (world.getWorldID() == worldID) {
+                console.log("THIS IS THE DEFAULT VIEW: " + this.defaultView);
+                world.registerEntity(this.defaultView);
                 world.registerEntity(player);
                 this.sessionManager.sendToClient(session.socket, "updateWorld", world.getTerrainMap());
                 return;
@@ -90,6 +97,9 @@ export class ZIRServerEngine {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public registerEntity(worldID: string, e: ZIREntity) {
         for (let world of this.universe) {
             if (world.getWorldID() == worldID) {
@@ -126,6 +136,8 @@ export class ZIRServerEngine {
         let usernames: string[] = [];
         for (let session of this.sessions) {
             usernames.push(session.username);
+            session.update();
+            this.sessionManager.sendToClient(session.socket, "updatePlayer", session.player.getObject());
         }
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
@@ -156,7 +168,9 @@ export class ZIRServerEngine {
 
     private collectGarbage() {
         this.getAllEntities().forEach(
-            (entity) => {if (entity.isDead()) this.destroyEntityInWorlds(entity)}
+            (entity) => {
+                if (entity.isDead()) this.destroyEntityInWorlds(entity);
+            }
         );
     }
 

@@ -1,6 +1,7 @@
 import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate"
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 import { ZIRPlayer } from "./entities/mobs/Player";
+import { ZIREntity } from "./baseObjects/EntityBase";
 import { ZIRLogger } from "./Logger";
 
 //declare function io();
@@ -8,10 +9,11 @@ import { ZIRLogger } from "./Logger";
 export class ZIRSessionManager {
     listeners: { [header: string]: Function } = {};
     io: any;
+    defaultView: ZIREntity;
     registerSessionHandler: (session: Session) => void;
     private logger: ZIRLogger;
 
-    constructor(registerSessionHandler, logger) {
+    constructor(registerSessionHandler, logger, defaultView : ZIREntity) {
         this.registerSessionHandler = registerSessionHandler;
         this.logger = logger;
         var express = require('express');
@@ -21,6 +23,7 @@ export class ZIRSessionManager {
         var app = express();
         var server = http.Server(app);
         this.io = socketIO(server);
+        this.defaultView = defaultView;
         const PORT: number = 5000;
 
         app.set('port', PORT);
@@ -78,7 +81,7 @@ export class ZIRSessionManager {
     }
 
     private handleLogin(socket): void {
-        const s = new Session(socket.id);
+        const s = new Session(socket.id, this.defaultView, this.io);
         socket.on("rename", this.handleRename.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
@@ -119,15 +122,25 @@ export class Session {
     socket: string;
     inputs: Inputs = {};
     debugMessages: string[] = [];
-    player: ZIRPlayer;
+    player: ZIREntity;
+    defaultView: ZIREntity;
     private worldID: string;
     private disconnectHandler: (session: Session) => void;
+    private io;
 
-    constructor(socket: string) {
+    constructor(socket: string, defaultView: ZIREntity, io) {
         this.socket = socket;
+        this.defaultView = defaultView;
         this.active = true;
         this.username = "Player" + Session.sessionCount;
+        this.io = io;
         Session.sessionCount++;
+    }
+
+    public update() {
+        if(this.player.isDead()) {
+            this.setPlayer(this.defaultView);
+        }
     }
 
     public setDisconnectHandler(handler: (session: Session) => void) {
@@ -147,11 +160,12 @@ export class Session {
         this.disconnectHandler(this);
     }
 
-    public setPlayer(player: ZIRPlayer) {
+    public setPlayer(player: ZIREntity) {
         this.player = player;
+        this.io.to(this.socket).emit("updatePlayer", player.getObject());
     }
 
-    public getPlayer(): ZIRPlayer {
+    public getPlayer(): ZIREntity {
         return this.player;
     }
 

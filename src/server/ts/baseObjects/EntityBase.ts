@@ -132,4 +132,10 @@ export class ZIREntity implements IZIREntity {
     public toString(): string {
         return "Entity" + this.id + "@" + this.position;
     }
+
+    public getObject(){
+        return {
+            playerID: this.id
+        };
+    }
 }
