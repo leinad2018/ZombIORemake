@@ -18,6 +18,11 @@ export class ZIRPlayer extends ZIREntity {
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
+        
+        if(this.dead) {
+            return;
+        }
+        
         let m = this.moveSpeed;
         let a = new Vector(0, 0);
 

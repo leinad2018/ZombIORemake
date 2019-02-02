@@ -1,16 +1,13 @@
 import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase"
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
-import { Vector } from "./utilityObjects/Math";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
 import { ZIRPlayer } from "./entities/mobs/Player";
-import { ZIRBoomerang } from "./entities/projectiles/Boomerang";
-import { ZIRThrownRock } from "./entities/projectiles/Rock";
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
-import { ZIREnemy } from "./entities/mobs/Enemy";
+import { ZIRSpite } from "./baseObjects/Spite";
 
 export class ZIRServerEngine {
     dt: number = 0;
@@ -19,6 +16,7 @@ export class ZIRServerEngine {
     TPS: number = 30;
     protected sessions: Session[] = [];
     universe: ZIRWorld[] = [];
+    defaultView: ZIREntity;
     tickCounter: number = 0;
     packetLogger: ZIRLogger;
     protected currentEvents: ZIRTimedEvent[] = [];
@@ -28,7 +26,9 @@ export class ZIRServerEngine {
 
         this.packetLogger = new ZIRLogger("packets.log");
         this.packetLogger.disable();
-        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger);
+        this.defaultView = new ZIRSpite();
+
+        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.packetLogger, this.defaultView);
     }
 
     /**
@@ -52,18 +52,19 @@ export class ZIRServerEngine {
         let worldID = "wilderness";
         session.setPlayer(player);
         session.setWorldID(worldID);
-        this.sessionManager.sendToClient(session.socket, "updatePlayer", player.getObject());
+
         for (let world of this.universe) {
             if (world.getWorldID() == worldID) {
                 world.registerEntity(player);
-                this.sessionManager.sendToClient(session.socket, "updateWorld", world.getTerrainMap());
+                this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
                 return;
             }
         }
         let newWorld = new ZIRPlayerWorld(worldID);
+        newWorld.registerEntity(this.defaultView);
         newWorld.registerEntity(player);
         this.universe.push(newWorld);
-        this.sessionManager.sendToClient(session.socket, "updateWorld", newWorld.getTerrainMap());
+        this.sessionManager.sendToClient(session.getSocket(), "updateWorld", newWorld.getTerrainMap());
     }
 
     public disconnectSession(disconnectedSession: Session) {
@@ -87,15 +88,6 @@ export class ZIRServerEngine {
     public destroyEntityInWorlds(entity: ZIREntity) {
         for (let world of this.universe) {
             world.destroyEntity(entity)
-        }
-    }
-
-    public registerEntity(worldID: string, e: ZIREntity) {
-        for (let world of this.universe) {
-            if (world.getWorldID() == worldID) {
-                world.registerEntity(e);
-                return;
-            }
         }
     }
 
@@ -125,7 +117,8 @@ export class ZIRServerEngine {
         this.packetLogger.log("ticked")
         let usernames: string[] = [];
         for (let session of this.sessions) {
-            usernames.push(session.username);
+            usernames.push(session.getUsername());
+            session.update();
         }
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
@@ -208,7 +201,10 @@ export class ZIRServerEngine {
     private handleInput = (): void => {
         for (let session of this.sessions) {
             let world = this.findWorldById(session.getWorldID());
-            session.handleInput(world);
+            let player = session.getPlayer();
+            if (player instanceof ZIRPlayer) {
+                (player as ZIRPlayer).do(session.getInputs(), world);
+            }
         }
     }
 
@@ -244,11 +240,11 @@ export class ZIRServerEngine {
         for (let session of this.sessions) {
             let debugMessages = [];
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
-            debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(0));
+            debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
             debugMessages.push("Entities (" + this.getAllEntities().length + " total): " + this.getAllEntities());
             session.setDebugMessages(debugMessages);
-            this.sessionManager.sendToClient(session.socket, "debug", debugMessages);
+            this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
         }
     }
 }

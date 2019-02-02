@@ -176,6 +176,11 @@ export abstract class ZIREntity implements IZIREntity {
         return "Entity" + this.id + "@" + this.position;
     }
 
+    public getObject(){
+        return {
+            playerID: this.id
+        };
+    }
     /**
      * Creates all hitboxes that do not move relative to the entity
      */
