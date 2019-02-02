@@ -2,6 +2,7 @@ import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/ISer
 import { Inputs } from "./globalInterfaces/UtilityInterfaces"
 import { ZIRPlayer } from "./entities/mobs/Player";
 import { ZIRLogger } from "./Logger";
+import { ZIRWorld } from "./baseObjects/World";
 
 //declare function io();
 
@@ -145,6 +146,10 @@ export class Session {
     public deactivate(): void {
         this.active = false;
         this.disconnectHandler(this);
+    }
+
+    public handleInput(worldData: ZIRWorld){
+        this.player.do(this.inputs, worldData);
     }
 
     public setPlayer(player: ZIRPlayer) {
