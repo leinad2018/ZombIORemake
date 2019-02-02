@@ -39,5 +39,7 @@ export abstract class ZIRClientBase {
 
     abstract getPlayerPosition(): Vector;
 
+    abstract getPlayerHealth(): number;
+
     abstract getWorldData(): IZIRRenderable[];
 }

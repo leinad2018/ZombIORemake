@@ -6,6 +6,7 @@ export class ZIREntityBase implements IZIRRenderable {
     protected position: Vector;
     protected size: Vector;
     protected asset: IZIRAsset;
+    protected health: number;
 
     constructor(id: string, position: Vector, size: Vector, asset: IZIRAsset){
         this.id = id;
@@ -21,9 +22,13 @@ export class ZIREntityBase implements IZIRRenderable {
     public getSize() {
         return this.size;
     }
-    
+
     public getPosition() {
         return this.position;
+    }
+
+    public getHealth() {
+        return this.health;
     }
 
     public getImageToRender() {

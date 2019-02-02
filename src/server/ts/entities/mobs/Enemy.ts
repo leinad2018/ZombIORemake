@@ -1,9 +1,10 @@
-import { ZIREntity } from "../../baseObjects/EntityBase"
+import { ZIREntity } from "../../baseObjects/EntityBase";
+import { ZIRMob } from "../../baseObjects/Mob";
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
-export class ZIREnemy extends ZIREntity {
+export class ZIREnemy extends ZIRMob {
     private cooldownUses: {[ability:string]:number}; // For storing cooldown timestamps
     private target: ZIREntity;
     private agroRange = 500;

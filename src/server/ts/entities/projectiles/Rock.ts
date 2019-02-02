@@ -10,7 +10,7 @@ export class ZIRThrownRock extends ZIRProjectile {
 
     protected createStaticHitboxes(): ZIRZone[] {
         let toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, "die");
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, "projectile");
         return toReturn;
     }
 }

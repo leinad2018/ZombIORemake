@@ -12,6 +12,7 @@ export abstract class ZIREntity implements IZIREntity {
     protected position: Vector;
     protected velocity: Vector = new Vector(0, 0);
     protected acceleration: Vector = new Vector(0, 0);
+    protected externalAcceleration: Vector = new Vector(0, 0);
     protected friction: number = .9;
     protected mass: number = 100;
     public readonly PIXELS_PER_METER = 50;

@@ -3,6 +3,7 @@ import { IZIRInventorySlot } from "./globalInterfaces/UtilityInterfaces";
 export class ZIRPlayerData{
     private playerID: string;
     private inventory: IZIRInventorySlot[];
+    private health: number;
 
 	public getPlayerID(): string {
 		return this.playerID;
@@ -18,5 +19,14 @@ export class ZIRPlayerData{
 
     public setInventory(newInventory: IZIRInventorySlot[]){
         this.inventory = newInventory;
+    }
+
+    public getHealth(): number {
+        console.log(this.health)
+        return this.health;
+    }
+
+    public setHealth(health: number) {
+        this.health = health;
     }
 }

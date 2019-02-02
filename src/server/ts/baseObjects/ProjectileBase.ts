@@ -5,6 +5,7 @@ import { ZIRZone } from "./Hitbox";
 export abstract class ZIRProjectile extends ZIREntity {
     protected behavior: Function;
     protected owner: ZIREntity;
+    protected damage: number = 2;
 
     constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(25, 25), asset: string = "rock", expiration: number = 2000) {
         super(position, size, asset);
@@ -24,6 +25,10 @@ export abstract class ZIRProjectile extends ZIREntity {
 
     public setBehavior(behavior: Function) {
         this.behavior = behavior;
+    }
+
+    public getDamage() {
+        return this.damage;
     }
 
     public getParent() {

@@ -22,6 +22,7 @@ export class ZIRClient extends ZIRClientBase {
     private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
+    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health");
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -34,6 +35,7 @@ export class ZIRClient extends ZIRClientBase {
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
         this.canvas = renderer;
+        this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
         this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
         this.serverComms.setHandler('reset', this.handleReset.bind(this));
@@ -156,6 +158,7 @@ export class ZIRClient extends ZIRClientBase {
 
     private updateFocus(data) {
         this.player.setPlayerID(data.playerID);
+        this.player.setHealth(data.health);
         this.player.setInventory(data.inventory);
     }
 
@@ -185,6 +188,10 @@ export class ZIRClient extends ZIRClientBase {
             return player.getPosition();
         }
         return(undefined);
+    }
+
+    public getPlayerHealth() : number {
+        return(this.player.getHealth());
     }
 
     public getWorldData() {

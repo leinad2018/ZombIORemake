@@ -6,8 +6,9 @@ import { ZIRWorld } from "../../baseObjects/World";
 import { ZIRBoomerang } from "../projectiles/Boomerang";
 import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
+import { ZIRMob } from "../../baseObjects/Mob";
 
-export class ZIRPlayer extends ZIREntity {
+export class ZIRPlayer extends ZIRMob {
     private inventory: IZIRInventorySlot[];
     private cooldownUses: { [ability: string]: number }; // For storing cooldown timestamps
 
@@ -151,7 +152,8 @@ export class ZIRPlayer extends ZIREntity {
     public getObject() {
         return {
             playerID: this.id,
-            inventory: this.inventory
+            inventory: this.inventory,
+            health: this.health
         };
     }
 

@@ -2,12 +2,15 @@ import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { Vector } from "./utilityObjects/Math";
+import { ZIRAssetLoader } from "./AssetLoader";
 
 export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private shouldRenderDebug: boolean = true;
     private playerPosition: Vector;
     private terrainCache: ZIRImageCache;
+    private heartSize: Vector = new Vector(50, 50);
+    private hudAssets: { [name: string]: IZIRAsset } = {};
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -25,6 +28,10 @@ export class ZIRCanvasController {
         return new Vector(cursorPoint.getX() - this.canvas.width / 2, cursorPoint.getY() - this.canvas.height / 2);
     }
 
+    public addHudAsset(name: string, asset: IZIRAsset) {
+        this.hudAssets[name] = asset;
+    }
+
     public render(state: ZIRClientBase) {
         this.shouldRenderDebug = state.isDebugMode();
         this.playerPosition = state.getPlayerPosition();
@@ -37,9 +44,17 @@ export class ZIRCanvasController {
 
         let entities: IZIRRenderable[] = state.getEntitiesToRender();
         this.renderEntities(ctx, entities);
+        this.renderHUD(ctx, state.getPlayerHealth())
 
         this.renderPlayerBox(ctx, state.getPlayersOnline());
         if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
+    }
+
+    private renderHUD(ctx: CanvasRenderingContext2D, health) {
+        let i = 0
+        for(i; i<health; i++) {
+            ctx.drawImage(this.hudAssets["health"].getImage(), i*50 + i*5, 0, this.heartSize.getX(), this.heartSize.getY());
+        }
     }
 
     private renderWorld(ctx: CanvasRenderingContext2D) {
