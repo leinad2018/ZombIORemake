@@ -9,10 +9,12 @@ import { ZIRPlayerData } from "./PlayerData";
 import { ZIRWorldData } from "./WorldData";
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRServerBase } from "./baseObjects/ServerBase";
+import { ZIRMenuController } from "./MenuController";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
     private serverComms: ZIRServerBase;
+    private menuController: ZIRMenuController;
     private canvas: ZIRCanvasController;
     private entities: ZIREntityBase[];
     private input: ZIRInput;
@@ -21,9 +23,10 @@ export class ZIRClient extends ZIRClientBase {
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
 
-    constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput) {
+    constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
         this.serverComms = comms;
+        this.menuController = menus;
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
@@ -39,6 +42,7 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
         this.serverComms.setHandler('updateFocus', this.updateFocus.bind(this));
         this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
+        this.serverComms.setHandler('requestRespawn', this.handleRespawn.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
@@ -54,6 +58,15 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleMessage(message) {
         console.log("From Server: " + message);
+    }
+
+    private handleRespawn(){
+        this.menuController.showRespawnMenu(this.sendRespawn.bind(this));
+    }
+
+    private sendRespawn(){
+        this.serverComms.sendInfoToServer('respawn',"");
+        this.menuController.hideRespawnMenu();
     }
 
     private handleReset(data: IZIRResetResult) {
