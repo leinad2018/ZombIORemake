@@ -190,6 +190,9 @@ export class Session {
 
     public setPlayer(player: ZIREntity) {
         this.player = player;
+        if(this.player instanceof ZIRPlayer) {
+            (this.player as ZIRPlayer).setName(this.username);
+        }
         this.setFocus(this.player);
     }
 
@@ -203,6 +206,8 @@ export class Session {
 
     public setUsername(username: string): void {
         this.username = username;
+        this.player.setName(this.username);
+
     }
 
     public toString(): string {

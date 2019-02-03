@@ -141,7 +141,8 @@ export class ZIRClient extends ZIRClientBase {
         var position: Vector = new Vector(result.x, result.y);
         var size: Vector = new Vector(result.xsize, result.ysize);
         var asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
-        return new ZIREntityBase(result.id, position, size, asset);
+        var name: string = result.name;
+        return new ZIREntityBase(result.id, position, size, asset, name);
     }
 
     private getEntityById(id: string) {
@@ -159,6 +160,7 @@ export class ZIRClient extends ZIRClientBase {
     private updateFocus(data) {
         this.player.setPlayerID(data.playerID);
         this.player.setHealth(data.health);
+        this.player.setName(data.name);
         this.player.setInventory(data.inventory);
     }
 

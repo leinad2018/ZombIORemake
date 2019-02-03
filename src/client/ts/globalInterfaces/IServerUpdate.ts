@@ -17,6 +17,7 @@ export interface IZIREntityResult {
     y: number;
     xsize: number;
     ysize: number;
+    name: string;
 }
 
 export interface IZIREntityUpdateResult extends IZIREntityResult{

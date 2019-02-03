@@ -7,12 +7,14 @@ export class ZIREntityBase implements IZIRRenderable {
     protected size: Vector;
     protected asset: IZIRAsset;
     protected health: number;
+    protected name: string;
 
-    constructor(id: string, position: Vector, size: Vector, asset: IZIRAsset){
+    constructor(id: string, position: Vector, size: Vector, asset: IZIRAsset, name: string){
         this.id = id;
         this.position = position;
         this.size = size;
         this.asset = asset;
+        this.name = name;
     }
 
     public getEntityId() {
@@ -21,6 +23,10 @@ export class ZIREntityBase implements IZIRRenderable {
 
     public getSize() {
         return this.size;
+    }
+
+    public getName() {
+        return this.name
     }
 
     public getPosition() {

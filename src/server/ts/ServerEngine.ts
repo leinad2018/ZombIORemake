@@ -192,7 +192,8 @@ export class ZIRServerEngine {
                 xspeed: null,
                 yspeed: null,
                 xsize: entity.getSize().getX(),
-                ysize: entity.getSize().getY()
+                ysize: entity.getSize().getY(),
+                name: entity.getName()
             }
             calculatedUpdates.push(update);
         }

@@ -2,6 +2,7 @@ import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { Vector } from "./utilityObjects/Math";
+import {ZIREntityBase} from "./baseObjects/EntityBase"
 import { ZIRAssetLoader } from "./AssetLoader";
 
 export class ZIRCanvasController {
@@ -123,6 +124,11 @@ export class ZIRCanvasController {
             let x = position.getX() - xs / 2;
             let y = position.getY() - ys / 2;
             ctx.drawImage(asset.getImage(), x, y, xs, ys);
+            if(entity instanceof ZIREntityBase) {
+                if (entity.getName()) {
+                    ctx.fillText(entity.getName(), x, y-5);
+                }
+            }
             if (this.shouldRenderDebug) ctx.strokeRect(x, y, xs, ys);
         }
 

@@ -4,6 +4,7 @@ export class ZIRPlayerData{
     private playerID: string;
     private inventory: IZIRInventorySlot[];
     private health: number;
+    private name: string;
 
 	public getPlayerID(): string {
 		return this.playerID;
@@ -28,5 +29,13 @@ export class ZIRPlayerData{
 
     public setHealth(health: number) {
         this.health = health;
+    }
+
+    public setName(name: string) {
+        this.name = name;
+    }
+
+    public getName(): string {
+        return this.name;
     }
 }

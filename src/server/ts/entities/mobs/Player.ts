@@ -153,7 +153,8 @@ export class ZIRPlayer extends ZIRMob {
         return {
             playerID: this.id,
             inventory: this.inventory,
-            health: this.health
+            health: this.health,
+            name: this.name
         };
     }
 
