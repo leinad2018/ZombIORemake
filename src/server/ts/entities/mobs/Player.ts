@@ -1,21 +1,21 @@
-import { ZIREntity } from "../../baseObjects/EntityBase"
-import { Vector } from "../../utilityObjects/Math"
-import { IZIRInventorySlot } from "../../globalInterfaces/UtilityInterfaces";
+import { ZIREntity } from "../../baseObjects/EntityBase";
+import { Vector } from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 import { ZIRWorld } from "../../baseObjects/World";
 import { ZIRBoomerang } from "../projectiles/Boomerang";
 import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
 import { ZIRMob } from "../../baseObjects/Mob";
+import { ZIRInventoryStack } from "../../baseObjects/Inventory";
 
 export class ZIRPlayer extends ZIRMob {
-    private inventory: IZIRInventorySlot[];
+    private inventory: ZIRInventoryStack[];
     private cooldownUses: { [ability: string]: number }; // For storing cooldown timestamps
 
 
     constructor(position: Vector = new Vector(1000 + Math.random() * 500, 1000 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.inventory = new Array(12).fill({ itemID: -1, amount: 0 });
+        this.inventory = new Array(12).fill(new ZIRInventoryStack("-1", "", 0));
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
@@ -80,18 +80,18 @@ export class ZIRPlayer extends ZIRMob {
      * This should never be called with information from the client.
      * @param newItem 
      */
-    public addToInventory(newItem: IZIRInventorySlot): boolean {
+    public addToInventory(newItem: ZIRInventoryStack): boolean {
         for (let slot of this.inventory) {
-            if (slot.itemID == newItem.itemID) {
-                slot.itemID = newItem.itemID;
-                slot.amount = newItem.amount;
+            if (slot.getItemID() == newItem.getItemID()) {
+                let oldAmount = slot.getStackSize();
+                slot.setStackSize(oldAmount + newItem.getStackSize());
                 return true;
             }
         }
         for (let slot of this.inventory) {
-            if (slot.itemID == "-1") {
-                slot.itemID = newItem.itemID;
-                slot.amount = newItem.amount;
+            if (slot.getItemID() == "-1") {
+                slot.setItemID(newItem.getItemID());
+                slot.setStackSize(newItem.getStackSize());
                 return true;
             }
         }
@@ -102,18 +102,19 @@ export class ZIRPlayer extends ZIRMob {
      * Drops an item out of the inventory.
      * Returns true if the drop succeeded. 
      */
-    public dropItem(toDrop: IZIRInventorySlot): boolean {
-        if (toDrop.amount < 0) {
+    public dropItem(toDrop: ZIRInventoryStack): boolean {
+        if (toDrop.getStackSize() < 0) {
             return false;
         }
         for (let slot of this.inventory) {
-            if (slot.itemID == toDrop.itemID) {
-                if (slot.amount < toDrop.amount) {
+            if (slot.getItemID() == toDrop.getItemID()) {
+                if (slot.getStackSize() < toDrop.getStackSize()) {
                     return false;
                 }
-                slot.amount -= toDrop.amount;
-                if (slot.amount == 0) {
-                    slot.itemID = "-1";
+                let newAmount = slot.getStackSize() - toDrop.getStackSize();
+                slot.setStackSize(newAmount);
+                if (newAmount == 0) {
+                    slot.setItemID("-1");
                 }
                 return true;
             }
@@ -126,17 +127,17 @@ export class ZIRPlayer extends ZIRMob {
      * Returns true if the reorder succeeded.
      * @param inventory 
      */
-    public reorderInventory(inventory: IZIRInventorySlot[]): boolean {
+    public reorderInventory(inventory: ZIRInventoryStack[]): boolean {
         if (inventory.length != this.inventory.length) {
             return false;
         }
         for (let slot of inventory) {
-            var found: boolean = false;
+            let found: boolean = false;
             for (let i = 0; !found && i < this.inventory.length; i++) {
                 var oldSlot = this.inventory[i];
-                if (oldSlot.itemID == slot.itemID) {
+                if (oldSlot.getItemID() == slot.getItemID()) {
                     found = true;
-                    if (oldSlot.amount != slot.amount) {
+                    if (oldSlot.getStackSize() != slot.getStackSize()) {
                         return false;
                     }
                 }
@@ -160,7 +161,7 @@ export class ZIRPlayer extends ZIRMob {
 
     protected createStaticHitboxes(): ZIRZone[] {
         let toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size);
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ['harvest']);
         return toReturn;
     }
 

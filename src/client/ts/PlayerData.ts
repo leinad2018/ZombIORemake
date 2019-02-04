@@ -1,8 +1,8 @@
-import { IZIRInventorySlot } from "./globalInterfaces/UtilityInterfaces";
+import { IZIRInventoryStack } from "./globalInterfaces/UtilityInterfaces";
 
 export class ZIRPlayerData{
     private playerID: string;
-    private inventory: IZIRInventorySlot[];
+    private inventory: IZIRInventoryStack[];
     private health: number;
     private name: string;
 
@@ -18,7 +18,7 @@ export class ZIRPlayerData{
         return this.inventory;
     }
 
-    public setInventory(newInventory: IZIRInventorySlot[]){
+    public setInventory(newInventory: IZIRInventoryStack[]){
         this.inventory = newInventory;
     }
 

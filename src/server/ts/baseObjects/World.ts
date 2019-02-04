@@ -1,8 +1,7 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
-import { ZIREffectBox } from "./Hitbox";
 import { Vector } from "../utilityObjects/Math";
-import { deprecate } from "util";
+import { ZIRResourceNode } from "../entities/ResourceNode";
 
 export class ZIRWorld {
     private worldID: string;
@@ -27,6 +26,8 @@ export class ZIRWorld {
         this.width = width;
         this.height = height;
         this.terrain = this.generateWorldTerrain();
+        let resource = new ZIRResourceNode(new Vector(1500,1500),new Vector(50,50),"spite", "spite");
+        this.registerEntity(resource);
     }
 
     public getSectorIdByPosition(position: Vector): number {
