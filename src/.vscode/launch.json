@@ -17,12 +17,31 @@
             "name": "Launch Chrome",
             "url": "localhost:5000",
             "webRoot": "${workspaceFolder}"
-        }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Clean All",
+            "url": "localhost:5000",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Lint"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Server",
+            "program": "${workspaceFolder}/output/server.js",
+            "preLaunchTask": "Build",
+        },
     ],
     "compounds": [
         {
             "name": "Run",
             "configurations": ["Launch Chrome","Launch Server"]
+        },
+        {
+            "name": "Clean & Run",
+            "configurations": ["Clean All","Launch Server"]
         }
     ]
 }

@@ -57,6 +57,26 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "lintClient",
+            "type": "shell",
+            "command": "tslint --project ${workspaceFolder}/tsconfig-client.json --config ${workspaceFolder}/tslint.json",
+            "group": "build"
+        },
+        {
+            "label": "lintServer",
+            "type": "shell",
+            "command": "tslint --project ${workspaceFolder}/tsconfig-server.json --config ${workspaceFolder}/tslint.json",
+            "group": "build"
+        },
+        {
+            "label": "Lint",
+            "dependsOn": [
+                "lintClient",
+                "lintServer"
+            ],
+            "group": "build"
         }
     ]
 }
