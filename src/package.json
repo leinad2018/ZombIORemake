@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "@types/node": "^10.12.21",
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0",
     "typescript": "^3.3.1"
   }
 }
