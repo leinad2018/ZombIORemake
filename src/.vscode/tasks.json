@@ -4,47 +4,71 @@
         {
             "label": "compileServer",
             "type": "typescript",
+            "isBackground": true,
             "tsconfig": "tsconfig-server.json",
             "problemMatcher": [
                 "$tsc"
             ],
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "buildServer",
             "dependsOn": "compileServer",
+            "isBackground": true,
             "type": "shell",
             "command": "${workspaceFolder}/copyServer.bat",
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "compileClient",
+            "isBackground": true,
             "type": "typescript",
             "tsconfig": "tsconfig-client.json",
             "problemMatcher": [
                 "$tsc"
             ],
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "buildClient",
+            "isBackground": true,
             "dependsOn": "compileClient",
             "type": "shell",
             "command": "${workspaceFolder}/copyClient.bat",
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "buildAssets",
+            "isBackground": true,
             "type": "shell",
             "command": "${workspaceFolder}/copyAssets.bat",
             "group": "build",
-            "dependsOn": "emptyOutput"
+            "dependsOn": "emptyOutput",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "emptyOutput",
+            "isBackground": true,
             "type": "shell",
             "command": "${workspaceFolder}/deleteOutput.bat",
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
         },
         {
             "label": "Build",
@@ -53,30 +77,32 @@
                 "buildClient",
                 "buildAssets"
             ],
-            "group": {
+           "group": {
                 "kind": "build",
                 "isDefault": true
             }
         },
         {
-            "label": "lintClient",
-            "type": "shell",
-            "command": "tslint --project ${workspaceFolder}/tsconfig-client.json --config ${workspaceFolder}/tslint.json",
-            "group": "build"
-        },
-        {
-            "label": "lintServer",
-            "type": "shell",
-            "command": "tslint --project ${workspaceFolder}/tsconfig-server.json --config ${workspaceFolder}/tslint.json",
-            "group": "build"
-        },
-        {
             "label": "Lint",
-            "dependsOn": [
-                "lintClient",
-                "lintServer"
-            ],
-            "group": "build"
+            "type": "shell",
+            "command": "yarn lint",
+            "problemMatcher": {
+                "owner": "Lint",
+                "fileLocation": ["absolute"],
+                "pattern": {
+                    "regexp": "^(WARNING|ERROR): (.*.ts):(.*):(.*) - (.*)",
+                    "file": 2,
+                    "line": 3,
+                    "column": 4,
+                    "severity": 1,
+                    "message": 5
+                }
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
         }
     ]
 }

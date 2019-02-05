@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "es6",
         "module": "amd",
-        "outDir": "output/static"
+        "outDir": "output/static",
+        "sourceMap": true
     },
     "include": [
         "client/**/*"
