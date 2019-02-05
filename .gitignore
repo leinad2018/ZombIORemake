@@ -1,5 +1,6 @@
 src/output/*
 src/logs/*
+src/node_modules/*
 
 *.class
 
