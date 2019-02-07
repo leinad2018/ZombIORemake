@@ -1,12 +1,29 @@
-export class ZIRMenuController{
+import { IZIRInventoryStack } from "./globalInterfaces/UtilityInterfaces";
+
+export class ZIRMenuController {
     private mainDiv: HTMLDivElement;
 
-    constructor(mainDiv: HTMLDivElement){
+    constructor(mainDiv: HTMLDivElement) {
         this.mainDiv = mainDiv;
     }
 
-    public showRespawnMenu(handler: () => void){
-        if(document.getElementById('respawn')){
+    public toggleMenu(menuName: string, argument: any) {
+        if (document.getElementById(menuName)) {
+            this.hideMenu(menuName);
+        }else{
+            switch(menuName){
+                case "inventory":
+                    this.showInventoryMenu(argument);
+                    break;
+                case "respawn":
+                    this.showInventoryMenu(argument);
+                    break;
+            }
+        }
+    }
+
+    public showRespawnMenu(handler: () => void) {
+        if (document.getElementById('respawn')) {
             return;
         }
         let div = document.createElement('div');
@@ -19,9 +36,39 @@ export class ZIRMenuController{
         this.mainDiv.appendChild(div);
     }
 
-    public hideRespawnMenu(){
-        let div = document.getElementById('respawn');
-        if(div){
+    public hideRespawnMenu() {
+        this.hideMenu('respawn');
+    }
+
+    public showInventoryMenu(inventory: IZIRInventoryStack[]) {
+        if (document.getElementById('inventory')) {
+            return;
+        }
+        let div = document.createElement('div');
+        div.id = "inventory";
+        let invList = this.createInventoryList(inventory);
+        div.appendChild(invList);
+        div.setAttribute('style', 'position:absolute;top:5%;left:0%');
+        this.mainDiv.appendChild(div);
+    }
+
+    private createInventoryList(inventory: IZIRInventoryStack[]) {
+        let mainList = document.createElement('ul');
+        for (let inv of inventory) {
+            let element = document.createElement('li');
+            element.textContent = inv.itemID + ": " + inv.stackSize;
+            mainList.appendChild(element);
+        }
+        return mainList;
+    }
+
+    public hideInventoryMenu() {
+        this.hideMenu('inventory');
+    }
+
+    private hideMenu(id: string) {
+        let div = document.getElementById(id);
+        if (div) {
             div.remove();
         }
     }

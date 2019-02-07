@@ -50,7 +50,7 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.registerServerListeners();
     }
 
-    public isDebugMode() : boolean {
+    public isDebugMode(): boolean {
         return this.input.getDebug();
     }
 
@@ -62,12 +62,12 @@ export class ZIRClient extends ZIRClientBase {
         console.log("From Server: " + message);
     }
 
-    private handleRespawn(){
+    private handleRespawn() {
         this.menuController.showRespawnMenu(this.sendRespawn.bind(this));
     }
 
-    private sendRespawn(){
-        this.serverComms.sendInfoToServer('respawn',"");
+    private sendRespawn() {
+        this.serverComms.sendInfoToServer('respawn', "");
         this.menuController.hideRespawnMenu();
     }
 
@@ -91,9 +91,9 @@ export class ZIRClient extends ZIRClientBase {
                 case 'update':
                     let newEntity = this.parseEntityResult(entity);
                     let index = this.getEntityIndexById(id);
-                    if(index == -1){
+                    if (index == -1) {
                         this.entities.push(newEntity);
-                    }else{
+                    } else {
                         this.entities[index] = newEntity;
                     }
                     break;
@@ -117,6 +117,9 @@ export class ZIRClient extends ZIRClientBase {
 
 
     private handleInput(keycode: string, state: boolean) {
+        if (keycode == "openInventory") {
+            this.menuController.toggleMenu("inventory", this.player.getInventory());
+        }
         this.serverComms.sendInfoToServer("input", {
             keycode: keycode,
             state: state
@@ -127,8 +130,8 @@ export class ZIRClient extends ZIRClientBase {
      * @param renderOffset gets global coordinate of point instead of
      * screen coordinate when true
      */
-    private handlePointInput(keycode: string, state: Vector, renderOffset: boolean=true) {
-        if(renderOffset) {
+    private handlePointInput(keycode: string, state: Vector, renderOffset: boolean = true) {
+        if (renderOffset) {
             state = this.canvas.transformRenderToPlayer(state);
         }
         this.serverComms.sendInfoToServer("input", {
@@ -184,16 +187,16 @@ export class ZIRClient extends ZIRClientBase {
         this.username = name;
     }
 
-    public getPlayerPosition() : Vector {
+    public getPlayerPosition(): Vector {
         var player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }
-        return(undefined);
+        return (undefined);
     }
 
-    public getPlayerHealth() : number {
-        return(this.player.getHealth());
+    public getPlayerHealth(): number {
+        return (this.player.getHealth());
     }
 
     public getWorldData() {

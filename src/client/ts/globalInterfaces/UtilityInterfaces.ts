@@ -10,6 +10,6 @@ export interface Point{
 
 export interface IZIRInventoryStack{
     itemID: string;
-    amount: number;
-    asset: IZIRRenderable;
+    stackSize: number;
+    assetName: IZIRRenderable;
 }

@@ -15,15 +15,22 @@ export class ZIRPlayer extends ZIRMob {
 
     constructor(position: Vector = new Vector(1000 + Math.random() * 500, 1000 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.inventory = new Array(12).fill(new ZIRInventoryStack("-1", "", 0));
+        this.inventory = new Array(12);
+        this.initInventory();
+    }
+
+    private initInventory() {
+        for (let i = 0; i < this.inventory.length; i++) {
+            this.inventory[i] = new ZIRInventoryStack("-1", "", 0);
+        }
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
-        
-        if(this.dead) {
+
+        if (this.dead) {
             return;
         }
-        
+
         let m = this.moveSpeed;
         let a = new Vector(0, 0);
 

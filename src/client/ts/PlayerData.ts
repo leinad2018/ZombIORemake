@@ -20,6 +20,7 @@ export class ZIRPlayerData{
 
     public setInventory(newInventory: IZIRInventoryStack[]){
         this.inventory = newInventory;
+        console.log(newInventory);
     }
 
     public getHealth(): number {
