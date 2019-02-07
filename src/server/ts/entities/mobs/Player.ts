@@ -23,6 +23,11 @@ export class ZIRPlayer extends ZIRMob {
         for (let i = 0; i < this.inventory.length; i++) {
             this.inventory[i] = new ZIRInventoryStack("-1", "", 0);
         }
+        //TODO remove this for final
+        this.inventory[0].setItemID("rock");
+        this.inventory[0].setStackSize(100);
+        this.inventory[1].setItemID("boomerang");
+        this.inventory[1].setStackSize(1000);
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
@@ -54,18 +59,26 @@ export class ZIRPlayer extends ZIRMob {
                         a = a.add(new Vector(m, 0));
                         break;
                     case "space":
-                        mouse = inputs["mouse"];
-                        direction = new Vector(mouse.x, mouse.y);
-                        velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
-                        p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
-                        worldState.registerEntity(p);
+                        let rangs = this.getInventoryItemByID("boomerang");
+                        if (rangs) {
+                            mouse = inputs["mouse"];
+                            direction = new Vector(mouse.x, mouse.y);
+                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
+                            p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
+                            worldState.registerEntity(p);
+                            this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
+                        }
                         break;
                     case "click":
-                        mouse = inputs["mouse"]
-                        direction = new Vector(mouse.x, mouse.y);
-                        velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER)
-                        p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
-                        worldState.registerEntity(p);
+                        let rocks = this.getInventoryItemByID("rock");
+                        if (rocks) {
+                            mouse = inputs["mouse"]
+                            direction = new Vector(mouse.x, mouse.y);
+                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER)
+                            p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
+                            worldState.registerEntity(p);
+                            this.dropItem(new ZIRInventoryStack("rock", "", 1));
+                        }
                         break;
                     case "debug":
                         let e = new ZIREnemy(this.position);
@@ -155,6 +168,14 @@ export class ZIRPlayer extends ZIRMob {
         }
         this.inventory = inventory;
         return true;
+    }
+
+    private getInventoryItemByID(itemID: string) {
+        for (let inv of this.inventory) {
+            if (inv.getItemID() == itemID) {
+                return inv;
+            }
+        }
     }
 
     public getObject() {

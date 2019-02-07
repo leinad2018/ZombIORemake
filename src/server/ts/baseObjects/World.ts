@@ -26,7 +26,7 @@ export class ZIRWorld {
         this.width = width;
         this.height = height;
         this.terrain = this.generateWorldTerrain();
-        let resource = new ZIRResourceNode(new Vector(1500,1500),new Vector(50,50),"spite", "spite");
+        let resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 50), "rock", "rock");
         this.registerEntity(resource);
     }
 
@@ -113,7 +113,7 @@ export class ZIRWorld {
                 }
             }
         }
-        for(let entity of this.entities){
+        for (let entity of this.entities) {
             entity.runEvents();
             entity.setCreating(false);
         }
