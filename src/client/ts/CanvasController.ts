@@ -2,7 +2,7 @@ import { IZIRServerUpdate } from "./globalInterfaces/IServerUpdate";
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { Vector } from "./utilityObjects/Math";
-import {ZIREntityBase} from "./baseObjects/EntityBase"
+import { ZIREntityBase } from "./baseObjects/EntityBase"
 import { ZIRAssetLoader } from "./AssetLoader";
 
 export class ZIRCanvasController {
@@ -48,13 +48,13 @@ export class ZIRCanvasController {
         this.renderHUD(ctx, state.getPlayerHealth())
 
         this.renderPlayerBox(ctx, state.getPlayersOnline());
-        if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
+        //if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
         let i = 0
-        for(i; i<health; i++) {
-            ctx.drawImage(this.hudAssets["health"].getImage(), i*50 + i*5, 0, this.heartSize.getX(), this.heartSize.getY());
+        for (i; i < health; i++) {
+            ctx.drawImage(this.hudAssets["health"].getImage(), i * 50 + i * 5, 0, this.heartSize.getX(), this.heartSize.getY());
         }
     }
 
@@ -116,20 +116,26 @@ export class ZIRCanvasController {
         ctx.setTransform(1, 0, 0, 1, xOffset, yOffset);
 
         for (let entity of entities) {
-            let asset = entity.getImageToRender();
             let position = entity.getPosition();
             let size = entity.getSize();
             let xs = size.getX();
             let ys = size.getY();
             let x = position.getX() - xs / 2;
             let y = position.getY() - ys / 2;
-            ctx.drawImage(asset.getImage(), x, y, xs, ys);
-            if(entity instanceof ZIREntityBase) {
-                if (entity.getName()) {
-                    ctx.fillText(entity.getName(), x, y-5);
+
+            let minX = x - xs + xOffset;
+            let minY = y - ys + yOffset;
+            let maxX = x + xs + xOffset;
+            let maxY = y + ys + yOffset;
+            if (maxX > 0 && maxY > 0 && minX < this.canvas.width && minY < this.canvas.height) {
+                let asset = entity.getImageToRender();
+                ctx.drawImage(asset.getImage(), x, y, xs, ys);
+                if (entity instanceof ZIREntityBase) {
+                    if (entity.getName()) {
+                        ctx.fillText(entity.getName(), x, y - 5);
+                    }
                 }
             }
-            if (this.shouldRenderDebug) ctx.strokeRect(x, y, xs, ys);
         }
 
         ctx.restore();
