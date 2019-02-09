@@ -13,4 +13,8 @@ export class ZIRSpite extends ZIREntity {
     protected createStaticHitboxes() {
         return [];
     }
+
+    public update() {
+        return null;
+    }
 }

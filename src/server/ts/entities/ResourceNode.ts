@@ -29,4 +29,8 @@ export class ZIRResourceNode extends ZIREntity {
         const hitbox = new ZIRRectangularZone(this.position, this, this.size);
         return [hitbox];
     }
+
+    public update() {
+        return null;
+    }
 }

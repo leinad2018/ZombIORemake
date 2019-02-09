@@ -158,6 +158,10 @@ export class ZIRPlayer extends ZIRMob {
         };
     }
 
+    public update() {
+        return null;
+    }
+
     protected createStaticHitboxes(): ZIRZone[] {
         const toReturn: ZIRZone[] = [];
         toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest"]);
