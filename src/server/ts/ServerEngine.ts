@@ -119,7 +119,7 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private async tick() {
-        this.packetLogger.log("ticked")
+        this.packetLogger.log("ticked");
         let usernames: string[] = [];
         for (let session of this.sessions) {
             usernames.push(session.getUsername());
@@ -133,7 +133,7 @@ export class ZIRServerEngine {
 
         this.handleInput();
 
-        this.checkCollision();
+        await this.checkCollision();
 
         await this.updateEvents();
 
@@ -146,9 +146,9 @@ export class ZIRServerEngine {
         this.collectGarbage();
     }
 
-    private checkCollision() {
+    private async checkCollision() {
         for (let world of this.universe) {
-            world.runCollisionLogic();
+            await world.runCollisionLogic();
         }
     }
 
@@ -208,7 +208,7 @@ export class ZIRServerEngine {
         for (let session of this.sessions) {
             let world = this.findWorldById(session.getWorldID());
             let player = session.getPlayer();
-            if (player instanceof ZIRPlayer) {
+            if (player.constructor === ZIRPlayer) {
                 (player as ZIRPlayer).do(session.getInputs(), world);
             }
         }

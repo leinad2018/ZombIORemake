@@ -94,28 +94,34 @@ export class ZIRWorld {
         }
     }
 
-    public runCollisionLogic() {
+    public async runCollisionLogic() {
         this.sortEntities();
+        let checks: Promise<void>[] = [];
         for (let entity of this.entities) {
-            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
-                let baseSectorID = this.getSectorIDByEntity(entity);
-                let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
-                let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
-                for (let check of entitiesToCheck) {
-                    for (let zone1 of check.getHitboxes()) {
-                        for (let zone2 of entity.getHitboxes()) {
-                            if (zone1.checkCollision(zone2)) {
-                                entity.registerEvent(zone1);
-                                check.registerEvent(zone2);
-                            }
+            checks.push(this.checkEntityCollision(entity));
+        }
+        await Promise.all(checks);
+        for (let entity of this.entities) {
+            entity.runEvents();
+            entity.setCreating(false);
+        }
+    }
+
+    private async checkEntityCollision(entity: ZIREntity){
+        if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
+            let baseSectorID = this.getSectorIDByEntity(entity);
+            let sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
+            let entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
+            for (let check of entitiesToCheck) {
+                for (let zone1 of check.getHitboxes()) {
+                    for (let zone2 of entity.getHitboxes()) {
+                        if (zone1.checkCollision(zone2)) {
+                            entity.registerEvent(zone1);
+                            check.registerEvent(zone2);
                         }
                     }
                 }
             }
-        }
-        for (let entity of this.entities) {
-            entity.runEvents();
-            entity.setCreating(false);
         }
     }
 
