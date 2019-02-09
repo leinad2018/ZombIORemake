@@ -1,5 +1,5 @@
 import { ZIRSessionManager, Session } from "./SessionManager";
-import { ZIREntity } from "./baseObjects/EntityBase"
+import { ZIREntity } from "./baseObjects/EntityBase";
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
@@ -10,19 +10,21 @@ import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
 import { ZIRSpite } from "./baseObjects/Spite";
 
 export class ZIRServerEngine {
-    dt: number = 0;
-    sessionManager: ZIRSessionManager;
-    physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
-    TPS: number = 30;
+    private dt: number = 0;
+    private sessionManager: ZIRSessionManager;
+    private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
+    private readonly TPS: number = 30;
     protected sessions: Session[] = [];
-    universe: ZIRWorld[] = [];
-    defaultView: ZIREntity;
-    tickCounter: number = 0;
-    packetLogger: ZIRLogger;
+    private universe: ZIRWorld[] = [];
+    private defaultView: ZIREntity;
+    private tickCounter: number = 0;
+    public packetLogger: ZIRLogger;
     protected currentEvents: ZIRTimedEvent[] = [];
 
     constructor() {
-        setInterval(() => { this.gameLoop() }, 1000 / this.TPS);
+        setInterval(() => {
+            this.gameLoop();
+        }, 1000 / this.TPS);
 
         this.packetLogger = new ZIRLogger("packets.log");
         this.packetLogger.disable();
@@ -43,22 +45,22 @@ export class ZIRServerEngine {
      * Registers a player to a world
      * If the world does not exist, one is created
      * @param worldID
-     * @param player 
+     * @param player
      */
     public registerSession(session: Session) {
         this.sessions.push(session);
         session.setDisconnectHandler(this.disconnectSession.bind(this));
-        let worldID = "wilderness";
+        const worldID = "wilderness";
         session.setWorldID(worldID);
 
-        for (let world of this.universe) {
-            if (world.getWorldID() == worldID) {
+        for (const world of this.universe) {
+            if (world.getWorldID() === worldID) {
                 this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
                 this.handleSpawn(session);
                 return;
             }
         }
-        let newWorld = new ZIRPlayerWorld(worldID);
+        const newWorld = new ZIRPlayerWorld(worldID);
         newWorld.registerEntity(this.defaultView);
         this.universe.push(newWorld);
         this.sessionManager.sendToClient(session.getSocket(), "updateWorld", newWorld.getTerrainMap());
@@ -66,16 +68,16 @@ export class ZIRServerEngine {
     }
 
     public handleSpawn(session: Session) {
-        let player = new ZIRPlayer();
+        const player = new ZIRPlayer();
         session.setPlayer(player);
-        let world = this.findWorldById(session.getWorldID());
+        const world = this.findWorldById(session.getWorldID());
         world.registerEntity(player);
     }
 
     public disconnectSession(disconnectedSession: Session) {
         for (let i = 0; i < this.sessions.length; i++) {
-            let session = this.sessions[i];
-            if (session == disconnectedSession) {
+            const session = this.sessions[i];
+            if (session === disconnectedSession) {
                 session.getPlayer().kill();
                 this.sessions.splice(i, 1);
             }
@@ -84,15 +86,15 @@ export class ZIRServerEngine {
 
     public getAllEntities() {
         let toReturn: ZIREntity[] = [];
-        for (let world of this.universe) {
+        for (const world of this.universe) {
             toReturn = toReturn.concat(world.getEntities());
         }
         return toReturn;
     }
 
     public destroyEntityInWorlds(entity: ZIREntity) {
-        for (let world of this.universe) {
-            world.destroyEntity(entity)
+        for (const world of this.universe) {
+            world.destroyEntity(entity);
         }
     }
 
@@ -106,7 +108,7 @@ export class ZIRServerEngine {
      * core engine functions
      */
     private gameLoop = (): void => {
-        const t = Date.now()
+        const t = Date.now();
 
         this.tick().then(() => {
             this.tickCounter++;
@@ -119,9 +121,9 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private async tick() {
-        this.packetLogger.log("ticked")
-        let usernames: string[] = [];
-        for (let session of this.sessions) {
+        this.packetLogger.log("ticked");
+        const usernames: string[] = [];
+        for (const session of this.sessions) {
             usernames.push(session.getUsername());
             session.update();
         }
@@ -138,7 +140,7 @@ export class ZIRServerEngine {
         await this.updateEvents();
 
         let shouldReset = false;
-        if (this.tickCounter % 30 == 0) {
+        if (this.tickCounter % 30 === 0) {
             shouldReset = true;
         }
         this.sendUpdate(shouldReset);
@@ -147,19 +149,21 @@ export class ZIRServerEngine {
     }
 
     private checkCollision() {
-        for (let world of this.universe) {
+        for (const world of this.universe) {
             world.runCollisionLogic();
         }
     }
 
     private collectGarbage() {
         this.getAllEntities().forEach(
-            (entity) => { if (entity.isDead()) this.destroyEntityInWorlds(entity) }
-        );
+            (entity) => { if (entity.isDead()) {
+                this.destroyEntityInWorlds(entity);
+            }
+        });
     }
 
     private async calculatePhysics() {
-        let updates: Promise<void>[] = [];
+        const updates: Array<Promise<void>> = [];
         this.getAllEntities().forEach((entity) => {
             entity.update(this);
             updates.push(this.physicsEngine.applyPhysics(entity, this.getDT()));
@@ -168,33 +172,37 @@ export class ZIRServerEngine {
     }
 
     private sendUpdate(reset: boolean = false) {
-        let calculatedUpdates = [];
+        const calculatedUpdates = [];
         let entities = this.getAllEntities();
 
-        if (!reset) entities = entities.filter((entity) => {
-            let e = entity.shouldUpdate();
-            entity.setUpdated(true);
-            return e;
-        });
+        if (!reset) {
+            entities = entities.filter((entity) => {
+                const e = entity.shouldUpdate();
+                entity.setUpdated(true);
+                return e;
+            });
+        }
 
-        if (reset) entities = entities.filter((entity) => {
-            return !entity.isDead();
-        });
+        if (reset) {
+            entities = entities.filter((entity) => {
+                return !entity.isDead();
+            });
+        }
 
-        for (let entity of entities) {
+        for (const entity of entities) {
 
-            let update = {
-                id: entity.getEntityId(),
-                type: entity.isDead() ? "delete" : "update",
+            const update = {
                 asset: entity.getAssetName(),
+                id: entity.getEntityId(),
+                name: entity.getName(),
+                type: entity.isDead() ? "delete" : "update",
                 x: entity.getPosition().getX(),
-                y: entity.getPosition().getY(),
-                xspeed: null,
-                yspeed: null,
                 xsize: entity.getSize().getX(),
+                xspeed: null,
+                y: entity.getPosition().getY(),
                 ysize: entity.getSize().getY(),
-                name: entity.getName()
-            }
+                yspeed: null,
+            };
             calculatedUpdates.push(update);
         }
         if (reset) {
@@ -205,26 +213,26 @@ export class ZIRServerEngine {
     }
 
     private handleInput = (): void => {
-        for (let session of this.sessions) {
-            let world = this.findWorldById(session.getWorldID());
-            let player = session.getPlayer();
+        for (const session of this.sessions) {
+            const world = this.findWorldById(session.getWorldID());
+            const player = session.getPlayer();
             if (player instanceof ZIRPlayer) {
                 (player as ZIRPlayer).do(session.getInputs(), world);
             }
         }
     }
 
-    private findWorldById(worldID: string){
-        for(let world of this.universe){
-            if(world.getWorldID() == worldID){
+    private findWorldById(worldID: string) {
+        for (const world of this.universe) {
+            if (world.getWorldID() === worldID) {
                 return world;
             }
         }
     }
 
     private async updateEvents() {
-        let events: Promise<void>[] = [];
-        for (let event of this.currentEvents) {
+        const events: Array<Promise<void>> = [];
+        for (const event of this.currentEvents) {
             events.push(this.updateEvent(event));
         }
         await Promise.all(events);
@@ -232,7 +240,7 @@ export class ZIRServerEngine {
 
     private async updateEvent(event) {
         if (this.tickCounter > event.getEndingFrame()) {
-            this.currentEvents.splice(this.currentEvents.indexOf(event))
+            this.currentEvents.splice(this.currentEvents.indexOf(event));
         } else {
             event.updateEvent(this.tickCounter);
         }
@@ -243,8 +251,8 @@ export class ZIRServerEngine {
      * to render if debug rendering is enabled
      */
     private sendDebugInfo = (): void => {
-        for (let session of this.sessions) {
-            let debugMessages = [];
+        for (const session of this.sessions) {
+            const debugMessages = [];
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);

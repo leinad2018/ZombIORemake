@@ -1,9 +1,9 @@
 import { IZIREntity } from "../globalInterfaces/MainInterfaces";
 import { Vector } from "../utilityObjects/Math";
-import { ZIRZone } from "../baseObjects/Hitbox"
+import { ZIRZone } from "../baseObjects/Hitbox";
 
 export abstract class ZIREntity implements IZIREntity {
-    static entityCount = 0;
+    private static entityCount = 0;
     protected id: string;
     protected updated: boolean;
     protected creating: boolean;
@@ -21,7 +21,7 @@ export abstract class ZIREntity implements IZIREntity {
     protected asset: string;
     protected staticHitboxes: ZIRZone[];
     protected size: Vector;
-    protected hitboxHandlers: ((otherZone: ZIRZone) => void)[];
+    protected hitboxHandlers: Array<(otherZone: ZIRZone) => void>;
     protected eventsToExecute: ZIRZone[];
     protected name: string = undefined;
 
@@ -43,10 +43,6 @@ export abstract class ZIREntity implements IZIREntity {
 
     public shouldUpdate() {
         return !this.updated;
-    }
-
-    public update(state): void {
-
     }
 
     /**
@@ -74,15 +70,15 @@ export abstract class ZIREntity implements IZIREntity {
     }
 
     public runEvents() {
-        for (let otherZone of this.eventsToExecute) {
-            let types = otherZone.getTypes();
+        for (const otherZone of this.eventsToExecute) {
+            const types = otherZone.getTypes();
             let owner: ZIREntity = otherZone.getParent();
-            if (owner != this) {
+            if (owner !== this) {
                 if (owner instanceof ZIRProjectile) {
                     owner = (owner as ZIRProjectile).getParent();
                 }
-                if(owner != this){
-                    for (let type of types) {
+                if (owner !== this) {
+                    for (const type of types) {
                         if (this.hitboxHandlers[type]) {
                             this.hitboxHandlers[type](otherZone);
                         }
@@ -151,8 +147,8 @@ export abstract class ZIREntity implements IZIREntity {
     }
 
     public setPosition(position: Vector): void {
-        let changeVector = position.sub(this.position);
-        for (let box of this.staticHitboxes) {
+        const changeVector = position.sub(this.position);
+        for (const box of this.staticHitboxes) {
             box.setPosition(box.getPosition().add(changeVector));
         }
         this.position = position;
@@ -192,12 +188,14 @@ export abstract class ZIREntity implements IZIREntity {
 
     public getObject() {
         return {
-            playerID: this.id
+            playerID: this.id,
         };
     }
     /**
      * Creates all hitboxes that do not move relative to the entity
      */
     protected abstract createStaticHitboxes(): ZIRZone[];
+
+    public abstract update(state: any): void;
 }
 import { ZIRProjectile } from "./ProjectileBase";
