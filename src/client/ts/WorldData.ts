@@ -9,25 +9,25 @@ export class ZIRWorldData {
 
     constructor(world: IZIRWorldUpdate) {
         this.tiles = [];
-        for(let zone of world.zones){
+        for (const zone of world.zones) {
             this.fillArea(zone);
         }
     }
 
     private fillArea(area: IZIRWorldZone) {
-        let asset = ZIRAssetLoader.getAsset(area.terrain);
-        let xDist = (area.x1 - area.x0) / this.TILE_SIZE;
-        let yDist = (area.y1 - area.y0) / this.TILE_SIZE;
+        const asset = ZIRAssetLoader.getAsset(area.terrain);
+        const xDist = (area.x1 - area.x0) / this.TILE_SIZE;
+        const yDist = (area.y1 - area.y0) / this.TILE_SIZE;
         for (let x = 0; x <= xDist; x++) {
             for (let y = 0; y <= yDist; y++) {
-                let pos = new Vector(area.x0 + x * this.TILE_SIZE, area.y0 + y * this.TILE_SIZE);
-                let size = new Vector(this.TILE_SIZE, this.TILE_SIZE);
+                const pos = new Vector(area.x0 + x * this.TILE_SIZE, area.y0 + y * this.TILE_SIZE);
+                const size = new Vector(this.TILE_SIZE, this.TILE_SIZE);
                 this.tiles.push(new ZIRWorldTile(pos, size, asset));
             }
         }
     }
 
-    public getWorldData(){
+    public getWorldData() {
         return this.tiles;
     }
 }

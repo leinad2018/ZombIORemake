@@ -9,7 +9,7 @@ export class ZIREntityBase implements IZIRRenderable {
     protected health: number;
     protected name: string;
 
-    constructor(id: string, position: Vector, size: Vector, asset: IZIRAsset, name: string){
+    constructor(id: string, position: Vector, size: Vector, asset: IZIRAsset, name: string) {
         this.id = id;
         this.position = position;
         this.size = size;

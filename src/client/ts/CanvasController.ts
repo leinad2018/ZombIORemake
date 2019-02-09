@@ -9,7 +9,7 @@ export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private shouldRenderDebug: boolean = true;
     private playerPosition: Vector;
-    private terrainCache: ZIRImageCache;
+    private terrainCache: IZIRImageCache;
     private heartSize: Vector = new Vector(50, 50);
     private hudAssets: { [name: string]: IZIRAsset } = {};
 
@@ -168,7 +168,7 @@ export class ZIRCanvasController {
     }
 
     private createImageCache(x: number, y: number, xOffset: number, yOffset: number) {
-        const canvas = document.createElement("canvas") as ZIRImageCache;
+        const canvas = document.createElement("canvas") as IZIRImageCache;
         canvas.setAttribute("width", x + "");
         canvas.setAttribute("height", y + "");
         canvas.xOffset = xOffset;
@@ -190,7 +190,7 @@ export class ZIRCanvasController {
     }
 }
 
-interface ZIRImageCache extends HTMLCanvasElement {
+interface IZIRImageCache extends HTMLCanvasElement {
     xOffset: number;
     yOffset: number;
 }

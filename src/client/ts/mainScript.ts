@@ -14,7 +14,7 @@ const waitForLoad = () => new Promise(() => {
         } else {
             setTimeout(check, 100);
         }
-    }
+    };
     setTimeout(check, 100);
 });
 

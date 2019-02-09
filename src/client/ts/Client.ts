@@ -37,14 +37,14 @@ export class ZIRClient extends ZIRClientBase {
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
-        this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
-        this.serverComms.setHandler('reset', this.handleReset.bind(this));
-        this.serverComms.setHandler('message', this.handleMessage.bind(this));
-        this.serverComms.setHandler('requestRename', this.fetchUsername.bind(this));
-        this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('updateFocus', this.updateFocus.bind(this));
-        this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
-        this.serverComms.setHandler('requestRespawn', this.handleRespawn.bind(this));
+        this.serverComms.setHandler("update", this.handleServerUpdate.bind(this));
+        this.serverComms.setHandler("reset", this.handleReset.bind(this));
+        this.serverComms.setHandler("message", this.handleMessage.bind(this));
+        this.serverComms.setHandler("requestRename", this.fetchUsername.bind(this));
+        this.serverComms.setHandler("debug", this.handleDebugMessage.bind(this));
+        this.serverComms.setHandler("updateFocus", this.updateFocus.bind(this));
+        this.serverComms.setHandler("updateWorld", this.handleWorldUpdate.bind(this));
+        this.serverComms.setHandler("requestRespawn", this.handleRespawn.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
@@ -118,8 +118,8 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleInput(keycode: string, state: boolean) {
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 
@@ -132,8 +132,8 @@ export class ZIRClient extends ZIRClientBase {
             state = this.canvas.transformRenderToPlayer(state);
         }
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 

@@ -1,29 +1,29 @@
 import { IZIRInventoryStack } from "./globalInterfaces/UtilityInterfaces";
 
-export class ZIRPlayerData{
+export class ZIRPlayerData {
     private playerID: string;
     private inventory: IZIRInventoryStack[];
     private health: number;
     private name: string;
 
-	public getPlayerID(): string {
-		return this.playerID;
-	}
-
-	public setPlayerID(value: string) {
-		this.playerID = value;
+    public getPlayerID(): string {
+        return this.playerID;
     }
-    
-    public getInventory(){
+
+    public setPlayerID(value: string) {
+        this.playerID = value;
+    }
+
+    public getInventory() {
         return this.inventory;
     }
 
-    public setInventory(newInventory: IZIRInventoryStack[]){
+    public setInventory(newInventory: IZIRInventoryStack[]) {
         this.inventory = newInventory;
     }
 
     public getHealth(): number {
-        console.log(this.health)
+        console.log(this.health);
         return this.health;
     }
 
