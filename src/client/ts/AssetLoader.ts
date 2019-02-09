@@ -5,11 +5,11 @@ export class ZIRAssetLoader {
 
     /**
      * Registers an asset into the asset loader.
-     * @param assetName 
-     * @param imageUrl 
+     * @param assetName
+     * @param imageUrl
      */
     public static loadAsset(assetName: string, imageUrl: string) {
-        var asset = new ZIRAsset(imageUrl);
+        const asset = new ZIRAsset(imageUrl);
         asset.name = assetName;
         this.assets.push(asset);
     }
@@ -17,11 +17,11 @@ export class ZIRAssetLoader {
     /**
      * Returns the asset associated with this name.
      * The asset must be loaded with loadAsset before it can be retrieved from this method.
-     * @param assetName 
+     * @param assetName
      */
     public static getAsset(assetName: string) {
-        for (var asset of this.assets) {
-            if (asset.name == assetName) {
+        for (const asset of this.assets) {
+            if (asset.name === assetName) {
                 return asset;
             }
         }
@@ -31,8 +31,8 @@ export class ZIRAssetLoader {
      * Checks to see if all assets are loaded
      */
     public static doneLoading() {
-        var doneLoading = true;
-        for (var asset of this.assets) {
+        let doneLoading = true;
+        for (const asset of this.assets) {
             if (!asset.isLoaded()) {
                 doneLoading = false;
             }
@@ -51,7 +51,7 @@ class ZIRAsset implements IZIRAsset {
         this.loaded = false;
         this.image.onload = this.handleLoad.bind(this);
         this.image.src = imageUrl;
-    }d
+    }
 
     private handleLoad() {
         this.loaded = true;
@@ -60,7 +60,7 @@ class ZIRAsset implements IZIRAsset {
     /**
      * Returns the HTMLImageElement if the image is loaded.
      * Otherwise returns null.
-     * 
+     *
      * It is suggested that you call the isLoaded method to make sure the image is loaded before calling getImage.
      */
     public getImage() {

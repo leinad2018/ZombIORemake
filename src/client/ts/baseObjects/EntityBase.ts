@@ -26,7 +26,7 @@ export class ZIREntityBase implements IZIRRenderable {
     }
 
     public getName() {
-        return this.name
+        return this.name;
     }
 
     public getPosition() {

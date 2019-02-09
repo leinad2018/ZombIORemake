@@ -1,11 +1,11 @@
 export abstract class ZIRServerBase {
-    protected handlers: ((data?: any) => void)[];
+    protected handlers: Array<(data?: any) => void>;
 
-    constructor(){
+    constructor() {
         this.handlers = [];
     }
 
-    public setHandler(type: string, handler: (data?: any) => void){
+    public setHandler(type: string, handler: (data?: any) => void) {
         this.handlers[type] = handler;
     }
 
