@@ -1,0 +1,27 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "max-line-length": {
+            "options": [200]
+        },
+        "ordered-imports": false,
+        "new-parens": true,
+        "member-ordering": false,
+        "no-arg": true,
+        "forin": false,
+        "no-string-literal": false,
+        "max-classes-per-file": false,
+        "no-bitwise": true,
+        "no-conditional-assignment": true,
+        "no-consecutive-blank-lines": false,
+        "no-console": {
+            "severity": "warning",
+            "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
+        }
+    },
+    "jsRules": {
+        "max-line-length": {
+            "options": [200]
+        }
+    }
+}

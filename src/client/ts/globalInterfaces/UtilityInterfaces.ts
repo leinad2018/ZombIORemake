@@ -1,12 +1,15 @@
-/** 
- * Deprecated!!! Do not use!
+import { IZIRRenderable } from "./RenderingInterfaces";
+
+/**
+ * @deprecated
  */
-export interface Point{
+export interface IPoint {
     x: number;
     y: number;
 }
 
-export interface IZIRInventorySlot{
+export interface IZIRInventoryStack {
     itemID: string;
     amount: number;
+    asset: IZIRRenderable;
 }

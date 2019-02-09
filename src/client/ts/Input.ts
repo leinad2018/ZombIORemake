@@ -5,8 +5,9 @@ export class ZIRInput {
     private pointHandler: (keycode: string, state: Vector) => void;
     private activeKeys: boolean[];
     private cursorState: Vector;
+    private debugState: boolean;
 
-    constructor(){
+    constructor() {
         this.activeKeys = [];
         document.addEventListener("keyup", this.handleKeyupEvent.bind(this));
         document.addEventListener("keydown", this.handleKeydownEvent.bind(this));
@@ -23,18 +24,24 @@ export class ZIRInput {
         this.pointHandler = pointHandler;
     }
 
-    private handleKeyupEvent(event){
-        var keycode: string = this.getKeyFromEvent(event);
+    public getDebug(): boolean {
+        return this.debugState;
+    }
+
+    private handleKeyupEvent(event) {
+        const keycode: string = this.getKeyFromEvent(event);
         this.handler(keycode, false);
         this.activeKeys[keycode] = false;
     }
 
-    private handleKeydownEvent(event){
-        console.log(event);
-        var keycode: string = this.getKeyFromEvent(event);
-        if(!this.activeKeys[keycode]){
+    private handleKeydownEvent(event) {
+        const keycode: string = this.getKeyFromEvent(event);
+        if (!this.activeKeys[keycode]) {
             this.handler(keycode, true);
             this.activeKeys[keycode] = true;
+        }
+        if (keycode === "debug") {
+            this.debugState = !this.debugState;
         }
     }
 
@@ -44,21 +51,21 @@ export class ZIRInput {
     }
 
     private handleMousedownEvent(event) {
-        if(!this.activeKeys["click"]) {
+        if (!this.activeKeys["click"]) {
             this.handler("click", true);
             this.activeKeys["click"] = true;
         }
     }
 
     private handleMouseMove(event) {
-        this.cursorState = new Vector(event.pageX,event.pageY);
-        this.pointHandler("mouse", this.cursorState)
+        this.cursorState = new Vector(event.pageX, event.pageY);
+        this.pointHandler("mouse", this.cursorState);
     }
 
     private getKeyFromEvent(event) {
-        var keyName: string;
-        //console.log(this.activeKeys)
-        //console.log(String.fromCharCode(event.keyCode));
+        let keyName: string;
+        // console.log(this.activeKeys)
+        // console.log(String.fromCharCode(event.keyCode));
         switch (event.keyCode) {
             case 32:
                 keyName = "space";
@@ -75,8 +82,11 @@ export class ZIRInput {
             case 83:
                 keyName = "downArrow";
                 break;
+            case 187:
+                keyName = "debug";
+                break;
         }
-        
+
         return keyName;
     }
 }

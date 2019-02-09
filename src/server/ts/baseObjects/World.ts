@@ -1,34 +1,57 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
+import { ZIRResourceNode } from "../entities/ResourceNode";
 
 export class ZIRWorld {
     private worldID: string;
     private terrain: IZIRTerrainMap;
     private entities: ZIREntity[];
-    private sectorLookup: string[];
+    private sectorLookup: number[];
     private sectors: ZIRSector[];
     private readonly sectorSize = 500;
     private readonly width;
+    private readonly height;
 
     constructor(id: string, width: number, height: number) {
         this.worldID = id;
         this.entities = [];
         this.sectors = [];
+        this.sectorLookup = [];
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 this.sectors.push(new ZIRSector());
             }
         }
         this.width = width;
+        this.height = height;
         this.terrain = this.generateWorldTerrain();
+        const resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 50), "spite", "spite");
+        this.registerEntity(resource);
+    }
+
+    public getSectorIdByPosition(position: Vector): number {
+
+        const sectorX = Math.trunc(position.getX() / this.sectorSize);
+        const sectorY = Math.trunc(position.getY() / this.sectorSize);
+
+        if (sectorX >= this.width || sectorX < 1) {
+            return -1;
+        }
+        if (sectorY >= this.height || sectorY < 1) {
+            return -1;
+        }
+
+        return this.width * sectorY + sectorX;
     }
 
     public registerEntity(entity: ZIREntity) {
-        let position = entity.getPosition();
-        let sectorX = Math.trunc(position.getX() / this.sectorSize);
-        let sectorY = Math.trunc(position.getY() / this.sectorSize);
-        let sectorID = this.width * sectorY + sectorX;
+        const position = entity.getPosition();
+        const sectorID = this.getSectorIdByPosition(position);
+        if (sectorID === -1) {
+            entity.kill();
+            return;
+        }
         this.sectorLookup[entity.getEntityId()] = sectorID;
         this.sectors[sectorID].addEntity(entity);
         this.entities.push(entity);
@@ -36,9 +59,9 @@ export class ZIRWorld {
 
     public removeEntity(entityID: string): ZIREntity {
         for (let i = 0; i < this.entities.length; i++) {
-            let entity = this.entities[i];
-            if (entity.getEntityId() == entityID) {
-                let sectorID = this.sectorLookup[entityID];
+            const entity = this.entities[i];
+            if (entity.getEntityId() === entityID) {
+                const sectorID = this.sectorLookup[entityID];
                 this.sectors[sectorID].removeEntity(entityID);
                 delete this.sectorLookup[entityID];
                 this.entities.splice(i, 1);
@@ -47,15 +70,64 @@ export class ZIRWorld {
         }
     }
 
-    public getSectorIDByEntity(entity: ZIREntity) {
+    public sortEntities() {
+        for (const entity of this.entities) {
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+                const entityID = entity.getEntityId();
+                const currentSectorID: number = this.sectorLookup[entityID];
+                const position = entity.getPosition();
+
+                const newSectorID = this.getSectorIdByPosition(position);
+                if (newSectorID === -1) {
+                    entity.kill();
+                    return;
+                }
+
+                if (newSectorID !== currentSectorID) {
+                    this.sectorLookup[entityID] = newSectorID;
+                    const curSector = this.sectors[currentSectorID];
+                    curSector.removeEntity(entityID);
+                    const newSector = this.sectors[newSectorID];
+                    newSector.addEntity(entity);
+                }
+            }
+        }
+    }
+
+    public runCollisionLogic() {
+        this.sortEntities();
+        for (const entity of this.entities) {
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
+                const baseSectorID = this.getSectorIDByEntity(entity);
+                const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
+                const entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
+                for (const check of entitiesToCheck) {
+                    for (const zone1 of check.getHitboxes()) {
+                        for (const zone2 of entity.getHitboxes()) {
+                            if (zone1.checkCollision(zone2)) {
+                                entity.registerEvent(zone1);
+                                check.registerEvent(zone2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (const entity of this.entities) {
+            entity.runEvents();
+            entity.setCreating(false);
+        }
+    }
+
+    private getSectorIDByEntity(entity: ZIREntity) {
         return this.sectorLookup[entity.getEntityId()];
     }
 
-    public getThreeByThreeGridOfSectorsByInnerSectorID(sector: number) {
-        let sectors: ZIRSector[] = [];
+    private getThreeByThreeGridOfSectorsByInnerSectorID(sector: number) {
+        const sectors: ZIRSector[] = [];
         let base = sector - this.width;
-        for(let i = 0; i < 3; i++){
-            for(let offset = -1; offset < 2; offset++){
+        for (let i = 0; i < 3; i++) {
+            for (let offset = -1; offset < 2; offset++) {
                 sectors.push(this.sectors[base + offset]);
             }
             base += this.width;
@@ -63,10 +135,10 @@ export class ZIRWorld {
         return sectors;
     }
 
-    public getEntitiesBySectorIDs(sectorIDs: number[]) {
-        let toReturn: ZIREntity[] = [];
-        for(let id of sectorIDs){
-            toReturn.push.apply(toReturn, this.sectors[id].getAllEntities());
+    private getEntitiesBySectorIDs(sectors: ZIRSector[]) {
+        const toReturn: ZIREntity[] = [];
+        for (const sector of sectors) {
+            toReturn.push.apply(toReturn, sector.getAllEntities());
         }
         return toReturn;
     }
@@ -83,9 +155,11 @@ export class ZIRWorld {
         return this.worldID;
     }
 
+    /**
+     * @deprecated
+     */
     public destroyEntity(entity: ZIREntity) {
-        let entityIndex = this.entities.indexOf(entity);
-        if (entityIndex !== -1) this.entities.splice(entityIndex, 1);
+        this.removeEntity(entity.getEntityId());
     }
 
     protected generateWorldTerrain(): IZIRTerrainMap {
@@ -105,14 +179,14 @@ export class ZIRSector {
     }
 
     public removeEntity(entityID: string) {
-        for (var i = 0; i < this.entities.length; i++) {
-            if (this.entities[i].getEntityId() == entityID) {
+        for (let i = 0; i < this.entities.length; i++) {
+            if (this.entities[i].getEntityId() === entityID) {
                 this.entities.splice(i, 1);
             }
         }
     }
 
-    public getAllEntities(){
+    public getAllEntities() {
         return this.entities;
     }
 }

@@ -6,9 +6,9 @@ export interface IZIRServerCommunications {
     setResetHandler: (handler: (data: IZIRResetResult) => void) => void;
 
     setMessageHandler: (handler: (message) => void) => void;
-    
+
     setUsernameHandler: (handler: () => void) => void;
-    
+
     sendInfoToServer: (type: string, message: string) => void;
 
     getPlayersOnline: () => string[];

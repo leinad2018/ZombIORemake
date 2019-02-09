@@ -1,25 +1,38 @@
 import { IZIRServerUpdate } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
-import { IZIRRenderable, IZIRAsset } from "../globalInterfaces/RenderingInterfaces";
+import { IZIRAsset, IZIRRenderable } from "../globalInterfaces/RenderingInterfaces";
 
 export abstract class ZIRClientBase {
-    private objectsToUpdate: IZIRServerUpdate[];
     protected sizeVector: Vector;
+    private objectsToUpdate: IZIRServerUpdate[];
 
     constructor() {
         this.objectsToUpdate = [];
     }
+
+    public abstract isDebugMode(): boolean;
+
+    public abstract getPlayersOnline();
+
+    public abstract getDebugMessages();
+
+    public abstract getBackgroundImage(): IZIRAsset;
+
+    public abstract getPlayerPosition(): Vector;
+
+    public abstract getPlayerHealth(): number;
+
+    public abstract getWorldData(): IZIRRenderable[];
 
     public registerUpdateHandler(objectToUpdate: IZIRServerUpdate) {
         this.objectsToUpdate.push(objectToUpdate);
     }
 
     public getEntitiesToRender() {
-        var toReturn: IZIRRenderable[] = [];
-        return toReturn;
+        return [];
     }
 
-    public setViewSize(size : Vector) {
+    public setViewSize(size: Vector) {
         this.sizeVector = size;
     }
 
@@ -29,13 +42,4 @@ export abstract class ZIRClientBase {
         });
     }
 
-    abstract getPlayersOnline();
-
-    abstract getDebugMessages();
-
-    abstract getBackgroundImage(): IZIRAsset;
-
-    abstract getPlayerPosition(): Vector;
-
-    abstract getWorldData(): IZIRRenderable[];
 }

@@ -9,10 +9,12 @@ import { ZIRPlayerData } from "./PlayerData";
 import { ZIRWorldData } from "./WorldData";
 import { ZIRCanvasController } from "./CanvasController";
 import { ZIRServerBase } from "./baseObjects/ServerBase";
+import { ZIRMenuController } from "./MenuController";
 
 export class ZIRClient extends ZIRClientBase {
     public playersOnline: string[];
     private serverComms: ZIRServerBase;
+    private menuController: ZIRMenuController;
     private canvas: ZIRCanvasController;
     private entities: ZIREntityBase[];
     private input: ZIRInput;
@@ -20,10 +22,12 @@ export class ZIRClient extends ZIRClientBase {
     private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
+    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health");
 
-    constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput) {
+    constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
         this.serverComms = comms;
+        this.menuController = menus;
         this.entities = [];
         this.username = name;
         this.playersOnline = [];
@@ -31,30 +35,46 @@ export class ZIRClient extends ZIRClientBase {
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
         this.canvas = renderer;
-        this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
-        this.serverComms.setHandler('reset', this.handleReset.bind(this));
-        this.serverComms.setHandler('message', this.handleMessage.bind(this));
-        this.serverComms.setHandler('requestUsername', this.fetchUsername.bind(this));
-        this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('updatePlayer', this.updatePlayer.bind(this));
-        this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
+        this.canvas.addHudAsset("health", this.heartAsset);
+        this.canvas.createTerrainCache(this.world.getWorldData());
+        this.serverComms.setHandler("update", this.handleServerUpdate.bind(this));
+        this.serverComms.setHandler("reset", this.handleReset.bind(this));
+        this.serverComms.setHandler("message", this.handleMessage.bind(this));
+        this.serverComms.setHandler("requestRename", this.fetchUsername.bind(this));
+        this.serverComms.setHandler("debug", this.handleDebugMessage.bind(this));
+        this.serverComms.setHandler("updateFocus", this.updateFocus.bind(this));
+        this.serverComms.setHandler("updateWorld", this.handleWorldUpdate.bind(this));
+        this.serverComms.setHandler("requestRespawn", this.handleRespawn.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
     }
 
+    public isDebugMode(): boolean {
+        return this.input.getDebug();
+    }
+
     private fetchUsername() {
-        this.serverComms.sendInfoToServer('rename', this.username);
+        this.serverComms.sendInfoToServer("rename", this.username);
     }
 
     private handleMessage(message) {
         console.log("From Server: " + message);
     }
 
+    private handleRespawn() {
+        this.menuController.showRespawnMenu(this.sendRespawn.bind(this));
+    }
+
+    private sendRespawn() {
+        this.serverComms.sendInfoToServer("respawn", "");
+        this.menuController.hideRespawnMenu();
+    }
+
     private handleReset(data: IZIRResetResult) {
         this.entities = [];
-        for (var entity of data.entities) {
-            var newEntity = this.parseEntityResult(entity);
+        for (const entity of data.entities) {
+            const newEntity = this.parseEntityResult(entity);
             this.entities.push(newEntity);
         }
         this.updateObjects();
@@ -65,19 +85,19 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
-        for (var entity of data.updates) {
-            var id = entity.id;
+        for (const entity of data.updates) {
+            const id = entity.id;
             switch (entity.type) {
-                case 'update':
-                    let newEntity = this.parseEntityResult(entity);
-                    let index = this.getEntityIndexById(id);
-                    if(index == -1){
+                case "update":
+                    const newEntity = this.parseEntityResult(entity);
+                    const index = this.getEntityIndexById(id);
+                    if (index === -1) {
                         this.entities.push(newEntity);
-                    }else{
+                    } else {
                         this.entities[index] = newEntity;
                     }
                     break;
-                case 'delete':
+                case "delete'":
                     if (this.getEntityById(id)) {
                         this.entities.splice(this.getEntityIndexById(id), 1);
                     }
@@ -92,13 +112,14 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleWorldUpdate(data: IZIRWorldUpdate) {
         this.world = new ZIRWorldData(data);
+        this.canvas.createTerrainCache(this.world.getWorldData());
     }
 
 
     private handleInput(keycode: string, state: boolean) {
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 
@@ -106,26 +127,27 @@ export class ZIRClient extends ZIRClientBase {
      * @param renderOffset gets global coordinate of point instead of
      * screen coordinate when true
      */
-    private handlePointInput(keycode: string, state: Vector, renderOffset: boolean=true) {
-        if(renderOffset) {
+    private handlePointInput(keycode: string, state: Vector, renderOffset: boolean = true) {
+        if (renderOffset) {
             state = this.canvas.transformRenderToPlayer(state);
         }
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 
     private parseEntityResult(result: IZIREntityResult) {
-        var position: Vector = new Vector(result.x, result.y);
-        var size: Vector = new Vector(result.xsize, result.ysize);
-        var asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
-        return new ZIREntityBase(result.id, position, size, asset);
+        const position: Vector = new Vector(result.x, result.y);
+        const size: Vector = new Vector(result.xsize, result.ysize);
+        const asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
+        const name: string = result.name;
+        return new ZIREntityBase(result.id, position, size, asset, name);
     }
 
     private getEntityById(id: string) {
-        for (let entity of this.entities) {
-            if (entity.getEntityId() == id) {
+        for (const entity of this.entities) {
+            if (entity.getEntityId() === id) {
                 return entity;
             }
         }
@@ -135,8 +157,10 @@ export class ZIRClient extends ZIRClientBase {
         return this.entities.indexOf(this.getEntityById(id));
     }
 
-    private updatePlayer(data) {
+    private updateFocus(data) {
         this.player.setPlayerID(data.playerID);
+        this.player.setHealth(data.health);
+        this.player.setName(data.name);
         this.player.setInventory(data.inventory);
     }
 
@@ -160,12 +184,16 @@ export class ZIRClient extends ZIRClientBase {
         this.username = name;
     }
 
-    public getPlayerPosition() : Vector {
-        var player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
+    public getPlayerPosition(): Vector {
+        const player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }
-        return(undefined);
+        return (undefined);
+    }
+
+    public getPlayerHealth(): number {
+        return (this.player.getHealth());
     }
 
     public getWorldData() {

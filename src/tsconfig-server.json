@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonJS",
-        "outDir": "output"
+        "outDir": "output",
+        "sourceMap": true
     },
     "include": [
         "server/**/*"
