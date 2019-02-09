@@ -22,7 +22,8 @@
             "command": "${workspaceFolder}/copyServer.bat",
             "group": "build",
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+                "panel": "new"
             }
         },
         {
@@ -46,18 +47,20 @@
             "command": "${workspaceFolder}/copyClient.bat",
             "group": "build",
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+                "panel": "new"
             }
         },
         {
             "label": "buildAssets",
-            "isBackground": true,
+            "isBackground": false,
             "type": "shell",
             "command": "${workspaceFolder}/copyAssets.bat",
             "group": "build",
             "dependsOn": "emptyOutput",
             "presentation": {
-                "reveal": "never"
+                "reveal": "silent",
+                "panel": "new",
             }
         },
         {

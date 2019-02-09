@@ -2,10 +2,13 @@
     "extends": "tslint:recommended",
     "rules": {
         "max-line-length": {
-            "options": [120]
+            "options": [200]
         },
+        "ordered-imports": false,
         "new-parens": true,
+        "member-ordering": false,
         "no-arg": true,
+        "no-string-literal": false,
         "no-bitwise": true,
         "no-conditional-assignment": true,
         "no-consecutive-blank-lines": false,
@@ -16,7 +19,7 @@
     },
     "jsRules": {
         "max-line-length": {
-            "options": [120]
+            "options": [200]
         }
     }
 }
