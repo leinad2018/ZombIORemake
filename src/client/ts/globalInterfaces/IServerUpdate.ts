@@ -20,7 +20,7 @@ export interface IZIREntityResult {
     name: string;
 }
 
-export interface IZIREntityUpdateResult extends IZIREntityResult{
+export interface IZIREntityUpdateResult extends IZIREntityResult {
     type: string;
 }
 

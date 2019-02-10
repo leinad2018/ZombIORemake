@@ -37,14 +37,14 @@ export class ZIRClient extends ZIRClientBase {
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
-        this.serverComms.setHandler('update', this.handleServerUpdate.bind(this));
-        this.serverComms.setHandler('reset', this.handleReset.bind(this));
-        this.serverComms.setHandler('message', this.handleMessage.bind(this));
-        this.serverComms.setHandler('requestRename', this.fetchUsername.bind(this));
-        this.serverComms.setHandler('debug', this.handleDebugMessage.bind(this));
-        this.serverComms.setHandler('updateFocus', this.updateFocus.bind(this));
-        this.serverComms.setHandler('updateWorld', this.handleWorldUpdate.bind(this));
-        this.serverComms.setHandler('requestRespawn', this.handleRespawn.bind(this));
+        this.serverComms.setHandler("update", this.handleServerUpdate.bind(this));
+        this.serverComms.setHandler("reset", this.handleReset.bind(this));
+        this.serverComms.setHandler("message", this.handleMessage.bind(this));
+        this.serverComms.setHandler("requestRename", this.fetchUsername.bind(this));
+        this.serverComms.setHandler("debug", this.handleDebugMessage.bind(this));
+        this.serverComms.setHandler("updateFocus", this.updateFocus.bind(this));
+        this.serverComms.setHandler("updateWorld", this.handleWorldUpdate.bind(this));
+        this.serverComms.setHandler("requestRespawn", this.handleRespawn.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
@@ -55,7 +55,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private fetchUsername() {
-        this.serverComms.sendInfoToServer('rename', this.username);
+        this.serverComms.sendInfoToServer("rename", this.username);
     }
 
     private handleMessage(message) {
@@ -67,14 +67,14 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private sendRespawn() {
-        this.serverComms.sendInfoToServer('respawn', "");
+        this.serverComms.sendInfoToServer("respawn", "");
         this.menuController.hideRespawnMenu();
     }
 
     private handleReset(data: IZIRResetResult) {
         this.entities = [];
-        for (var entity of data.entities) {
-            var newEntity = this.parseEntityResult(entity);
+        for (const entity of data.entities) {
+            const newEntity = this.parseEntityResult(entity);
             this.entities.push(newEntity);
         }
         this.updateObjects();
@@ -85,8 +85,8 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
-        for (var entity of data.updates) {
-            var id = entity.id;
+        for (const entity of data.updates) {
+            const id = entity.id;
             switch (entity.type) {
                 case 'update':
                     let newEntity = this.parseEntityResult(entity);
@@ -97,7 +97,7 @@ export class ZIRClient extends ZIRClientBase {
                         this.entities[index] = newEntity;
                     }
                     break;
-                case 'delete':
+                case "delete'":
                     if (this.getEntityById(id)) {
                         this.entities.splice(this.getEntityIndexById(id), 1);
                     }
@@ -121,8 +121,8 @@ export class ZIRClient extends ZIRClientBase {
             this.menuController.toggleMenu("inventory", this.player.getInventory());
         }
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 
@@ -135,22 +135,22 @@ export class ZIRClient extends ZIRClientBase {
             state = this.canvas.transformRenderToPlayer(state);
         }
         this.serverComms.sendInfoToServer("input", {
-            keycode: keycode,
-            state: state
+            keycode,
+            state,
         });
     }
 
     private parseEntityResult(result: IZIREntityResult) {
-        var position: Vector = new Vector(result.x, result.y);
-        var size: Vector = new Vector(result.xsize, result.ysize);
-        var asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
-        var name: string = result.name;
+        const position: Vector = new Vector(result.x, result.y);
+        const size: Vector = new Vector(result.xsize, result.ysize);
+        const asset: IZIRAsset = ZIRAssetLoader.getAsset(result.asset);
+        const name: string = result.name;
         return new ZIREntityBase(result.id, position, size, asset, name);
     }
 
     private getEntityById(id: string) {
-        for (let entity of this.entities) {
-            if (entity.getEntityId() == id) {
+        for (const entity of this.entities) {
+            if (entity.getEntityId() === id) {
                 return entity;
             }
         }
@@ -188,7 +188,7 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     public getPlayerPosition(): Vector {
-        var player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
+        const player: ZIREntityBase = this.getEntityById(this.player.getPlayerID());
         if (player) {
             return player.getPosition();
         }

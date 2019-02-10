@@ -1,29 +1,24 @@
-import { ZIREntity } from "./baseObjects/EntityBase"
+import { ZIREntity } from "./baseObjects/EntityBase";
 import { Vector } from "./utilityObjects/Math";
 
 export class ZIRPhysicsEngine {
-    readonly G: number = 9.8;
-
-    constructor() {
-
-    }
+    public readonly G: number = 9.8;
 
     public async applyPhysics(entity: ZIREntity, dt: number) {
         let velocity = entity.getVelocity();
         let acceleration = entity.getAcceleration();
-        let mv = velocity.getMagnitude()
+        const mv = velocity.getMagnitude();
 
         if (mv > 0) {
-            let friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
+            const friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
 
-    
             let frictionVector = new Vector(0, 0);
             frictionVector = velocity.getUnitVector().scale(-1 * friction);
             if (frictionVector.getMagnitude() * dt > velocity.getMagnitude()) {
                 frictionVector = frictionVector.getUnitVector().scale(velocity.getMagnitude() / dt);
             }
             acceleration = acceleration.add(frictionVector);
-        
+
             if (mv >= entity.getMaxMovement()) {
                 acceleration.scale(0);
                 velocity = velocity.getUnitVector().scale(entity.getMaxMovement());
@@ -31,16 +26,16 @@ export class ZIRPhysicsEngine {
         }
 
 
-        //TODO: handle external forces
+        // TODO: handle external forces
 
         velocity = velocity.add(acceleration.scale(dt));
 
-        if(velocity.getMagnitude() !== 0) {
+        if (velocity.getMagnitude() !== 0) {
             entity.setUpdated(false);
-            let position = entity.getPosition().add(velocity.scale(dt));
+            const position = entity.getPosition().add(velocity.scale(dt));
             entity.setPosition(position);
         }
 
-        entity.setVelocity(velocity); 
+        entity.setVelocity(velocity);
     }
 }

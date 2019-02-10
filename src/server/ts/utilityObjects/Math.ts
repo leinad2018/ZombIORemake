@@ -2,7 +2,7 @@
 export class Vector {
     private x: number;
     private y: number;
-    static ZERO_VECTOR : Vector = new Vector(0,0);
+    public static ZERO_VECTOR: Vector = new Vector(0, 0);
 
     constructor(x: number, y: number) {
         this.x = x;
@@ -18,8 +18,8 @@ export class Vector {
     }
 
     public getUnitVector(): Vector {
-        let m = this.getMagnitude()
-        return m === 0 ? new Vector(1,0) : this.scale(1 / this.getMagnitude());
+        const m = this.getMagnitude();
+        return m === 0 ? new Vector(1, 0) : this.scale(1 / this.getMagnitude());
     }
 
     public add(v: Vector): Vector {

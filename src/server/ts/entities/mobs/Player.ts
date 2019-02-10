@@ -31,15 +31,14 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
-
         if (this.dead) {
             return;
         }
 
-        let m = this.moveSpeed;
+        const m = this.moveSpeed;
         let a = new Vector(0, 0);
 
-        for (let input in inputs) {
+        for (const input in inputs) {
             if (inputs[input]) {
                 let mouse;
                 let direction;
@@ -72,23 +71,23 @@ export class ZIRPlayer extends ZIRMob {
                     case "click":
                         let rocks = this.getInventoryItemByID("rock");
                         if (rocks) {
-                            mouse = inputs["mouse"]
+                            mouse = inputs["mouse"];
                             direction = new Vector(mouse.x, mouse.y);
-                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER)
+                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
                             p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
                             worldState.registerEntity(p);
                             this.dropItem(new ZIRInventoryStack("rock", "", 1));
                         }
                         break;
                     case "debug":
-                        let e = new ZIREnemy(this.position);
+                        const e = new ZIREnemy(this.position);
                         worldState.registerEntity(e);
                         break;
                 }
             }
         }
 
-        if (a.getMagnitude() != 0) {
+        if (a.getMagnitude() !== 0) {
             a = a.getUnitVector().scale(m);
         }
         this.acceleration = a;
@@ -98,18 +97,18 @@ export class ZIRPlayer extends ZIRMob {
      * Adds a new item to the inventory in either an existing slot or an empty on if there is no existing.
      * Returns true if the add succeeded.
      * This should never be called with information from the client.
-     * @param newItem 
+     * @param newItem
      */
     public addToInventory(newItem: ZIRInventoryStack): boolean {
-        for (let slot of this.inventory) {
-            if (slot.getItemID() == newItem.getItemID()) {
-                let oldAmount = slot.getStackSize();
+        for (const slot of this.inventory) {
+            if (slot.getItemID() === newItem.getItemID()) {
+                const oldAmount = slot.getStackSize();
                 slot.setStackSize(oldAmount + newItem.getStackSize());
                 return true;
             }
         }
-        for (let slot of this.inventory) {
-            if (slot.getItemID() == "-1") {
+        for (const slot of this.inventory) {
+            if (slot.getItemID() === "-1") {
                 slot.setItemID(newItem.getItemID());
                 slot.setStackSize(newItem.getStackSize());
                 return true;
@@ -120,20 +119,20 @@ export class ZIRPlayer extends ZIRMob {
 
     /**
      * Drops an item out of the inventory.
-     * Returns true if the drop succeeded. 
+     * Returns true if the drop succeeded.
      */
     public dropItem(toDrop: ZIRInventoryStack): boolean {
         if (toDrop.getStackSize() < 0) {
             return false;
         }
-        for (let slot of this.inventory) {
-            if (slot.getItemID() == toDrop.getItemID()) {
+        for (const slot of this.inventory) {
+            if (slot.getItemID() === toDrop.getItemID()) {
                 if (slot.getStackSize() < toDrop.getStackSize()) {
                     return false;
                 }
-                let newAmount = slot.getStackSize() - toDrop.getStackSize();
+                const newAmount = slot.getStackSize() - toDrop.getStackSize();
                 slot.setStackSize(newAmount);
-                if (newAmount == 0) {
+                if (newAmount === 0) {
                     slot.setItemID("-1");
                 }
                 return true;
@@ -143,21 +142,21 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     /**
-     * Reorders the inventory to the inputted inventory. 
+     * Reorders the inventory to the inputted inventory.
      * Returns true if the reorder succeeded.
-     * @param inventory 
+     * @param inventory
      */
     public reorderInventory(inventory: ZIRInventoryStack[]): boolean {
-        if (inventory.length != this.inventory.length) {
+        if (inventory.length !== this.inventory.length) {
             return false;
         }
-        for (let slot of inventory) {
+        for (const slot of inventory) {
             let found: boolean = false;
             for (let i = 0; !found && i < this.inventory.length; i++) {
-                var oldSlot = this.inventory[i];
-                if (oldSlot.getItemID() == slot.getItemID()) {
+                const oldSlot = this.inventory[i];
+                if (oldSlot.getItemID() === slot.getItemID()) {
                     found = true;
-                    if (oldSlot.getStackSize() != slot.getStackSize()) {
+                    if (oldSlot.getStackSize() !== slot.getStackSize()) {
                         return false;
                     }
                 }
@@ -180,16 +179,20 @@ export class ZIRPlayer extends ZIRMob {
 
     public getObject() {
         return {
-            playerID: this.id,
-            inventory: this.inventory,
             health: this.health,
-            name: this.name
+            inventory: this.inventory,
+            name: this.name,
+            playerID: this.id,
         };
     }
 
+    public update() {
+        return null;
+    }
+
     protected createStaticHitboxes(): ZIRZone[] {
-        let toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ['harvest']);
+        const toReturn: ZIRZone[] = [];
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest"]);
         return toReturn;
     }
 

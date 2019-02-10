@@ -11,13 +11,15 @@ export class ZIRServerCommunications extends ZIRServerBase {
     }
 
     public registerServerListeners() {
-        var socket = io();
-        socket.emit('login');
-        socket.on('players', ((data) => {
-            this.playersOnline = JSON.parse(data)
+        const socket = io();
+        socket.emit("login");
+        socket.on("players", ((data) => {
+            this.playersOnline = JSON.parse(data);
         }).bind(this));
-        for (let handler in this.handlers) {
-            socket.on(handler, (data) => { this.handlers[handler](data) });
+        for (const handler in this.handlers) {
+            socket.on(handler, (data) => {
+                this.handlers[handler](data);
+            });
         }
         this.socket = socket;
     }

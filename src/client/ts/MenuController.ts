@@ -23,16 +23,16 @@ export class ZIRMenuController {
     }
 
     public showRespawnMenu(handler: () => void) {
-        if (document.getElementById('respawn')) {
+        if (document.getElementById("respawn")) {
             return;
         }
-        let div = document.createElement('div');
+        const div = document.createElement("div");
         div.id = "respawn";
-        let button = document.createElement('button');
+        const button = document.createElement("button");
         button.textContent = "Respawn";
-        button.addEventListener('click', handler);
+        button.addEventListener("click", handler);
         div.appendChild(button);
-        div.setAttribute('style', 'position:absolute;top:50%;left:50%');
+        div.setAttribute("style", "position:absolute;top:50%;left:50%");
         this.mainDiv.appendChild(div);
     }
 
@@ -67,7 +67,7 @@ export class ZIRMenuController {
     }
 
     private hideMenu(id: string) {
-        let div = document.getElementById(id);
+        const div = document.getElementById(id);
         if (div) {
             div.remove();
         }

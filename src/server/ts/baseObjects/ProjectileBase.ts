@@ -3,7 +3,7 @@ import { Vector } from "../utilityObjects/Math";
 import { ZIRZone } from "./Hitbox";
 
 export abstract class ZIRProjectile extends ZIREntity {
-    protected behavior: Function;
+    protected behavior: (e: ZIREntity) => void;
     protected owner: ZIREntity;
     protected damage: number = 2;
 
@@ -14,16 +14,20 @@ export abstract class ZIRProjectile extends ZIREntity {
         this.mass = 1;
         this.friction = 0;
         this.moveSpeed = 30 * this.PIXELS_PER_METER;
-        this.behavior = (e: ZIREntity) => { };
+        this.behavior = (e: ZIREntity) => {
+            return null;
+        };
         this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
-        setTimeout(() => { this.kill() }, expiration);
+        setTimeout(() => {
+            this.kill();
+        }, expiration);
     }
 
     public update(state) {
         this.behavior(this.owner);
     }
 
-    public setBehavior(behavior: Function) {
+    public setBehavior(behavior: (a: any) => void) {
         this.behavior = behavior;
     }
 

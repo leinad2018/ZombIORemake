@@ -16,11 +16,11 @@ export abstract class ZIRZone {
         return this.position;
     }
 
-    public setPosition(pos: Vector){
+    public setPosition(pos: Vector) {
         this.position = pos;
     }
 
-    public getTypes(){
+    public getTypes() {
         return this.types;
     }
 
@@ -40,7 +40,7 @@ export class ZIREffectBox extends ZIRZone {
     }
 
     public checkCollision(zone: ZIRZone): boolean {
-        for (let area of this.areas) {
+        for (const area of this.areas) {
             if (area.checkCollision(zone)) {
                 return true;
             }
@@ -72,7 +72,7 @@ export class ZIRCircleZone extends ZIRZone {
     }
 
     private checkCircle(circle: ZIRCircleZone): boolean {
-        let distance = Math.sqrt(Math.pow(this.position.getX() - circle.position.getX(), 2) + Math.pow(this.position.getY() - circle.position.getY(), 2));
+        const distance = Math.sqrt(Math.pow(this.position.getX() - circle.position.getX(), 2) + Math.pow(this.position.getY() - circle.position.getY(), 2));
         if (this.radius <= distance) {
             return true;
         }
@@ -105,7 +105,7 @@ export class ZIRRectangularZone extends ZIRZone {
     }
 
     private checkCircle(pos: Vector, radius: number): boolean {
-        let otherCorner = this.position.add(this.size);
+        const otherCorner = this.position.add(this.size);
         if (pos.getY() - radius > this.position.getY() || pos.getY() + radius < otherCorner.getY()) {
             return false;
         }
@@ -116,7 +116,7 @@ export class ZIRRectangularZone extends ZIRZone {
     }
 
     private checkRectangle(pos: Vector, otherPoint: Vector): boolean {
-        let otherCorner = this.position.add(this.size);
+        const otherCorner = this.position.add(this.size);
         if (this.position.getX() > otherPoint.getX() || pos.getX() > otherCorner.getX()) {
             return false;
         }

@@ -1,19 +1,18 @@
-import {IZIRUpdateResult, IZIRResetResult} from "./globalInterfaces/IServerUpdate"
-
+import {IZIRUpdateResult, IZIRResetResult} from "./globalInterfaces/IServerUpdate";
 
 export class ZIRLogger {
-    private active : boolean;
-    private filePath : string;
+    private active: boolean;
+    private filePath: string;
     private stream;
-    constructor(filePath : string, active : boolean = true) {
+    constructor(filePath: string, active: boolean = true) {
         this.active = active;
-        var dir = './logs/';
+        const dir = "./logs/";
         this.filePath = dir + filePath;
-        let fs = require('fs');
-        if (!fs.existsSync(dir)){
+        const fs = require("fs");
+        if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
-        this.stream = fs.createWriteStream(filePath, {flags:"a"});
+        this.stream = fs.createWriteStream(filePath, {flags: "a"});
     }
 
     public enable() {
@@ -24,10 +23,10 @@ export class ZIRLogger {
         this.active = false;
     }
 
-    public log(data : any) {
-        if(this.active) {
+    public log(data: any) {
+        if (this.active) {
             data = JSON.stringify(data);
-            this.stream.write("[" + Date.now() + "] " + data+"\n");
+            this.stream.write("[" + Date.now() + "] " + data + "\n");
         }
     }
 
@@ -35,11 +34,11 @@ export class ZIRLogger {
         this.log(this.unpack(data));
     }
 
-    public unpack(data) : Object {
-        let object = {}
-        let array = []
+    public unpack(data): object {
+        const object = {};
+        const array = [];
         let label = "";
-        for(let entry in data) {
+        for (const entry in data) {
             label = entry;
             array.push(data[entry]);
         }
@@ -47,7 +46,7 @@ export class ZIRLogger {
         return object;
     }
 
-    public close() : void {
+    public close(): void {
         this.stream.end();
     }
 }
