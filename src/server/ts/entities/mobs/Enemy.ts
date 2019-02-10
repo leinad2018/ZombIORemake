@@ -3,7 +3,6 @@ import { ZIRMob } from "../../baseObjects/Mob";
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
-import { eventNames } from "cluster";
 
 export class ZIREnemy extends ZIRMob {
     private cooldownUses: {[ability: string]: number}; // For storing cooldown timestamps
