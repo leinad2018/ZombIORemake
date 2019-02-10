@@ -1,7 +1,6 @@
-output/*
-logs/*
-node_modules/*
-node_modules/typescript/*
+output
+logs
+node_modules
 
 *.class
 
