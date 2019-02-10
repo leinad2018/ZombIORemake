@@ -2,6 +2,7 @@ import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
+import { ZIRPlayer } from "../entities/mobs/Player";
 
 export class ZIRWorld {
     private worldID: string;
@@ -72,7 +73,11 @@ export class ZIRWorld {
 
     public sortEntities() {
         for (const entity of this.entities) {
-            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+            if (true) {// Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
+                if (!(entity instanceof ZIRPlayer)) {
+                    entity.kill();
+                }
+                return;
                 const entityID = entity.getEntityId();
                 const currentSectorID: number = this.sectorLookup[entityID];
                 const position = entity.getPosition();
@@ -96,18 +101,18 @@ export class ZIRWorld {
 
     public async runCollisionLogic() {
         this.sortEntities();
-        let checks: Promise<void>[] = [];
-        for (let entity of this.entities) {
+        const checks: Array<Promise<void>> = [];
+        for (const entity of this.entities) {
             checks.push(this.checkEntityCollision(entity));
         }
         await Promise.all(checks);
-        for (let entity of this.entities) {
+        for (const entity of this.entities) {
             entity.runEvents();
             entity.setCreating(false);
         }
     }
 
-    private async checkEntityCollision(entity: ZIREntity){
+    private async checkEntityCollision(entity: ZIREntity) {
         if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
             const baseSectorID = this.getSectorIDByEntity(entity);
             const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
@@ -123,9 +128,9 @@ export class ZIRWorld {
                 }
             }
         }
-        for (const entity of this.entities) {
-            entity.runEvents();
-            entity.setCreating(false);
+        for (const eventEntity of this.entities) {
+            eventEntity.runEvents();
+            eventEntity.setCreating(false);
         }
     }
 
@@ -163,13 +168,6 @@ export class ZIRWorld {
 
     public getWorldID() {
         return this.worldID;
-    }
-
-    /**
-     * @deprecated
-     */
-    public destroyEntity(entity: ZIREntity) {
-        this.removeEntity(entity.getEntityId());
     }
 
     protected generateWorldTerrain(): IZIRTerrainMap {

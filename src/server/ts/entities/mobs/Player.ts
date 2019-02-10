@@ -23,7 +23,7 @@ export class ZIRPlayer extends ZIRMob {
         for (let i = 0; i < this.inventory.length; i++) {
             this.inventory[i] = new ZIRInventoryStack("-1", "", 0);
         }
-        //TODO remove this for final
+        // TODO remove this for final
         this.inventory[0].setItemID("rock");
         this.inventory[0].setStackSize(100);
         this.inventory[1].setItemID("boomerang");
@@ -58,7 +58,7 @@ export class ZIRPlayer extends ZIRMob {
                         a = a.add(new Vector(m, 0));
                         break;
                     case "space":
-                        let rangs = this.getInventoryItemByID("boomerang");
+                        const rangs = this.getInventoryItemByID("boomerang");
                         if (rangs) {
                             mouse = inputs["mouse"];
                             direction = new Vector(mouse.x, mouse.y);
@@ -69,7 +69,7 @@ export class ZIRPlayer extends ZIRMob {
                         }
                         break;
                     case "click":
-                        let rocks = this.getInventoryItemByID("rock");
+                        const rocks = this.getInventoryItemByID("rock");
                         if (rocks) {
                             mouse = inputs["mouse"];
                             direction = new Vector(mouse.x, mouse.y);
@@ -170,8 +170,8 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     private getInventoryItemByID(itemID: string) {
-        for (let inv of this.inventory) {
-            if (inv.getItemID() == itemID) {
+        for (const inv of this.inventory) {
+            if (inv.getItemID() === itemID) {
                 return inv;
             }
         }

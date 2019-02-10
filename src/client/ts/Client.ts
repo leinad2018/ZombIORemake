@@ -88,16 +88,16 @@ export class ZIRClient extends ZIRClientBase {
         for (const entity of data.updates) {
             const id = entity.id;
             switch (entity.type) {
-                case 'update':
-                    let newEntity = this.parseEntityResult(entity);
-                    let index = this.getEntityIndexById(id);
-                    if (index == -1) {
+                case "update":
+                    const newEntity = this.parseEntityResult(entity);
+                    const index = this.getEntityIndexById(id);
+                    if (index === -1) {
                         this.entities.push(newEntity);
                     } else {
                         this.entities[index] = newEntity;
                     }
                     break;
-                case "delete'":
+                case "delete":
                     if (this.getEntityById(id)) {
                         this.entities.splice(this.getEntityIndexById(id), 1);
                     }
@@ -117,7 +117,7 @@ export class ZIRClient extends ZIRClientBase {
 
 
     private handleInput(keycode: string, state: boolean) {
-        if (keycode == "openInventory") {
+        if (keycode === "openInventory") {
             this.menuController.toggleMenu("inventory", this.player.getInventory());
         }
         this.serverComms.sendInfoToServer("input", {

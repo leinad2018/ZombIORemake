@@ -48,11 +48,13 @@ export class ZIRCanvasController {
         this.renderHUD(ctx, state.getPlayerHealth());
 
         this.renderPlayerBox(ctx, state.getPlayersOnline());
-        //if (this.shouldRenderDebug) this.renderDebugBox(ctx, state.getDebugMessages());
+        if (this.shouldRenderDebug) {
+            this.renderDebugBox(ctx, state.getDebugMessages());
+        }
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
-        let i = 0
+        let i = 0;
         for (i; i < health; i++) {
             ctx.drawImage(this.hudAssets["health"].getImage(), i * 50 + i * 5, 0, this.heartSize.getX(), this.heartSize.getY());
         }
@@ -115,7 +117,7 @@ export class ZIRCanvasController {
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, xOffset, yOffset);
 
-        for (let entity of entities) {
+        for (const entity of entities) {
             const position = entity.getPosition();
             const size = entity.getSize();
             const xs = size.getX();

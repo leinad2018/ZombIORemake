@@ -94,7 +94,7 @@ export class ZIRServerEngine {
 
     public destroyEntityInWorlds(entity: ZIREntity) {
         for (const world of this.universe) {
-            world.destroyEntity(entity);
+            world.removeEntity(entity.getEntityId());
         }
     }
 
