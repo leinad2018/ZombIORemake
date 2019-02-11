@@ -73,11 +73,7 @@ export class ZIRWorld {
 
     public sortEntities() {
         for (const entity of this.entities) {
-            if (true) {// Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
-                if (!(entity instanceof ZIRPlayer)) {
-                    entity.kill();
-                }
-                return;
+            if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {
                 const entityID = entity.getEntityId();
                 const currentSectorID: number = this.sectorLookup[entityID];
                 const position = entity.getPosition();
@@ -85,10 +81,9 @@ export class ZIRWorld {
                 const newSectorID = this.getSectorIdByPosition(position);
                 if (newSectorID === -1) {
                     entity.kill();
-                    return;
                 }
 
-                if (newSectorID !== currentSectorID) {
+                if ((newSectorID !== currentSectorID) && (newSectorID !== -1)) {
                     this.sectorLookup[entityID] = newSectorID;
                     const curSector = this.sectors[currentSectorID];
                     curSector.removeEntity(entityID);
@@ -115,6 +110,9 @@ export class ZIRWorld {
     private async checkEntityCollision(entity: ZIREntity) {
         if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
             const baseSectorID = this.getSectorIDByEntity(entity);
+            if (baseSectorID === -1) {
+                return;
+            }
             const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
             const entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
             for (const check of entitiesToCheck) {
