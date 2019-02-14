@@ -1,11 +1,11 @@
 Things to design
 
-Touching things with other things - how to hit things
-Resource gathering
 Build
 Looting
 What happens when you die
 Making items
 Weapons / tools
+Animations
 Mobility
 Bosses / raids
+Mobile and Desktop clients

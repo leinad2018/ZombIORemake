@@ -110,9 +110,9 @@ export class ZIRWorld {
     private async checkEntityCollision(entity: ZIREntity) {
         if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
             const baseSectorID = this.getSectorIDByEntity(entity);
-            if (baseSectorID === -1) {
-                return;
-            }
+            // if (baseSectorID === -1) {
+            //     return;
+            // }
             const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
             const entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
             for (const check of entitiesToCheck) {

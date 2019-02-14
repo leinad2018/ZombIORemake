@@ -23,6 +23,7 @@ export class ZIRClient extends ZIRClientBase {
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
     private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health");
+    private running: boolean;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -34,6 +35,7 @@ export class ZIRClient extends ZIRClientBase {
         this.input = input;
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
+        this.running = false;
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
@@ -48,10 +50,22 @@ export class ZIRClient extends ZIRClientBase {
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
+        this.runRenderingLoop();
     }
 
     public isDebugMode(): boolean {
         return this.input.getDebug();
+    }
+
+    private runRenderingLoop() {
+        if (this.running) {
+            try{
+                this.canvas.render(this);
+            }catch(e){
+                console.log(e);
+            }
+        }
+        requestAnimationFrame(this.runRenderingLoop.bind(this));
     }
 
     private fetchUsername() {
@@ -106,7 +120,8 @@ export class ZIRClient extends ZIRClientBase {
         }
         this.playersOnline = this.serverComms.getPlayersOnline();
         this.updateObjects();
-        this.canvas.render(this);
+        //this.canvas.render(this);
+        this.running = true;
         this.setViewSize(this.canvas.getDimensions());
     }
 

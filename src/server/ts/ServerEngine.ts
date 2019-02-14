@@ -156,10 +156,11 @@ export class ZIRServerEngine {
 
     private collectGarbage() {
         this.getAllEntities().forEach(
-            (entity) => { if (entity.isDead()) {
-                this.destroyEntityInWorlds(entity);
-            }
-        });
+            (entity) => {
+                if (entity.isDead()) {
+                    this.destroyEntityInWorlds(entity);
+                }
+            });
     }
 
     private async calculatePhysics() {
@@ -172,43 +173,48 @@ export class ZIRServerEngine {
     }
 
     private sendUpdate(reset: boolean = false) {
-        const calculatedUpdates = [];
-        let entities = this.getAllEntities();
+        for (let session of this.sessions) {
+            const calculatedUpdates = [];
+            let world = this.findWorldById(session.getWorldID());
+            let entities = world.getEntities();
 
-        if (!reset) {
-            entities = entities.filter((entity) => {
-                const e = entity.shouldUpdate();
-                entity.setUpdated(true);
-                return e;
-            });
-        }
+            if (!reset) {
+                entities = entities.filter((entity) => {
+                    const e = entity.shouldUpdate();
+                    entity.setUpdated(true);
+                    return e;
+                });
+            }
 
-        if (reset) {
-            entities = entities.filter((entity) => {
-                return !entity.isDead();
-            });
-        }
+            if (reset) {
+                entities = entities.filter((entity) => {
+                    return !entity.isDead();
+                });
+            }
 
-        for (const entity of entities) {
+            for (const entity of entities) {
 
-            const update = {
-                asset: entity.getAssetName(),
-                id: entity.getEntityId(),
-                name: entity.getName(),
-                type: entity.isDead() ? "delete" : "update",
-                x: entity.getPosition().getX(),
-                xsize: entity.getSize().getX(),
-                xspeed: null,
-                y: entity.getPosition().getY(),
-                ysize: entity.getSize().getY(),
-                yspeed: null,
-            };
-            calculatedUpdates.push(update);
-        }
-        if (reset) {
-            this.sessionManager.broadcast("reset", { entities: calculatedUpdates } as IZIRResetResult);
-        } else {
-            this.sessionManager.broadcast("update", { updates: calculatedUpdates } as IZIRUpdateResult);
+                const update = {
+                    asset: entity.getAssetName(),
+                    id: entity.getEntityId(),
+                    name: entity.getName(),
+                    type: entity.isDead() ? "delete" : "update",
+                    x: entity.getPosition().getX(),
+                    xsize: entity.getSize().getX(),
+                    xspeed: null,
+                    y: entity.getPosition().getY(),
+                    ysize: entity.getSize().getY(),
+                    yspeed: null,
+                };
+                calculatedUpdates.push(update);
+            }
+
+
+            if (reset) {
+                this.sessionManager.sendToClient(session.getSocket(), "reset", { entities: calculatedUpdates } as IZIRResetResult);
+            } else {
+                this.sessionManager.sendToClient(session.getSocket(), "update", { updates: calculatedUpdates } as IZIRUpdateResult);
+            }
         }
     }
 
