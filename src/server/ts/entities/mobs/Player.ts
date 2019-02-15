@@ -1,4 +1,3 @@
-import { ZIREntity } from "../../baseObjects/EntityBase";
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 import { ZIRWorld } from "../../baseObjects/World";
@@ -7,16 +6,22 @@ import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
 import { ZIRMob } from "../../baseObjects/Mob";
 import { ZIRInventoryStack } from "../../baseObjects/Inventory";
+import { ZIRTimedEvent } from "../../baseObjects/TimedEvent";
+import { ZIRServerEngine } from "../../ServerEngine";
 
 export class ZIRPlayer extends ZIRMob {
     private inventory: ZIRInventoryStack[];
-    private cooldownUses: { [ability: string]: number }; // For storing cooldown timestamps
+    private cooldowns: { [ability: string]: boolean }; // For storing cooldown timestamps
 
 
     constructor(position: Vector = new Vector(1000 + Math.random() * 500, 1000 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "player", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
         this.inventory = new Array(12);
         this.initInventory();
+        this.cooldowns = {
+            boomerang: true,
+            rock: true,
+        }
     }
 
     private initInventory() {
@@ -30,7 +35,7 @@ export class ZIRPlayer extends ZIRMob {
         this.inventory[1].setStackSize(1000);
     }
 
-    public do(inputs: any, worldState: ZIRWorld) {
+    public do(inputs: any, worldState: ZIRWorld, serverState: ZIRServerEngine) {
         if (this.dead) {
             return;
         }
@@ -58,25 +63,31 @@ export class ZIRPlayer extends ZIRMob {
                         a = a.add(new Vector(m, 0));
                         break;
                     case "space":
-                        const rangs = this.getInventoryItemByID("boomerang");
-                        if (rangs) {
-                            mouse = inputs["mouse"];
-                            direction = new Vector(mouse.x, mouse.y);
-                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
-                            p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
-                            worldState.registerEntity(p);
-                            this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
+                        if (this.cooldowns["boomerang"]) {
+                            const rangs = this.getInventoryItemByID("boomerang");
+                            if (rangs) {
+                                mouse = inputs["mouse"];
+                                direction = new Vector(mouse.x, mouse.y);
+                                velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
+                                p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
+                                worldState.registerEntity(p);
+                                this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
+                                serverState.registerEvent(this.startAbilityCooldown("boomerang"));
+                            }
                         }
                         break;
                     case "click":
-                        const rocks = this.getInventoryItemByID("rock");
-                        if (rocks) {
-                            mouse = inputs["mouse"];
-                            direction = new Vector(mouse.x, mouse.y);
-                            velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
-                            p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
-                            worldState.registerEntity(p);
-                            this.dropItem(new ZIRInventoryStack("rock", "", 1));
+                        if (this.cooldowns["rock"]) {
+                            const rocks = this.getInventoryItemByID("rock");
+                            if (rocks) {
+                                mouse = inputs["mouse"];
+                                direction = new Vector(mouse.x, mouse.y);
+                                velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
+                                p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
+                                worldState.registerEntity(p);
+                                this.dropItem(new ZIRInventoryStack("rock", "", 1));
+                                serverState.registerEvent(this.startAbilityCooldown("rock"));
+                            }
                         }
                         break;
                     case "debug":
@@ -91,6 +102,16 @@ export class ZIRPlayer extends ZIRMob {
             a = a.getUnitVector().scale(m);
         }
         this.acceleration = a;
+    }
+
+    private startAbilityCooldown(ability: string) {
+        this.cooldowns[ability] = false;
+        let cooldown = new ZIRAbilityCooldown(10, () => { this.setAbilityOffCooldown(ability) });
+        return cooldown;
+    }
+
+    private setAbilityOffCooldown(ability: string) {
+        this.cooldowns[ability] = true;
     }
 
     /**
@@ -198,5 +219,22 @@ export class ZIRPlayer extends ZIRMob {
 
     public toString(): string {
         return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/A" + this.acceleration;
+    }
+}
+
+class ZIRAbilityCooldown extends ZIRTimedEvent {
+    private abilityHandler: () => void;
+
+    constructor(length: number, abilityHandler: () => void) {
+        super(length);
+        this.abilityHandler = abilityHandler;
+    }
+
+    protected runEvent() {
+
+    }
+
+    public endEvent() {
+        this.abilityHandler();
     }
 }

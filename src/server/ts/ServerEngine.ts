@@ -223,7 +223,7 @@ export class ZIRServerEngine {
             const world = this.findWorldById(session.getWorldID());
             const player = session.getPlayer();
             if (player instanceof ZIRPlayer) {
-                (player as ZIRPlayer).do(session.getInputs(), world);
+                (player as ZIRPlayer).do(session.getInputs(), world, this);
             }
         }
     }
@@ -244,9 +244,10 @@ export class ZIRServerEngine {
         await Promise.all(events);
     }
 
+    //TODO this may not be thread safe
     private async updateEvent(event) {
         if (this.tickCounter > event.getEndingFrame()) {
-            this.currentEvents.splice(this.currentEvents.indexOf(event));
+            this.currentEvents.splice(this.currentEvents.indexOf(event), 1);
         } else {
             event.updateEvent(this.tickCounter);
         }

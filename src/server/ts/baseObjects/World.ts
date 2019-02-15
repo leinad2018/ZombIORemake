@@ -3,6 +3,7 @@ import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
 import { ZIRPlayer } from "../entities/mobs/Player";
+import { ZIRTimedEvent } from "./TimedEvent";
 
 export class ZIRWorld {
     private worldID: string;
@@ -69,6 +70,10 @@ export class ZIRWorld {
                 return entity;
             }
         }
+    }
+
+    public registerTimedEvent(event: ZIRTimedEvent){
+        
     }
 
     public sortEntities() {
