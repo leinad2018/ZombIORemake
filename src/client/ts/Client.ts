@@ -59,9 +59,9 @@ export class ZIRClient extends ZIRClientBase {
 
     private runRenderingLoop() {
         if (this.running) {
-            try{
+            try {
                 this.canvas.render(this);
-            }catch(e){
+            } catch (e) {
                 console.log(e);
             }
         }
@@ -132,13 +132,20 @@ export class ZIRClient extends ZIRClientBase {
 
 
     private handleInput(keycode: string, state: boolean) {
-        if (keycode === "openInventory") {
-            this.menuController.toggleMenu("inventory", this.player.getInventory());
-        }
+        this.handleClientInput(keycode, state);
         this.serverComms.sendInfoToServer("input", {
             keycode,
             state,
         });
+    }
+
+    private handleClientInput(keycode: string, state: boolean) {
+        if (keycode === "openInventory" && state === true) {
+            this.menuController.toggleMenu("inventory", this.player.getInventory());
+        }
+        if (keycode === "buildMenu" && state === true) {
+            this.menuController.toggleMenu("build", () => { });
+        }
     }
 
     /**

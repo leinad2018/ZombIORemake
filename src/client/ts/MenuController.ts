@@ -1,5 +1,8 @@
 import { IZIRInventoryStack } from "./globalInterfaces/UtilityInterfaces";
 
+/**
+ * All of the menus in this controller should be changed to look good
+ */
 export class ZIRMenuController {
     private mainDiv: HTMLDivElement;
 
@@ -8,15 +11,19 @@ export class ZIRMenuController {
     }
 
     public toggleMenu(menuName: string, argument: any) {
+        console.log(menuName);
         if (document.getElementById(menuName)) {
             this.hideMenu(menuName);
-        }else{
-            switch(menuName){
+        } else {
+            switch (menuName) {
                 case "inventory":
                     this.showInventoryMenu(argument);
                     break;
                 case "respawn":
                     this.showInventoryMenu(argument);
+                    break;
+                case "build":
+                    this.showBuildMenu(argument);
                     break;
             }
         }
@@ -64,6 +71,29 @@ export class ZIRMenuController {
 
     public hideInventoryMenu() {
         this.hideMenu('inventory');
+    }
+
+    public showBuildMenu(handler: (buildingType: string) => void) {
+        if (document.getElementById("build")) {
+            return;
+        }
+        let div = document.createElement("div");
+        div.id = "build";
+        this.createBuildMenu(div, handler);
+        this.mainDiv.appendChild(div);
+    }
+
+    private createBuildMenu(div: HTMLDivElement, handler: (buildingType: string) => void) {
+        for (let i = 0; i < 4; i++) {
+            let button = document.createElement("button");
+            button.textContent = "Building " + i;
+            button.addEventListener("click", () => { handler(button.textContent) });
+            div.appendChild(button);
+        }
+    }
+
+    public hideBuildMenu() {
+        this.hideMenu("build");
     }
 
     private hideMenu(id: string) {

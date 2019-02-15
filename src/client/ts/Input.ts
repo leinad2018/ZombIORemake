@@ -85,6 +85,9 @@ export class ZIRInput {
             case 73:
                 keyName = "openInventory";
                 break;
+            case 66:
+                keyName = "buildMenu";
+                break;
             case 187:
                 keyName = "debug";
                 break;
