@@ -1,6 +1,7 @@
 import { ZIREntity } from "./EntityBase";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRZone } from "./Hitbox";
+import { ZIRServerEngine } from "../ServerEngine";
 
 export abstract class ZIRProjectile extends ZIREntity {
     protected behavior: (e: ZIREntity) => void;
@@ -23,7 +24,7 @@ export abstract class ZIRProjectile extends ZIREntity {
         }, expiration);
     }
 
-    public update(state) {
+    public update(state: ZIRServerEngine) {
         this.behavior(this.owner);
     }
 

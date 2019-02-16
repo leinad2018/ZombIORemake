@@ -196,6 +196,7 @@ export abstract class ZIREntity implements IZIREntity {
      */
     protected abstract createStaticHitboxes(): ZIRZone[];
 
-    public abstract update(state: any): void;
+    public abstract update(state: ZIRServerEngine): void;
 }
-import { ZIRProjectile } from "./ProjectileBase";
+import { ZIRProjectile } from "./ProjectileBase";import { ZIRServerEngine } from "../ServerEngine";
+
