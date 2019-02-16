@@ -6,8 +6,8 @@ import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
 import { ZIRMob } from "../../baseObjects/Mob";
 import { ZIRInventoryStack } from "../../baseObjects/Inventory";
-import { ZIRTimedEvent } from "../../baseObjects/TimedEvent";
 import { ZIRServerEngine } from "../../ServerEngine";
+import { ZIRSingleEvent, ZIREventScheduler } from "../../EventScheduler";
 
 export class ZIRPlayer extends ZIRMob {
     private inventory: ZIRInventoryStack[];
@@ -35,7 +35,7 @@ export class ZIRPlayer extends ZIRMob {
         this.inventory[1].setStackSize(1000);
     }
 
-    public do(inputs: any, worldState: ZIRWorld, serverState: ZIRServerEngine) {
+    public do(inputs: any, worldState: ZIRWorld) {
         if (this.dead) {
             return;
         }
@@ -72,7 +72,7 @@ export class ZIRPlayer extends ZIRMob {
                                 p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
                                 worldState.registerEntity(p);
                                 this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
-                                serverState.registerEvent(this.startAbilityCooldown("boomerang"));
+                                ZIREventScheduler.getInstance().registerEvent(this.startAbilityCooldown("boomerang"));
                             }
                         }
                         break;
@@ -86,7 +86,7 @@ export class ZIRPlayer extends ZIRMob {
                                 p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
                                 worldState.registerEntity(p);
                                 this.dropItem(new ZIRInventoryStack("rock", "", 1));
-                                serverState.registerEvent(this.startAbilityCooldown("rock"));
+                                ZIREventScheduler.getInstance().registerEvent(this.startAbilityCooldown("rock"));
                             }
                         }
                         break;
@@ -222,7 +222,7 @@ export class ZIRPlayer extends ZIRMob {
     }
 }
 
-class ZIRAbilityCooldown extends ZIRTimedEvent {
+class ZIRAbilityCooldown extends ZIRSingleEvent {
     private abilityHandler: () => void;
 
     constructor(length: number, abilityHandler: () => void) {
@@ -230,11 +230,7 @@ class ZIRAbilityCooldown extends ZIRTimedEvent {
         this.abilityHandler = abilityHandler;
     }
 
-    protected runEvent() {
-
-    }
-
-    public endEvent() {
+    public runEvent() {
         this.abilityHandler();
     }
 }

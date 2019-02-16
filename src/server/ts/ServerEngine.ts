@@ -6,20 +6,20 @@ import { ZIRPlayerWorld } from "./PlayerWorld";
 import { ZIRPlayer } from "./entities/mobs/Player";
 import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
-import { ZIRTimedEvent } from "./baseObjects/TimedEvent";
 import { ZIRSpite } from "./baseObjects/Spite";
+import { ZIREventScheduler } from "./EventScheduler";
 
 export class ZIRServerEngine {
     private dt: number = 0;
     private sessionManager: ZIRSessionManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
+    private eventScheduler: ZIREventScheduler;
     private readonly TPS: number = 30;
     protected sessions: Session[] = [];
     private universe: ZIRWorld[] = [];
     private defaultView: ZIREntity;
     private tickCounter: number = 0;
     public packetLogger: ZIRLogger;
-    protected currentEvents: ZIRTimedEvent[] = [];
 
     constructor() {
         setInterval(() => {
@@ -31,6 +31,7 @@ export class ZIRServerEngine {
         this.defaultView = new ZIRSpite();
 
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.packetLogger, this.defaultView);
+        this.eventScheduler = ZIREventScheduler.getInstance();
     }
 
     /**
@@ -98,11 +99,6 @@ export class ZIRServerEngine {
         }
     }
 
-    public registerEvent(event: ZIRTimedEvent) {
-        event.setStartingFrame(this.tickCounter);
-        this.currentEvents.push(event);
-    }
-
     /**
      * Regulates game ticks and other
      * core engine functions
@@ -137,7 +133,7 @@ export class ZIRServerEngine {
 
         await this.checkCollision();
 
-        await this.updateEvents();
+        this.eventScheduler.update(this.tickCounter);
 
         let shouldReset = false;
         if (this.tickCounter % 30 === 0) {
@@ -223,7 +219,7 @@ export class ZIRServerEngine {
             const world = this.findWorldById(session.getWorldID());
             const player = session.getPlayer();
             if (player instanceof ZIRPlayer) {
-                (player as ZIRPlayer).do(session.getInputs(), world, this);
+                (player as ZIRPlayer).do(session.getInputs(), world);
             }
         }
     }
@@ -233,23 +229,6 @@ export class ZIRServerEngine {
             if (world.getWorldID() === worldID) {
                 return world;
             }
-        }
-    }
-
-    private async updateEvents() {
-        const events: Array<Promise<void>> = [];
-        for (const event of this.currentEvents) {
-            events.push(this.updateEvent(event));
-        }
-        await Promise.all(events);
-    }
-
-    // TODO this may not be thread safe
-    private async updateEvent(event) {
-        if (this.tickCounter > event.getEndingFrame()) {
-            this.currentEvents.splice(this.currentEvents.indexOf(event), 1);
-        } else {
-            event.updateEvent(this.tickCounter);
         }
     }
 
