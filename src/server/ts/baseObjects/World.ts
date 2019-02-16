@@ -72,10 +72,6 @@ export class ZIRWorld {
         }
     }
 
-    public registerTimedEvent(event: ZIRTimedEvent){
-        
-    }
-
     public sortEntities() {
         for (const entity of this.entities) {
             if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1) {

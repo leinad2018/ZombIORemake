@@ -21,7 +21,7 @@ export class ZIRPlayer extends ZIRMob {
         this.cooldowns = {
             boomerang: true,
             rock: true,
-        }
+        };
     }
 
     private initInventory() {
@@ -106,7 +106,7 @@ export class ZIRPlayer extends ZIRMob {
 
     private startAbilityCooldown(ability: string) {
         this.cooldowns[ability] = false;
-        let cooldown = new ZIRAbilityCooldown(10, () => { this.setAbilityOffCooldown(ability) });
+        const cooldown = new ZIRAbilityCooldown(10, () => { this.setAbilityOffCooldown(ability); });
         return cooldown;
     }
 

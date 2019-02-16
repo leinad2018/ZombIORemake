@@ -120,7 +120,6 @@ export class ZIRClient extends ZIRClientBase {
         }
         this.playersOnline = this.serverComms.getPlayersOnline();
         this.updateObjects();
-        //this.canvas.render(this);
         this.running = true;
         this.setViewSize(this.canvas.getDimensions());
     }

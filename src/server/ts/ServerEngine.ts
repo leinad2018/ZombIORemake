@@ -173,9 +173,9 @@ export class ZIRServerEngine {
     }
 
     private sendUpdate(reset: boolean = false) {
-        for (let session of this.sessions) {
+        for (const session of this.sessions) {
             const calculatedUpdates = [];
-            let world = this.findWorldById(session.getWorldID());
+            const world = this.findWorldById(session.getWorldID());
             let entities = world.getEntities();
 
             if (!reset) {
@@ -244,7 +244,7 @@ export class ZIRServerEngine {
         await Promise.all(events);
     }
 
-    //TODO this may not be thread safe
+    // TODO this may not be thread safe
     private async updateEvent(event) {
         if (this.tickCounter > event.getEndingFrame()) {
             this.currentEvents.splice(this.currentEvents.indexOf(event), 1);

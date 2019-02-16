@@ -11,7 +11,6 @@ export class ZIRMenuController {
     }
 
     public toggleMenu(menuName: string, argument: any) {
-        console.log(menuName);
         if (document.getElementById(menuName)) {
             this.hideMenu(menuName);
         } else {
@@ -44,25 +43,25 @@ export class ZIRMenuController {
     }
 
     public hideRespawnMenu() {
-        this.hideMenu('respawn');
+        this.hideMenu("respawn");
     }
 
     public showInventoryMenu(inventory: IZIRInventoryStack[]) {
-        if (document.getElementById('inventory')) {
+        if (document.getElementById("inventory")) {
             return;
         }
-        let div = document.createElement('div');
+        const div = document.createElement("div");
         div.id = "inventory";
-        let invList = this.createInventoryList(inventory);
+        const invList = this.createInventoryList(inventory);
         div.appendChild(invList);
-        div.setAttribute('style', 'position:absolute;top:5%;left:0%');
+        div.setAttribute("style", "position:absolute;top:5%;left:0%");
         this.mainDiv.appendChild(div);
     }
 
     private createInventoryList(inventory: IZIRInventoryStack[]) {
-        let mainList = document.createElement('ul');
-        for (let inv of inventory) {
-            let element = document.createElement('li');
+        const mainList = document.createElement("ul");
+        for (const inv of inventory) {
+            const element = document.createElement("li");
             element.textContent = inv.itemID + ": " + inv.stackSize;
             mainList.appendChild(element);
         }
@@ -70,14 +69,14 @@ export class ZIRMenuController {
     }
 
     public hideInventoryMenu() {
-        this.hideMenu('inventory');
+        this.hideMenu("inventory");
     }
 
     public showBuildMenu(handler: (buildingType: string) => void) {
         if (document.getElementById("build")) {
             return;
         }
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.id = "build";
         this.createBuildMenu(div, handler);
         this.mainDiv.appendChild(div);
@@ -85,9 +84,9 @@ export class ZIRMenuController {
 
     private createBuildMenu(div: HTMLDivElement, handler: (buildingType: string) => void) {
         for (let i = 0; i < 4; i++) {
-            let button = document.createElement("button");
+            const button = document.createElement("button");
             button.textContent = "Building " + i;
-            button.addEventListener("click", () => { handler(button.textContent) });
+            button.addEventListener("click", () => { handler(button.textContent); });
             div.appendChild(button);
         }
     }
