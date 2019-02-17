@@ -2,8 +2,6 @@ import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
-import { ZIRPlayer } from "../entities/mobs/Player";
-import { ZIRTimedEvent } from "./TimedEvent";
 
 export class ZIRWorld {
     private worldID: string;

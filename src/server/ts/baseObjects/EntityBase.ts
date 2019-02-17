@@ -72,19 +72,13 @@ export abstract class ZIREntity implements IZIREntity {
     public runEvents() {
         for (const otherZone of this.eventsToExecute) {
             const types = otherZone.getTypes();
-            let owner: ZIREntity = otherZone.getParent();
-            if (owner !== this) {
-                if (owner instanceof ZIRProjectile) {
-                    owner = (owner as ZIRProjectile).getParent();
-                }
-                if (owner !== this) {
-                    for (const type of types) {
-                        if (this.hitboxHandlers[type]) {
-                            this.hitboxHandlers[type](otherZone);
-                        }
-                    }
+            for (const type of types) {
+                if (this.hitboxHandlers[type]) {
+                    this.hitboxHandlers[type](otherZone);
                 }
             }
+
+
         }
         this.eventsToExecute = [];
     }
@@ -198,6 +192,7 @@ export abstract class ZIREntity implements IZIREntity {
 
     public abstract update(state: ZIRServerEngine): void;
 }
-import { ZIRProjectile } from "./ProjectileBase";
+
+
 import { ZIRServerEngine } from "../ServerEngine";
 
