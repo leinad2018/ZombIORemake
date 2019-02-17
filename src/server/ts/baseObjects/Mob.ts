@@ -20,7 +20,7 @@ export abstract class ZIRMob extends ZIREntity {
 
     protected onProjectileHit(other: ZIRZone) {
         const projectile = other.getParent() as ZIRProjectile;
-        if(projectile.getParent() !== this){
+        if (projectile.getParent() !== this) {
             this.damage(projectile.getDamage());
         }
     }
