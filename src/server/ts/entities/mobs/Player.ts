@@ -198,6 +198,21 @@ export class ZIRPlayer extends ZIRMob {
         }
     }
 
+    protected onBoomerangHit(other: ZIRZone) {
+        const boomerang = other.getParent() as ZIRBoomerang;
+        console.log(boomerang.getParent());
+        console.log(this);
+        if (boomerang.getParent() === this) {
+            boomerang.kill();
+        }
+    }
+
+    protected registerHitboxHandlers() {
+        super.registerHitboxHandlers();
+        this.hitboxHandlers["boomerang"] = this.onBoomerangHit.bind(this);
+        // this.hitboxHandlers["collision"] = this.collide.bind(this);
+    }
+
     public getObject() {
         return {
             health: this.health,
@@ -213,7 +228,7 @@ export class ZIRPlayer extends ZIRMob {
 
     protected createStaticHitboxes(): ZIRZone[] {
         const toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest"]);
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest", "player"]);
         return toReturn;
     }
 
@@ -231,7 +246,7 @@ class ZIRAbilityCooldown extends ZIRTimedEvent {
     }
 
     protected runEvent() {
-
+        // appease linter
     }
 
     public endEvent() {

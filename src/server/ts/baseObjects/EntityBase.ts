@@ -198,5 +198,6 @@ export abstract class ZIREntity implements IZIREntity {
 
     public abstract update(state: ZIRServerEngine): void;
 }
-import { ZIRProjectile } from "./ProjectileBase";import { ZIRServerEngine } from "../ServerEngine";
+import { ZIRProjectile } from "./ProjectileBase";
+import { ZIRServerEngine } from "../ServerEngine";
 
