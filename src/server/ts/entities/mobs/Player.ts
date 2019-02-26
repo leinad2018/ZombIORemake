@@ -200,10 +200,9 @@ export class ZIRPlayer extends ZIRMob {
 
     protected onBoomerangHit(other: ZIRZone) {
         const boomerang = other.getParent() as ZIRBoomerang;
-        console.log(boomerang.getParent());
-        console.log(this);
-        if (boomerang.getParent() === this) {
+        if (boomerang.getParent() === this && boomerang.isReturning()) {
             boomerang.kill();
+            this.addToInventory(new ZIRInventoryStack("boomerang", "", 1));
         }
     }
 

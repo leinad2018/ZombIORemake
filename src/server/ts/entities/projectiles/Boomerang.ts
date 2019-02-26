@@ -4,12 +4,28 @@ import {Vector} from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRBoomerang extends ZIRProjectile {
-    constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(80, 50), asset: string = "boomerang", expiration: number = 3000) {
+    private returning: boolean = false;
+
+    constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(80, 50), asset: string = "boomerang", expiration: number = -1) {
         super(owner, velocity, position, size, asset, expiration);
+        this.returning = false;
         this.damage = 5;
+
         setTimeout(() => {
             this.setBehavior(this.seek);
+            this.returning = true;
         }, 200);
+        setTimeout(() => {
+            this.setAcceleration(Vector.ZERO_VECTOR);
+            this.setVelocity(Vector.ZERO_VECTOR);
+            this.setBehavior((e: ZIREntity) => {
+                return null;
+            });
+        }, 3000);
+    }
+
+    public isReturning(): boolean {
+        return this.returning;
     }
 
     private seek(target: ZIREntity) {
