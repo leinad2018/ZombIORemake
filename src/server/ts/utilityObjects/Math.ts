@@ -38,6 +38,10 @@ export class Vector {
         return this.y;
     }
 
+    public equals(other: Vector): boolean {
+        return(this.x === other.x && this.y === other.y);
+    }
+
     public toString(): string {
         return "(" + this.x + ", " + this.y + ")";
     }

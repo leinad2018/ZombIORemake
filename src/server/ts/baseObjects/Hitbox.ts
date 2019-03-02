@@ -28,6 +28,14 @@ export abstract class ZIRZone {
         return this.owner;
     }
 
+    public equals(other: ZIRZone): boolean {
+        // TODO: FIX THIS. It is horribly broken
+        // console.log("Equals?");
+        // console.log(this.owner);
+        // console.log(other.owner);
+        return true; // (this.owner.getEntityId() === other.owner.getEntityId()); //&& this.types === other.types); //&& this.position.equals(other.position));
+    }
+
     public abstract checkCollision(otherZone: ZIRZone): boolean;
 }
 
@@ -85,6 +93,10 @@ export class ZIRCircleZone extends ZIRZone {
     public getRadius() {
         return this.radius;
     }
+
+    public equals(other: ZIRZone): boolean {
+        return super.equals(other) && other instanceof ZIRCircleZone;
+    }
 }
 
 export class ZIRRectangularZone extends ZIRZone {
@@ -124,5 +136,9 @@ export class ZIRRectangularZone extends ZIRZone {
             return false;
         }
         return true;
+    }
+
+    public equals(other: ZIRZone): boolean {
+        return super.equals(other) && other instanceof ZIRRectangularZone;
     }
 }

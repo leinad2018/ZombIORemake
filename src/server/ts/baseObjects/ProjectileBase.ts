@@ -20,7 +20,6 @@ export abstract class ZIRProjectile extends ZIREntity {
         };
         this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
         if (expiration >= 0) {
-            console.log("expires");
             setTimeout(() => {
                 this.kill();
             }, expiration);

@@ -61,6 +61,19 @@ export abstract class ZIREntity implements IZIREntity {
         this.eventsToExecute.push(otherZone);
     }
 
+    // INCOMPLETE. Do not use.
+    public hasEvent(otherZone: ZIRZone): boolean {
+        // Needs modification to work properly.
+        // Equals method isn't consistent due to
+        // JS object weirdness.
+        for (const event of this.eventsToExecute) {
+            if (otherZone.equals(event)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public setName(name: string) {
         this.name = name;
     }
