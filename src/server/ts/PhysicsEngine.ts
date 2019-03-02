@@ -7,29 +7,26 @@ export class ZIRPhysicsEngine {
     public async applyPhysics(entity: ZIREntity, dt: number) {
         if (entity.getIsPhysical()) {
             let velocity = entity.getVelocity();
-            let acceleration = entity.getAcceleration();
-            const mv = velocity.getMagnitude();
+            let force = entity.getForce().add(entity.getInternalForce());
+            let acceleration = Vector.ZERO_VECTOR;
+            const friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
 
-            if (mv > 0) {
-                const friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
+            // TODO: handle external forces & implement max velocity
 
-                let frictionVector = new Vector(0, 0);
+            acceleration = force.scale(1 / entity.getMass());
+            velocity = velocity.add(acceleration.scale(dt));
+            let frictionVector;
+            if (velocity.getMagnitude() < 0.1) {
+                frictionVector = Vector.ZERO_VECTOR;
+                velocity = Vector.ZERO_VECTOR;
+            } else if (friction > force.getMagnitude()) {
+                frictionVector = velocity.getUnitVector().scale(-1 * force.getMagnitude());
+            } else {
                 frictionVector = velocity.getUnitVector().scale(-1 * friction);
-                if (frictionVector.getMagnitude() * dt > velocity.getMagnitude()) {
-                    frictionVector = frictionVector.getUnitVector().scale(velocity.getMagnitude() / dt);
-                }
-                acceleration = acceleration.add(frictionVector);
-
-                if (mv >= entity.getMaxMovement()) {
-                    acceleration.scale(0);
-                    velocity = velocity.getUnitVector().scale(entity.getMaxMovement());
-                }
             }
 
-
-            // TODO: handle external forces
-
-            velocity = velocity.add(acceleration.scale(dt));
+            // This is added to the next tick's force. Internal force should NOT be added.
+            force = frictionVector;
 
             if (velocity.getMagnitude() !== 0) {
                 entity.setUpdated(false);
@@ -37,7 +34,15 @@ export class ZIRPhysicsEngine {
                 entity.setPosition(position);
             }
 
+            entity.setForce(force);
             entity.setVelocity(velocity);
+
+            /**
+             * Acceleration does not actually persist between physics ticks -
+             * this just sets the variable so that it can be read as a stat.
+             * Use force to alter the next physics state.
+             */
+            entity.setAcceleration(acceleration);
         }
     }
 }

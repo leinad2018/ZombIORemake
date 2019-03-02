@@ -6,7 +6,6 @@ import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
 import { ZIRMob } from "../../baseObjects/Mob";
 import { ZIRInventoryStack } from "../../baseObjects/Inventory";
-import { ZIRServerEngine } from "../../ServerEngine";
 import { ZIRSingleEvent, ZIREventScheduler } from "../../EventScheduler";
 
 export class ZIRPlayer extends ZIRMob {
@@ -40,8 +39,8 @@ export class ZIRPlayer extends ZIRMob {
             return;
         }
 
-        const m = this.moveSpeed;
-        let a = new Vector(0, 0);
+        const m = this.moveSpeed * this.mass;
+        let f = new Vector(0, 0);
 
         for (const input in inputs) {
             if (inputs[input]) {
@@ -51,16 +50,16 @@ export class ZIRPlayer extends ZIRMob {
                 let p;
                 switch (input) {
                     case "upArrow":
-                        a = a.add(new Vector(0, -m));
+                        f = f.add(new Vector(0, -m));
                         break;
                     case "downArrow":
-                        a = a.add(new Vector(0, m));
+                        f = f.add(new Vector(0, m));
                         break;
                     case "leftArrow":
-                        a = a.add(new Vector(-m, 0));
+                        f = f.add(new Vector(-m, 0));
                         break;
                     case "rightArrow":
-                        a = a.add(new Vector(m, 0));
+                        f = f.add(new Vector(m, 0));
                         break;
                     case "space":
                         if (this.cooldowns["boomerang"]) {
@@ -98,10 +97,10 @@ export class ZIRPlayer extends ZIRMob {
             }
         }
 
-        if (a.getMagnitude() !== 0) {
-            a = a.getUnitVector().scale(m);
+        if (f.getMagnitude() !== 0) {
+            f = f.getUnitVector().scale(m);
         }
-        this.acceleration = a;
+        this.internalForce = f;
     }
 
     private startAbilityCooldown(ability: string) {
@@ -232,7 +231,7 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     public toString(): string {
-        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/A" + this.acceleration;
+        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.force;
     }
 }
 

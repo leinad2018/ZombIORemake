@@ -19,7 +19,7 @@ export class Vector {
 
     public getUnitVector(): Vector {
         const m = this.getMagnitude();
-        return m === 0 ? new Vector(1, 0) : this.scale(1 / this.getMagnitude());
+        return m === 0 ? new Vector(1, 0) : this.scale(1 / m);
     }
 
     public add(v: Vector): Vector {

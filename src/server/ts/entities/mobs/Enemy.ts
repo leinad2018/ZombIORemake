@@ -25,9 +25,9 @@ export class ZIREnemy extends ZIRMob {
     public ai(state): void {
         this.findTarget(state);
         if (this.target) {
-            this.setAcceleration(this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveSpeed));
+            this.internalForce = this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveSpeed * this.mass);
         } else {
-            this.setAcceleration(Vector.ZERO_VECTOR);
+            this.internalForce = Vector.ZERO_VECTOR;
         }
     }
 
