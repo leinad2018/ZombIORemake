@@ -8,6 +8,7 @@ export interface IZIRRenderable {
 
 export interface IZIRAsset {
     name: string;
-    getImage: () => HTMLImageElement;
+    getImage: (num?: number) => HTMLImageElement;
+    getLength: () => number;
     isLoaded: () => boolean;
 }

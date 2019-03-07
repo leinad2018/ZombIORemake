@@ -22,7 +22,7 @@ export class ZIRClient extends ZIRClientBase {
     private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
-    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health");
+    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health", 60);
     private running: boolean;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {

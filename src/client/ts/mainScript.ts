@@ -37,7 +37,7 @@ function loadAssets() {
     ZIRAssetLoader.loadAsset("spite", "../static/assets/spite.jpg");
     ZIRAssetLoader.loadAsset("rock", "../static/assets/rock.png");
     ZIRAssetLoader.loadAsset("boomerang", "../static/assets/boomerang.png");
-    ZIRAssetLoader.loadAsset("health", "../static/assets/health.png");
+    ZIRAssetLoader.loadAsset("health", ["../static/assets/health.png", "../static/assets/rock.png"]);
 }
 
 function runAfterLoaded() {
