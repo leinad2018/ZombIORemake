@@ -12,7 +12,7 @@ export class ZIRPhysicsEngine {
             let acceleration = Vector.ZERO_VECTOR;
             const friction = this.G * entity.getFriction() * entity.getMass() * entity.PIXELS_PER_METER;
 
-            // TODO: handle external forces & implement max velocity
+            // TODO: handle external forces
 
             const netForce = (entity.getMaxMovement() < velocity.getMagnitude()) ? externalForce : internalForce.add(externalForce);
 

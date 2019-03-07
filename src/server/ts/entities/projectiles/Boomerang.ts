@@ -14,9 +14,9 @@ export class ZIRBoomerang extends ZIRProjectile {
         setTimeout(() => {
             this.setBehavior(this.seek);
             this.returning = true;
-        }, 200);
+        }, 500);
         setTimeout(() => {
-            this.setAcceleration(Vector.ZERO_VECTOR);
+            this.setInternalForce(Vector.ZERO_VECTOR);
             this.setVelocity(Vector.ZERO_VECTOR);
             this.setBehavior((e: ZIREntity) => {
                 return null;
@@ -31,7 +31,7 @@ export class ZIRBoomerang extends ZIRProjectile {
     private seek(target: ZIREntity) {
         target = this.owner;
         const direction = (target.getPosition().sub(this.getPosition())).getUnitVector();
-        this.setInternalForce(direction.scale(this.moveSpeed * this.mass));
+        this.setVelocity(direction.getUnitVector().scale(15 * this.PIXELS_PER_METER));
     }
 
     protected createStaticHitboxes(): ZIRZone[] {
