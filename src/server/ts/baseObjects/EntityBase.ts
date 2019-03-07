@@ -12,14 +12,14 @@ export abstract class ZIREntity implements IZIREntity {
     protected position: Vector;
     protected velocity: Vector = new Vector(0, 0);
     protected acceleration: Vector = new Vector(0, 0);
-    protected force: Vector = new Vector(0, 0);
+    protected externalForce: Vector = new Vector(0, 0);
     protected internalForce: Vector = new Vector(0, 0);
     protected externalAcceleration: Vector = new Vector(0, 0);
     protected friction: number = 100;
     protected mass: number = 100;
     public readonly PIXELS_PER_METER = 50;
-    protected moveSpeed: number = 40 * this.PIXELS_PER_METER;
-    protected maxMovement: number = 4 * this.PIXELS_PER_METER;
+    protected moveSpeed: number = 4 * this.PIXELS_PER_METER; // Newtons
+    protected maxMovement: number = 4 * this.PIXELS_PER_METER; // m/s
     protected asset: string;
     protected staticHitboxes: ZIRZone[];
     protected size: Vector;
@@ -191,12 +191,16 @@ export abstract class ZIREntity implements IZIREntity {
         return this.moveSpeed;
     }
 
-    public getForce(): Vector {
-        return this.force;
+    public getExternalForce(): Vector {
+        return this.externalForce;
     }
 
-    public setForce(force: Vector) {
-        this.force = force;
+    public setExternalForce(force: Vector) {
+        this.externalForce = force;
+    }
+
+    public applyForce(force: Vector) {
+        this.externalForce = this.externalForce.add(force);
     }
 
     public getInternalForce(): Vector {

@@ -7,26 +7,31 @@ export class ZIRPhysicsEngine {
     public async applyPhysics(entity: ZIREntity, dt: number) {
         if (entity.getIsPhysical()) {
             let velocity = entity.getVelocity();
-            let force = entity.getForce().add(entity.getInternalForce());
+            const externalForce = entity.getExternalForce();
+            const internalForce = entity.getInternalForce();
             let acceleration = Vector.ZERO_VECTOR;
             const friction = this.G * entity.getFriction() * entity.PIXELS_PER_METER;
 
             // TODO: handle external forces & implement max velocity
 
-            acceleration = force.scale(1 / entity.getMass());
+            const netForce = internalForce.add(externalForce);
+
+            acceleration = netForce.scale(1 / entity.getMass());
             velocity = velocity.add(acceleration.scale(dt));
+
             let frictionVector;
             if (velocity.getMagnitude() < 0.1) {
                 frictionVector = Vector.ZERO_VECTOR;
                 velocity = Vector.ZERO_VECTOR;
-            } else if (friction > force.getMagnitude()) {
-                frictionVector = velocity.getUnitVector().scale(-1 * force.getMagnitude());
+            } else if (friction > netForce.getMagnitude()) {
+                frictionVector = velocity.getUnitVector().scale(-1 * netForce.getMagnitude());
             } else {
                 frictionVector = velocity.getUnitVector().scale(-1 * friction);
             }
 
-            // This is added to the next tick's force. Internal force should NOT be added.
-            force = frictionVector;
+            // This is added to the next tick's force. Internal force should not be added.
+            entity.setExternalForce(Vector.ZERO_VECTOR);
+            entity.applyForce(frictionVector);
 
             if (velocity.getMagnitude() !== 0) {
                 entity.setUpdated(false);
@@ -34,7 +39,6 @@ export class ZIRPhysicsEngine {
                 entity.setPosition(position);
             }
 
-            entity.setForce(force);
             entity.setVelocity(velocity);
 
             /**

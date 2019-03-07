@@ -31,7 +31,7 @@ export class ZIRBoomerang extends ZIRProjectile {
     private seek(target: ZIREntity) {
         target = this.owner;
         const direction = (target.getPosition().sub(this.getPosition())).getUnitVector();
-        this.setForce(direction.scale(this.moveSpeed * this.mass));
+        this.setInternalForce(direction.scale(this.moveSpeed * this.mass));
     }
 
     protected createStaticHitboxes(): ZIRZone[] {

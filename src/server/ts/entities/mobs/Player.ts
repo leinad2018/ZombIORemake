@@ -231,7 +231,7 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     public toString(): string {
-        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.force;
+        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.externalForce;
     }
 }
 
