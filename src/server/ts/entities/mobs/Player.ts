@@ -67,7 +67,7 @@ export class ZIRPlayer extends ZIRMob {
                             if (rangs) {
                                 mouse = inputs["mouse"];
                                 direction = new Vector(mouse.x, mouse.y);
-                                velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
+                                velocity = direction.getUnitVector().scale(15 * this.PIXELS_PER_METER);
                                 p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
                                 worldState.registerEntity(p);
                                 this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
