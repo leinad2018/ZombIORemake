@@ -20,11 +20,17 @@ export class ZIRAssetLoader {
      * The asset must be loaded with loadAsset before it can be retrieved from this method.
      * @param assetName
      */
-    public static getAsset(assetName: string, animationLength?: number) {
+    public static getAsset(assetName: string) {
+        const paramIndex = assetName.indexOf("[");
+        
+        let baseName: string = assetName;
+        if(paramIndex !== -1){
+            baseName = assetName.substring(0, paramIndex);
+        }
         for (const asset of this.assets) {
-            if (asset.name === assetName) {
-                if (animationLength) {
-                    return new ZIRAnimation(asset, animationLength);
+            if (asset.name === baseName) {
+                if (paramIndex !== -1) {
+                    return new ZIRAnimation(asset, assetName.substring(paramIndex, assetName.length));
                 } else {
                     return asset;
                 }

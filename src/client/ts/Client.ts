@@ -22,7 +22,7 @@ export class ZIRClient extends ZIRClientBase {
     private debugMessages: string[] = ["Not receiving debug message packets from server"];
     private player: ZIRPlayerData;
     private world: ZIRWorldData;
-    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health", 60);
+    private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health[30]");
     private running: boolean;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
@@ -108,7 +108,7 @@ export class ZIRClient extends ZIRClientBase {
                     if (index === -1) {
                         this.entities.push(newEntity);
                     } else {
-                        this.entities[index] = newEntity;
+                        this.entities[index].updateEntity(newEntity);
                     }
                     break;
                 case "delete":
