@@ -17,6 +17,15 @@ export class ZIREntityBase implements IZIRRenderable {
         this.name = name;
     }
 
+    public updateEntity(update: ZIREntityBase) {
+        this.position = update.position;
+        this.size = update.size;
+        this.name = update.name;
+        if (update.asset.name !== this.asset.name) {
+            this.asset = update.asset;
+        }
+    }
+
     public getEntityId() {
         return this.id;
     }

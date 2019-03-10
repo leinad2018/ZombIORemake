@@ -54,9 +54,9 @@ export class ZIRCanvasController {
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
-        let i = 0;
-        for (i; i < health; i++) {
-            ctx.drawImage(this.hudAssets["health"].getImage(), i * 50 + i * 5, 0, this.heartSize.getX(), this.heartSize.getY());
+        const img = this.hudAssets["health"].getImage();
+        for (let i = 0; i < health; i++) {
+            ctx.drawImage(img, i * 50 + i * 5, 0, this.heartSize.getX(), this.heartSize.getY());
         }
     }
 
