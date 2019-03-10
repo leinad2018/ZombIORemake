@@ -22,6 +22,10 @@ export class Vector {
         return m === 0 ? new Vector(1, 0) : this.scale(1 / m);
     }
 
+    public dot(v: Vector): number {
+        return((this.x * v.getX()) + (this.y * v.getY()));
+    }
+
     public add(v: Vector): Vector {
         return new Vector(this.x + v.getX(), this.y + v.getY());
     }

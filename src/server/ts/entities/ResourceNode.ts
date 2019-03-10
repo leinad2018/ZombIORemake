@@ -8,8 +8,9 @@ export class ZIRResourceNode extends ZIREntity {
     private itemType: string;
 
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, type: string) {
-        super(position, size, asset, false);
+        super(position, size, asset, true);
         this.itemType = type;
+        this.movable = false;
     }
 
     protected registerHitboxHandlers() {
@@ -26,7 +27,7 @@ export class ZIRResourceNode extends ZIREntity {
     }
 
     protected createStaticHitboxes() {
-        const hitbox = new ZIRRectangularZone(this.position, this, this.size);
+        const hitbox = new ZIRRectangularZone(this.position, this, this.size, ["collision"]);
         return [hitbox];
     }
 

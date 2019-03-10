@@ -8,6 +8,8 @@ export abstract class ZIREntity implements IZIREntity {
     protected updated: boolean;
     protected creating: boolean;
     protected isPhysical: boolean;
+    protected movable: boolean;
+    protected collides: boolean;
     protected dead: boolean;
     protected position: Vector;
     protected velocity: Vector = new Vector(0, 0);
@@ -36,6 +38,8 @@ export abstract class ZIREntity implements IZIREntity {
         this.size = size;
         this.asset = asset;
         this.isPhysical = isPhysical;
+        this.collides = true;
+        this.movable = true;
         this.staticHitboxes = this.createStaticHitboxes();
         this.hitboxHandlers = [];
         this.eventsToExecute = [];
@@ -82,6 +86,14 @@ export abstract class ZIREntity implements IZIREntity {
 
     public getName(): string {
         return this.name;
+    }
+
+    public getMovable(): boolean {
+        return this.movable;
+    }
+
+    public getCollides(): boolean {
+        return this.collides;
     }
 
     public runEvents() {

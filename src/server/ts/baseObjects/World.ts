@@ -26,7 +26,7 @@ export class ZIRWorld {
         this.width = width;
         this.height = height;
         this.terrain = this.generateWorldTerrain();
-        const resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 50), "rock", "rock");
+        const resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 500), "rock", "rock");
         this.registerEntity(resource);
     }
 
@@ -96,8 +96,10 @@ export class ZIRWorld {
     public async runCollisionLogic() {
         this.sortEntities();
         const checks: Array<Promise<void>> = [];
-        for (const entity of this.entities) {
-            checks.push(this.checkEntityCollision(entity));
+
+        const potentialCollisions = this.generateCollisionPairs();
+        for (const potentialCollision of potentialCollisions) {
+            checks.push(this.checkEntityCollision(potentialCollision));
         }
         await Promise.all(checks);
         for (const entity of this.entities) {
@@ -106,20 +108,75 @@ export class ZIRWorld {
         }
     }
 
-    private async checkEntityCollision(entity: ZIREntity) {
-        if (Math.abs(entity.getVelocity().getMagnitude()) > 0.1 || entity.isCreating()) {
-            const baseSectorID = this.getSectorIDByEntity(entity);
-            // if (baseSectorID === -1) {
-            //     return;
-            // }
-            const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
-            const entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
-            for (const check of entitiesToCheck) {
-                for (const zone1 of check.getHitboxes()) {
-                    for (const zone2 of entity.getHitboxes()) {
-                        if (zone1.checkCollision(zone2)) {
-                            entity.registerEvent(zone1);
-                            check.registerEvent(zone2);
+    private generateCollisionPairs(): IZIRCollisionCandidate[] {
+        const pairs = [];
+        for (let i = this.entities.length - 1; i > 0; i--) {
+            for (let j = i - 1; j >= 0; j--) {
+                const pair = {
+                    e1: this.entities[i],
+                    e2: this.entities[j],
+                };
+                pairs.push(pair);
+            }
+        }
+        return pairs;
+        // TODO: Utilize sectors to filter pairs
+
+
+        /*
+        const baseSectorID = this.getSectorIDByEntity(entity);
+        // if (baseSectorID === -1) {
+        //     return;
+        // }
+        const sectorsToCheck = this.getThreeByThreeGridOfSectorsByInnerSectorID(baseSectorID);
+        const entitiesToCheck = this.getEntitiesBySectorIDs(sectorsToCheck);
+        for (const check of entitiesToCheck) {
+            for (const zone1 of check.getHitboxes()) {
+                for (const zone2 of entity.getHitboxes()) {
+                    if (zone1.checkCollision(zone2)) {
+                        entity.registerEvent(zone1);
+                        check.registerEvent(zone2);
+                        if (entity.getCollides() && check.getCollides()) {
+                            if (entity.getMovable())
+                        }
+                    }
+                }
+            }
+        }
+        */
+    }
+
+    private async checkEntityCollision(check: IZIRCollisionCandidate) {
+        const {e1, e2} = check;
+
+        // Collision is possible if either entity is moving or newly created
+        if (true) { // Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
+            for (const zone1 of e1.getHitboxes()) {
+                for (const zone2 of e2.getHitboxes()) {
+                    if (zone1.checkCollision(zone2)) {
+                        e1.registerEvent(zone2);
+                        e2.registerEvent(zone1);
+                        if (e1.getCollides() && e2.getCollides() && zone1.getTypes().indexOf("collision") !== undefined && zone2.getTypes().indexOf("collision") !== undefined) {
+                            // Normal vector on e1's boundary at point of collision
+                            const direction = zone1.getCollisionVector(zone2);
+
+                            // Force component of e1 on e2
+                            const f1 = direction.scale(e1.getExternalForce().add(e1.getInternalForce()).dot(direction));
+
+                            // Force component of e2 on e1s
+                            const f2 = direction.scale(-1 * e2.getExternalForce().add(e1.getInternalForce()).dot(direction));
+
+                            if (e1.getMovable()) {
+                                // Apply normal forces to e1
+                                // console.log(f1);
+                                e1.applyForce(f1.scale(-1));
+                                e1.applyForce(f2);
+                            }
+                            if (e2.getMovable()) {
+                                e2.applyForce(f1);
+                                e2.applyForce(f2.scale(-1));
+                                // Apply normal forces to e2
+                            }
                         }
                     }
                 }
@@ -194,4 +251,9 @@ export class ZIRSector {
     public getAllEntities() {
         return this.entities;
     }
+}
+
+export interface IZIRCollisionCandidate {
+    e1: ZIREntity;
+    e2: ZIREntity;
 }

@@ -1,5 +1,6 @@
 import { Vector } from "../utilityObjects/Math";
 import { ZIREntity } from "./EntityBase";
+import { ZIRPlayer } from "../entities/mobs/Player";
 
 export abstract class ZIRZone {
     protected position: Vector;
@@ -37,6 +38,8 @@ export abstract class ZIRZone {
     }
 
     public abstract checkCollision(otherZone: ZIRZone): boolean;
+
+    public abstract getCollisionVector(otherZone: ZIRZone): Vector;
 }
 
 export class ZIREffectBox extends ZIRZone {
@@ -54,6 +57,11 @@ export class ZIREffectBox extends ZIRZone {
             }
         }
         return false;
+    }
+
+    public getCollisionVector(zone: ZIRZone): Vector {
+        // TODO: implement maybe
+        return Vector.ZERO_VECTOR;
     }
 
     public isMoving() {
@@ -77,6 +85,11 @@ export class ZIRCircleZone extends ZIRZone {
             return this.checkCircle(otherZone);
         }
         return false;
+    }
+
+    public getCollisionVector(otherZone: ZIRZone): Vector {
+        // TODO: Implement
+        return new Vector(100, 0);
     }
 
     private checkCircle(circle: ZIRCircleZone): boolean {
@@ -114,6 +127,59 @@ export class ZIRRectangularZone extends ZIRZone {
         if (otherZone instanceof ZIRRectangularZone) {
             return this.checkRectangle(otherZone.position, otherZone.position.add(otherZone.size));
         }
+    }
+
+    public getCollisionVector(otherZone: ZIRZone): Vector {
+        if (otherZone instanceof ZIRCircleZone) {
+            return this.checkCircleVector(otherZone.getPosition(), otherZone.getRadius());
+        }
+        if (otherZone instanceof ZIRRectangularZone) {
+            return this.checkRectangleVector(otherZone.position, otherZone.size);
+        }
+    }
+
+    private checkCircleVector(pos: Vector, radius: number): Vector {
+        return Vector.ZERO_VECTOR;
+    }
+
+    private checkRectangleVector(pos: Vector, size: Vector): Vector {
+        // First find signed this-relative collision overlap for each dimension
+        // x-component
+        const l1 = this.position.getX();
+        const l2 = pos.getX();
+        const r1 = l1 + this.size.getX();
+        const r2 = l2 + size.getX();
+
+        let xOverlap = 0;
+        if (r2 > r1) { // Collision on right side of me
+            xOverlap = r1 - l2;
+        } else { // Collision on left side of me, intentionally negative
+            xOverlap = l1 - r2;
+        }
+
+        // y-component
+        const t1 = this.position.getY();
+        const t2 = pos.getY();
+        const b1 = t1 + this.size.getY();
+        const b2 = t2 + size.getY();
+
+        let yOverlap = 0;
+        if (b2 > b1) { // Collision on bottom side of me
+            yOverlap = b1 - t2;
+        } else { // Collision on top side of me, intentionally negative
+            yOverlap = t1 - b2;
+        }
+
+        let normalVector;
+
+        // Generate a normal vector based on the least overlap
+        if (Math.abs(xOverlap) < Math.abs(yOverlap)) {
+            normalVector = new Vector(xOverlap, 0).getUnitVector();
+        } else {
+            normalVector = new Vector(0, yOverlap).getUnitVector();
+        }
+
+        return normalVector;
     }
 
     private checkCircle(pos: Vector, radius: number): boolean {

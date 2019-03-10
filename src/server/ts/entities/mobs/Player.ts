@@ -226,12 +226,12 @@ export class ZIRPlayer extends ZIRMob {
 
     protected createStaticHitboxes(): ZIRZone[] {
         const toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest", "player"]);
+        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest", "player", "collision"]);
         return toReturn;
     }
 
     public toString(): string {
-        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.externalForce;
+        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.externalForce.add(this.getInternalForce());
     }
 }
 
