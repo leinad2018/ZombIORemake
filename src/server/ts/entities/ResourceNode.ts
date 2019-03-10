@@ -10,7 +10,7 @@ export class ZIRResourceNode extends ZIREntity {
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, type: string) {
         super(position, size, asset, true);
         this.itemType = type;
-        this.movable = false;
+        this.movable = true;
     }
 
     protected registerHitboxHandlers() {

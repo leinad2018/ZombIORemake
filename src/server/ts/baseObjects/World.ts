@@ -26,8 +26,10 @@ export class ZIRWorld {
         this.width = width;
         this.height = height;
         this.terrain = this.generateWorldTerrain();
-        const resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 500), "rock", "rock");
+        const resource = new ZIRResourceNode(new Vector(1500, 1500), new Vector(50, 50), "rock", "rock");
+        const resource2 = new ZIRResourceNode(new Vector(1500, 2500), new Vector(50, 50), "rock", "rock");
         this.registerEntity(resource);
+        this.registerEntity(resource2);
     }
 
     public getSectorIdByPosition(position: Vector): number {
