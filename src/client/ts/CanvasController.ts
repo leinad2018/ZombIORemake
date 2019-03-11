@@ -122,8 +122,8 @@ export class ZIRCanvasController {
             const size = entity.getSize();
             const xs = size.getX();
             const ys = size.getY();
-            const x = position.getX() - xs / 2;
-            const y = position.getY() - ys / 2;
+            const x = position.getX();
+            const y = position.getY();
 
             const minX = x - xs + xOffset;
             const minY = y - ys + yOffset;
