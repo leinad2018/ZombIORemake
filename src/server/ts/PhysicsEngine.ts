@@ -13,21 +13,19 @@ export class ZIRPhysicsEngine {
             const friction = this.G * entity.getFriction() * entity.getMass() * entity.PIXELS_PER_METER;
 
             const netForce = (entity.getMaxMovement() < velocity.getMagnitude()) ? externalForce : internalForce.add(externalForce);
+            entity.setExternalForce(Vector.ZERO_VECTOR);
 
             acceleration = netForce.scale(1 / entity.getMass());
             velocity = velocity.add(acceleration.scale(dt));
 
-            let frictionVector;
-            if (velocity.getMagnitude() < 10) {
-                frictionVector = Vector.ZERO_VECTOR;
+            let frictionVector = velocity.getUnitVector().scale(-1 * friction);
+            let velocityChange = frictionVector.scale(dt / entity.getMass());
+
+            if (velocityChange.getMagnitude() > velocity.getMagnitude()) {
                 velocity = Vector.ZERO_VECTOR;
             } else {
-                frictionVector = velocity.getUnitVector().scale(-1 * friction);
+                velocity = velocity.add(velocityChange);
             }
-
-            // This is added to the next tick's force. Internal force should not be added.
-            entity.setExternalForce(Vector.ZERO_VECTOR);
-            entity.applyForce(frictionVector);
 
             if (velocity.getMagnitude() !== 0) {
                 entity.setUpdated(false);
