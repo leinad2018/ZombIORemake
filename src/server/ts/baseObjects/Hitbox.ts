@@ -174,9 +174,9 @@ export class ZIRRectangularZone extends ZIRZone {
 
         // Generate a normal vector based on the least overlap
         if (Math.abs(xOverlap) < Math.abs(yOverlap)) {
-            normalVector = new Vector(xOverlap, 0).getUnitVector();
+            normalVector = new Vector(xOverlap, 0);
         } else {
-            normalVector = new Vector(0, yOverlap).getUnitVector();
+            normalVector = new Vector(0, yOverlap);
         }
 
         return normalVector;

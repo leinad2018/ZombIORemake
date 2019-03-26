@@ -149,7 +149,7 @@ export class ZIRWorld {
     }
 
     private async checkEntityCollision(check: IZIRCollisionCandidate) {
-        const {e1, e2} = check;
+        const { e1, e2 } = check;
 
         // Collision is possible if either entity is moving or newly created
         if (true) { // Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
@@ -161,24 +161,7 @@ export class ZIRWorld {
                         if (e1.getCollides() && e2.getCollides() && zone1.getTypes().indexOf("collision") !== undefined && zone2.getTypes().indexOf("collision") !== undefined) {
                             // Normal vector on e1's boundary at point of collision
                             const direction = zone1.getCollisionVector(zone2);
-
-                            // Force component of e1 on e2
-                            const f1 = direction.scale(e1.getExternalForce().add(e1.getInternalForce()).dot(direction));
-
-                            // Force component of e2 on e1s
-                            const f2 = direction.scale(-1 * e2.getExternalForce().add(e1.getInternalForce()).dot(direction));
-
-                            if (e1.getMovable()) {
-                                // Apply normal forces to e1
-                                // console.log(f1);
-                                e1.applyForce(f1.scale(-1));
-                                e1.applyForce(f2);
-                            }
-                            if (e2.getMovable()) {
-                                e2.applyForce(f1);
-                                e2.applyForce(f2.scale(-1));
-                                // Apply normal forces to e2
-                            }
+                            this.resolvePhysicalCollision(e1, e2, direction);
                         }
                     }
                 }
@@ -187,6 +170,85 @@ export class ZIRWorld {
         for (const eventEntity of this.entities) {
             eventEntity.runEvents();
             eventEntity.setCreating(false);
+        }
+    }
+
+    private resolvePhysicalCollision(e1: ZIREntity, e2: ZIREntity, overlap: Vector) {
+        const velocity1 = e1.getVelocity();
+        const velocity2 = e2.getVelocity();
+        const mass1 = e1.getMass();
+        const mass2 = e2.getMass();
+        const direction = overlap.getUnitVector();
+        //Find the velocity in the direction of the collision
+        const v1Initial = velocity1.dot(direction);
+        const v2Initial = velocity2.dot(direction);
+
+        const e1movable = e1.getMovable();
+        const e2movable = e2.getMovable();
+
+        let v2Final: number;
+        if (e2movable) {
+            if (e1movable) {
+                v2Final = (mass1 * (2 * v1Initial - v2Initial) + mass2 * v2Initial) / (mass1 + mass2);
+            } else {
+                v2Final = 2 * v1Initial - v2Initial;
+            }
+        } else {
+            v2Final = v2Initial;
+        }
+
+        let v1Final: number;
+        if (e1movable) {
+            v1Final = v2Final + v2Initial - v1Initial;
+        } else {
+            v1Final = v1Initial;
+        }
+
+        const impulse1 = v1Final - v1Initial;
+        const impulse2 = v2Final - v2Initial;
+
+        let e1displacement: Vector = Vector.ZERO_VECTOR;
+        let e2displacement: Vector = Vector.ZERO_VECTOR;
+        if (e1movable) {
+            if (e2movable) {
+                e1displacement = overlap.scale(-0.5);
+                e2displacement = overlap.scale(0.5);
+            } else {
+                e1displacement = overlap.scale(-1);
+            }
+        } else {
+            if (e2movable) {
+                e2displacement = overlap;
+            }
+        }
+
+        e1.setPosition(e1.getPosition().add(e1displacement));
+        e2.setPosition(e2.getPosition().add(e2displacement));
+
+        const velocity1Final = velocity1.add(direction.scale(impulse1));
+        const velocity2Final = velocity2.add(direction.scale(impulse2));
+
+        e1.setVelocity(velocity1Final);
+        e2.setVelocity(velocity2Final);
+    }
+
+    private oldResolveCollision(e1: ZIREntity, e2: ZIREntity, direction: Vector) {
+        // Force component of e1 on e2
+        const f1 = direction.scale(e1.getExternalForce().add(e1.getInternalForce()).dot(direction));
+
+        // Force component of e2 on e1s
+        const f2 = direction.scale(-1 * e2.getExternalForce().add(e1.getInternalForce()).dot(direction));
+
+        if (e1.getMovable()) {
+            // Apply normal forces to e1
+            // console.log(f1);
+            e1.applyForce(f1.scale(-1));
+            e1.applyForce(f2);
+        }
+        if (e2.getMovable()) {
+            e2.applyForce(f1);
+            e2.applyForce(f2.scale(-1));
+            // Apply normal forces to e2
         }
     }
 
