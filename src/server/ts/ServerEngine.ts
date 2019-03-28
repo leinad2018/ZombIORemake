@@ -16,18 +16,23 @@ export class ZIRServerEngine {
     private eventScheduler: ZIREventScheduler;
     private readonly TPS: number = 30;
     protected sessions: Session[] = [];
+
+    // TODO: Refactor to World ID-indexed hashmap
     private universe: ZIRWorld[] = [];
     private defaultView: ZIREntity;
     private tickCounter: number = 0;
     public packetLogger: ZIRLogger;
 
     constructor() {
+        // TODO: MAKE NOT BROKEN
         setInterval(() => {
             this.gameLoop();
         }, 1000 / this.TPS);
 
+        // TODO: Remove this
         this.packetLogger = new ZIRLogger("packets.log");
         this.packetLogger.disable();
+
         this.defaultView = new ZIRSpite();
 
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.packetLogger, this.defaultView);
@@ -38,7 +43,8 @@ export class ZIRServerEngine {
      * Return delta time from the
      * previous game tick
      */
-    public getDT = (): number => {
+    public getDT(): number {
+        // TODO: Store in divided form
         return this.dt / 1000;
     }
 
@@ -54,6 +60,7 @@ export class ZIRServerEngine {
         const worldID = "wilderness";
         session.setWorldID(worldID);
 
+        // TODO: Use findWorldById
         for (const world of this.universe) {
             if (world.getWorldID() === worldID) {
                 this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
@@ -85,6 +92,8 @@ export class ZIRServerEngine {
         }
     }
 
+    // TODO: Cache at the beginning of each tick
+    // but not Dan's way
     public getAllEntities() {
         let toReturn: ZIREntity[] = [];
         for (const world of this.universe) {
@@ -93,6 +102,10 @@ export class ZIRServerEngine {
         return toReturn;
     }
 
+    /**
+     * @deprecated
+     * @param entity An entity
+     */
     public destroyEntityInWorlds(entity: ZIREntity) {
         for (const world of this.universe) {
             world.removeEntity(entity.getEntityId());
@@ -117,14 +130,16 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private async tick() {
-        this.packetLogger.log("ticked");
         const usernames: string[] = [];
         for (const session of this.sessions) {
             usernames.push(session.getUsername());
             session.update();
         }
+
+        // TODO: Consider moving broadcast packets to central list and reading within SessionManager
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
+        // TODO: Debug flag
         this.sendDebugInfo();
 
         await this.calculatePhysics();
@@ -147,6 +162,7 @@ export class ZIRServerEngine {
         }
     }
 
+    // TODO: Refactor to place in World
     private collectGarbage() {
         this.getAllEntities().forEach(
             (entity) => {
@@ -176,9 +192,7 @@ export class ZIRServerEngine {
                     const e = entity.shouldUpdate();
                     return e;
                 });
-            }
-
-            if (reset) {
+            } else {
                 entities = entities.filter((entity) => {
                     return !entity.isDead();
                 });

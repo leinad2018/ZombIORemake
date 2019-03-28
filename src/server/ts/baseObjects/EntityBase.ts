@@ -20,7 +20,7 @@ export abstract class ZIREntity implements IZIREntity {
     protected friction: number = 1.5;
     protected mass: number = 100;
     public readonly PIXELS_PER_METER = 50;
-    protected moveSpeed: number = 40 * this.PIXELS_PER_METER; // Newtons
+    protected moveForce: number = 40 * this.PIXELS_PER_METER; // Newtons
     protected maxMovement: number = 5 * this.PIXELS_PER_METER; // m/s
     protected asset: string;
     protected staticHitboxes: ZIRZone[];
@@ -199,8 +199,8 @@ export abstract class ZIREntity implements IZIREntity {
         return this.maxMovement;
     }
 
-    public getMoveSpeed(): number {
-        return this.moveSpeed;
+    public getmoveForce(): number {
+        return this.moveForce;
     }
 
     public getExternalForce(): Vector {

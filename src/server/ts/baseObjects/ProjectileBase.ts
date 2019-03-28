@@ -14,7 +14,7 @@ export abstract class ZIRProjectile extends ZIREntity {
         this.velocity = velocity;
         this.mass = 1;
         this.friction = 0;
-        this.moveSpeed = 30 * this.PIXELS_PER_METER;
+        this.moveForce = 30 * this.PIXELS_PER_METER;
         this.behavior = (e: ZIREntity) => {
             return null;
         };
