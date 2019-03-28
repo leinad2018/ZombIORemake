@@ -88,7 +88,7 @@ export class ZIRServerEngine {
     public getAllEntities() {
         let toReturn: ZIREntity[] = [];
         for (const world of this.universe) {
-            toReturn = toReturn.concat(world.getEntities());
+            toReturn.push(...world.getEntities());
         }
         return toReturn;
     }
@@ -135,10 +135,7 @@ export class ZIRServerEngine {
 
         this.eventScheduler.update(this.tickCounter);
 
-        let shouldReset = false;
-        if (this.tickCounter % 30 === 0) {
-            shouldReset = true;
-        }
+        const shouldReset = this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
 
         this.collectGarbage();
@@ -177,7 +174,6 @@ export class ZIRServerEngine {
             if (!reset) {
                 entities = entities.filter((entity) => {
                     const e = entity.shouldUpdate();
-                    entity.setUpdated(true);
                     return e;
                 });
             }
@@ -211,6 +207,11 @@ export class ZIRServerEngine {
             } else {
                 this.sessionManager.sendToClient(session.getSocket(), "update", { updates: calculatedUpdates } as IZIRUpdateResult);
             }
+        }
+
+        const entities = this.getAllEntities();
+        for(const e of entities){
+            e.setUpdated(true);
         }
     }
 
