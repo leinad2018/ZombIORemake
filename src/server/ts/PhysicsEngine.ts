@@ -18,8 +18,8 @@ export class ZIRPhysicsEngine {
             acceleration = netForce.scale(1 / entity.getMass());
             velocity = velocity.add(acceleration.scale(dt));
 
-            let frictionVector = velocity.getUnitVector().scale(-1 * friction);
-            let velocityChange = frictionVector.scale(dt / entity.getMass());
+            const frictionVector = velocity.getUnitVector().scale(-1 * friction);
+            const velocityChange = frictionVector.scale(dt / entity.getMass());
 
             if (velocityChange.getMagnitude() > velocity.getMagnitude()) {
                 velocity = Vector.ZERO_VECTOR;

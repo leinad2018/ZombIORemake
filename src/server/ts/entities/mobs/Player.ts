@@ -39,7 +39,7 @@ export class ZIRPlayer extends ZIRMob {
             return;
         }
 
-        const m = this.moveSpeed * this.mass;
+        const m = this.moveForce * this.mass;
         let f = new Vector(0, 0);
 
         for (const input in inputs) {

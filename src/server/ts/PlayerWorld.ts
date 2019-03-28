@@ -3,7 +3,7 @@ import { IZIRTerrainMap, IZIRTerrainZone } from "./globalInterfaces/IServerUpdat
 
 export class ZIRPlayerWorld extends ZIRWorld {
     constructor(id: string) {
-        super(id, 50, 50);
+        super(id);
     }
 
     protected generateWorldTerrain(): IZIRTerrainMap {

@@ -15,7 +15,7 @@ export class ZIREnemy extends ZIRMob {
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "enemy", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
         this.name = ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)];
-        this.moveSpeed = 10 * this.PIXELS_PER_METER;
+        this.maxMovement = 4 * this.PIXELS_PER_METER;
     }
 
     public update(state): void {
@@ -25,7 +25,7 @@ export class ZIREnemy extends ZIRMob {
     public ai(state): void {
         this.findTarget(state);
         if (this.target) {
-            this.internalForce = this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveSpeed * this.mass);
+            this.internalForce = this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveForce * this.mass);
         } else {
             this.internalForce = Vector.ZERO_VECTOR;
         }
