@@ -21,22 +21,14 @@ export class ZIRServerEngine {
     private universe: ZIRWorld[] = [];
     private defaultView: ZIREntity;
     private tickCounter: number = 0;
-    public packetLogger: ZIRLogger;
 
     constructor() {
-        // TODO: MAKE NOT BROKEN
-        setInterval(() => {
-            this.gameLoop();
-        }, 1000 / this.TPS);
-
-        // TODO: Remove this
-        this.packetLogger = new ZIRLogger("packets.log");
-        this.packetLogger.disable();
-
         this.defaultView = new ZIRSpite();
 
-        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.packetLogger, this.defaultView);
+        this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.defaultView);
         this.eventScheduler = ZIREventScheduler.getInstance();
+
+        this.gameLoop();
     }
 
     /**
@@ -101,16 +93,6 @@ export class ZIRServerEngine {
     }
 
     /**
-     * @deprecated
-     * @param entity An entity
-     */
-    public destroyEntityInWorlds(entity: ZIREntity) {
-        for (const world of this.universe) {
-            world.removeEntity(entity.getEntityId());
-        }
-    }
-
-    /**
      * Regulates game ticks and other
      * core engine functions
      */
@@ -120,7 +102,10 @@ export class ZIRServerEngine {
         this.tick().then(() => {
             this.tickCounter++;
 
-            this.dt = Date.now() - t + (1000 / this.TPS);
+            const dt = Date.now() - t;
+            const pause = Math.max((1000 / this.TPS) - dt, 0);
+            this.dt = dt + pause;
+            setTimeout(this.gameLoop, pause);
         });
     }
 
@@ -162,12 +147,9 @@ export class ZIRServerEngine {
 
     // TODO: Refactor to place in World
     private collectGarbage() {
-        this.getAllEntities().forEach(
-            (entity) => {
-                if (entity.isDead()) {
-                    this.destroyEntityInWorlds(entity);
-                }
-            });
+        for (const world in this.universe) {
+            this.universe[world].collectGarbage();
+        }
     }
 
     private async calculatePhysics() {

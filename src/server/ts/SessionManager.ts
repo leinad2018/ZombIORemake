@@ -11,12 +11,10 @@ export class ZIRSessionManager {
     private defaultView: ZIREntity;
     public registerSessionHandler: (session: Session) => void;
     private spawnHandler: (session: Session) => void;
-    private logger: ZIRLogger;
 
-    constructor(registerSessionHandler, spawnHandler, logger, defaultView: ZIREntity) {
+    constructor(registerSessionHandler, spawnHandler, defaultView: ZIREntity) {
         this.registerSessionHandler = registerSessionHandler;
         this.spawnHandler = spawnHandler;
-        this.logger = logger;
         const express = require("express");
         const http = require("http");
         const path = require("path");
@@ -102,7 +100,6 @@ export class ZIRSessionManager {
     }
 
     public broadcast = (header: string, data: any): void => {
-        this.logger.logUnpacked(header + " " + data);
         this.io.sockets.emit(header, data);
     }
 
