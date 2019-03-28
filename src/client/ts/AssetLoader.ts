@@ -22,9 +22,9 @@ export class ZIRAssetLoader {
      */
     public static getAsset(assetName: string) {
         const paramIndex = assetName.indexOf("[");
-        
+
         let baseName: string = assetName;
-        if(paramIndex !== -1){
+        if (paramIndex !== -1) {
             baseName = assetName.substring(0, paramIndex);
         }
         for (const asset of this.assets) {

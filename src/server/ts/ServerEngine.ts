@@ -85,7 +85,7 @@ export class ZIRServerEngine {
     // TODO: Cache at the beginning of each tick
     // but not Dan's way
     public getAllEntities() {
-        let toReturn: ZIREntity[] = [];
+        const toReturn: ZIREntity[] = [];
         for (const world in this.universe) {
             toReturn.push(...this.universe[world].getEntities());
         }
@@ -165,20 +165,20 @@ export class ZIRServerEngine {
         for (const session of this.sessions) {
             const calculatedUpdates = [];
             const world = this.findWorldById(session.getWorldID());
-            let entities = world.getEntities();
+            let entitiesToUpdate = world.getEntities();
 
             if (!reset) {
-                entities = entities.filter((entity) => {
+                entitiesToUpdate = entitiesToUpdate.filter((entity) => {
                     const e = entity.shouldUpdate();
                     return e;
                 });
             } else {
-                entities = entities.filter((entity) => {
+                entitiesToUpdate = entitiesToUpdate.filter((entity) => {
                     return !entity.isDead();
                 });
             }
 
-            for (const entity of entities) {
+            for (const entity of entitiesToUpdate) {
 
                 const update = {
                     asset: entity.getAssetName(),
