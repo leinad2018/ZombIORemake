@@ -31,6 +31,10 @@ export class ZIRWorld {
         }
     }
 
+    /**
+     * Use this when you want to remove an entity from the world in order to transfer it to another world
+     * If an entity should be removed from all worlds consider using entity.kill()
+     */
     public removeEntity(entityID: string): ZIREntity {
         for (let i = 0; i < this.entities.length; i++) {
             const entity = this.entities[i];
