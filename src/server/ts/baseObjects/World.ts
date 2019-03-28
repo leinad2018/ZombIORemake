@@ -46,8 +46,6 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
-        const checks: Array<Promise<void>> = [];
-
         const potentialCollisions = this.generateCollisionPairs();
         for (const potentialCollision of potentialCollisions) {
             this.checkEntityCollision(potentialCollision);
@@ -90,10 +88,6 @@ export class ZIRWorld {
                     }
                 }
             }
-        }
-        for (const eventEntity of this.entities) {
-            eventEntity.runEvents();
-            eventEntity.setCreating(false);
         }
     }
 
