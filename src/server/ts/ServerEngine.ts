@@ -61,17 +61,15 @@ export class ZIRServerEngine {
         session.setWorldID(worldID);
 
         // TODO: Use findWorldById
-        for (const world of this.universe) {
-            if (world.getWorldID() === worldID) {
-                this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
-                this.handleSpawn(session);
-                return;
-            }
+        let world = this.findWorldById(worldID);
+        if (!world) {
+            const newWorld = new ZIRPlayerWorld(worldID);
+            newWorld.registerEntity(this.defaultView);
+            this.universe[worldID] = newWorld;
+            world = newWorld;
         }
-        const newWorld = new ZIRPlayerWorld(worldID);
-        newWorld.registerEntity(this.defaultView);
-        this.universe.push(newWorld);
-        this.sessionManager.sendToClient(session.getSocket(), "updateWorld", newWorld.getTerrainMap());
+
+        this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
         this.handleSpawn(session);
     }
 
@@ -96,8 +94,8 @@ export class ZIRServerEngine {
     // but not Dan's way
     public getAllEntities() {
         let toReturn: ZIREntity[] = [];
-        for (const world of this.universe) {
-            toReturn.push(...world.getEntities());
+        for (const world in this.universe) {
+            toReturn.push(...this.universe[world].getEntities());
         }
         return toReturn;
     }
@@ -157,8 +155,8 @@ export class ZIRServerEngine {
     }
 
     private async checkCollision() {
-        for (const world of this.universe) {
-            await world.runCollisionLogic();
+        for (const world in this.universe) {
+            await this.universe[world].runCollisionLogic();
         }
     }
 
@@ -224,7 +222,7 @@ export class ZIRServerEngine {
         }
 
         const entities = this.getAllEntities();
-        for(const e of entities){
+        for (const e of entities) {
             e.setUpdated(true);
         }
     }
@@ -240,11 +238,7 @@ export class ZIRServerEngine {
     }
 
     private findWorldById(worldID: string) {
-        for (const world of this.universe) {
-            if (world.getWorldID() === worldID) {
-                return world;
-            }
-        }
+        return this.universe[worldID];
     }
 
     /**
