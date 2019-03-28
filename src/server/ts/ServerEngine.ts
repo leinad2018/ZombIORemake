@@ -146,7 +146,7 @@ export class ZIRServerEngine {
 
         this.handleInput();
 
-        await this.checkCollision();
+        this.checkCollision();
 
         this.eventScheduler.update(this.tickCounter);
 
@@ -159,9 +159,9 @@ export class ZIRServerEngine {
         this.collectGarbage();
     }
 
-    private async checkCollision() {
+    private checkCollision() {
         for (const world of this.universe) {
-            await world.runCollisionLogic();
+            world.runCollisionLogic();
         }
     }
 

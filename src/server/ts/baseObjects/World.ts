@@ -32,14 +32,13 @@ export class ZIRWorld {
         }
     }
 
-    public async runCollisionLogic() {
+    public runCollisionLogic() {
         const checks: Array<Promise<void>> = [];
 
         const potentialCollisions = this.generateCollisionPairs();
         for (const potentialCollision of potentialCollisions) {
-            checks.push(this.checkEntityCollision(potentialCollision));
+            this.checkEntityCollision(potentialCollision);
         }
-        await Promise.all(checks);
         for (const entity of this.entities) {
             entity.runEvents();
             entity.setCreating(false);
@@ -60,7 +59,7 @@ export class ZIRWorld {
         return pairs;
     }
 
-    private async checkEntityCollision(check: IZIRCollisionCandidate) {
+    private checkEntityCollision(check: IZIRCollisionCandidate) {
         const { e1, e2 } = check;
 
         // Collision is possible if either entity is moving or newly created
