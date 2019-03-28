@@ -22,6 +22,15 @@ export class ZIRWorld {
         this.entities.push(entity);
     }
 
+    public collectGarbage() {
+        for (let i = this.entities.length - 1; i > 0; i--) {
+            const entity = this.entities[i];
+            if (entity.isDead()) {
+                this.entities.splice(i, 1);
+            }
+        }
+    }
+
     public removeEntity(entityID: string): ZIREntity {
         for (let i = 0; i < this.entities.length; i++) {
             const entity = this.entities[i];
