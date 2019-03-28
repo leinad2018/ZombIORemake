@@ -35,7 +35,7 @@ export class ZIRSessionManager {
 
         // Starts the server.
         server.listen(PORT, () => {
-            console.log("Starting server on port " + PORT);
+            console.log("Starting game server on port " + PORT);
         });
         // Add the WebSocket handlers
         this.io.on("connection", (socket) => {
