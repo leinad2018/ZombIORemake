@@ -24,6 +24,7 @@ export class ZIRClient extends ZIRClientBase {
     private world: ZIRWorldData;
     private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health[30]");
     private running: boolean;
+    private updating: boolean;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -36,6 +37,7 @@ export class ZIRClient extends ZIRClientBase {
         this.player = new ZIRPlayerData();
         this.world = new ZIRWorldData({ zones: [] });
         this.running = false;
+        this.updating = false;
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
@@ -86,12 +88,16 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleReset(data: IZIRResetResult) {
-        this.entities = [];
-        for (const entity of data.entities) {
-            const newEntity = this.parseEntityResult(entity);
-            this.entities.push(newEntity);
+        if (!this.updating) {
+            this.updating = true;
+            this.entities = [];
+            for (const entity of data.entities) {
+                const newEntity = this.parseEntityResult(entity);
+                this.entities.push(newEntity);
+            }
+            this.updateObjects();
+            this.updating = false;
         }
-        this.updateObjects();
     }
 
     private handleDebugMessage(data: string[]) {
@@ -99,29 +105,33 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
-        for (const entity of data.updates) {
-            const id = entity.id;
-            switch (entity.type) {
-                case "update":
-                    const newEntity = this.parseEntityResult(entity);
-                    const index = this.getEntityIndexById(id);
-                    if (index === -1) {
-                        this.entities.push(newEntity);
-                    } else {
-                        this.entities[index].updateEntity(newEntity);
-                    }
-                    break;
-                case "delete":
-                    if (this.getEntityById(id)) {
-                        this.entities.splice(this.getEntityIndexById(id), 1);
-                    }
-                    break;
+        if (!this.updating) {
+            this.updating = true;
+            for (const entity of data.updates) {
+                const id = entity.id;
+                switch (entity.type) {
+                    case "update":
+                        const newEntity = this.parseEntityResult(entity);
+                        const index = this.getEntityIndexById(id);
+                        if (index === -1) {
+                            this.entities.push(newEntity);
+                        } else {
+                            this.entities[index].updateEntity(newEntity);
+                        }
+                        break;
+                    case "delete":
+                        if (this.getEntityById(id)) {
+                            this.entities.splice(this.getEntityIndexById(id), 1);
+                        }
+                        break;
+                }
             }
+            this.playersOnline = this.serverComms.getPlayersOnline();
+            this.updateObjects();
+            this.running = true;
+            this.setViewSize(this.canvas.getDimensions());
+            this.updating = false;
         }
-        this.playersOnline = this.serverComms.getPlayersOnline();
-        this.updateObjects();
-        this.running = true;
-        this.setViewSize(this.canvas.getDimensions());
     }
 
     private handleWorldUpdate(data: IZIRWorldUpdate) {

@@ -125,7 +125,7 @@ export class ZIRServerEngine {
         // TODO: Debug flag
         this.sendDebugInfo();
 
-        await this.calculatePhysics();
+        this.calculatePhysics();
 
         this.handleInput();
 
@@ -152,13 +152,12 @@ export class ZIRServerEngine {
         }
     }
 
-    private async calculatePhysics() {
-        const updates: Array<Promise<void>> = [];
-        this.getAllEntities().forEach((entity) => {
+    private calculatePhysics() {
+        const entities = this.getAllEntities();
+        for (const entity of entities) {
             entity.update(this);
-            updates.push(this.physicsEngine.applyPhysics(entity, this.getDT()));
-        });
-        await Promise.all(updates);
+            this.physicsEngine.applyPhysics(entity, this.getDT());
+        }
     }
 
     private sendUpdate(reset: boolean = false) {

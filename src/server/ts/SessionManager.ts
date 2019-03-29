@@ -86,7 +86,7 @@ export class ZIRSessionManager {
         socket.on("rename", this.handleRename.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
-        socket.on("respawn", (() => {this.spawnHandler(s); }).bind(this));
+        socket.on("respawn", (() => { this.spawnHandler(s); }).bind(this));
         this.registerSessionHandler(s);
         socket.emit("requestRename");
     }
