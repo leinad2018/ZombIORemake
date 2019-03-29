@@ -2,8 +2,6 @@ import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/ISer
 import { Inputs } from "./globalInterfaces/UtilityInterfaces";
 import { ZIRPlayer } from "./entities/mobs/Player";
 import { ZIREntity } from "./baseObjects/EntityBase";
-import { ZIRLogger } from "./Logger";
-import { ZIRWorld } from "./baseObjects/World";
 
 export class ZIRSessionManager {
     private listeners: { [header: string]: () => void } = {};

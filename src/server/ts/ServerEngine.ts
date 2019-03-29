@@ -4,7 +4,6 @@ import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRWorld } from "./baseObjects/World";
 import { ZIRPlayerWorld } from "./PlayerWorld";
 import { ZIRPlayer } from "./entities/mobs/Player";
-import { ZIRLogger } from "./Logger";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRSpite } from "./baseObjects/Spite";
 import { ZIREventScheduler } from "./EventScheduler";
@@ -81,7 +80,6 @@ export class ZIRServerEngine {
         }
     }
 
-    // TODO: Cache at the beginning of each tick
     // but not Dan's way
     public getAllEntities() {
         const toReturn: ZIREntity[] = [];
