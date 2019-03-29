@@ -14,13 +14,13 @@ export class ZIRServerEngine {
     private sessionManager: ZIRSessionManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
-    private readonly TPS: number = 30;
+    private readonly TPS: number = 60;
     protected sessions: Session[] = [];
 
-    // TODO: Refactor to World ID-indexed hashmap
     private universe: ZIRWorld[] = [];
     private defaultView: ZIREntity;
     private tickCounter: number = 0;
+    private entityCache: ZIREntity[] = [];
 
     constructor() {
         this.defaultView = new ZIRSpite();
@@ -52,7 +52,6 @@ export class ZIRServerEngine {
         const worldID = "wilderness";
         session.setWorldID(worldID);
 
-        // TODO: Use findWorldById
         let world = this.findWorldById(worldID);
         if (!world) {
             const newWorld = new ZIRPlayerWorld(worldID);
@@ -122,6 +121,8 @@ export class ZIRServerEngine {
         // TODO: Consider moving broadcast packets to central list and reading within SessionManager
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
 
+        this.entityCache = this.getAllEntities();
+
         // TODO: Debug flag
         this.sendDebugInfo();
 
@@ -136,6 +137,7 @@ export class ZIRServerEngine {
         const shouldReset = this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
 
+        this.entityCache = null;
         this.collectGarbage();
     }
 
@@ -145,7 +147,6 @@ export class ZIRServerEngine {
         }
     }
 
-    // TODO: Refactor to place in World
     private collectGarbage() {
         for (const world in this.universe) {
             this.universe[world].collectGarbage();
@@ -153,7 +154,7 @@ export class ZIRServerEngine {
     }
 
     private calculatePhysics() {
-        const entities = this.getAllEntities();
+        const entities = this.entityCache;
         for (const entity of entities) {
             entity.update(this);
             this.physicsEngine.applyPhysics(entity, this.getDT());
@@ -202,7 +203,7 @@ export class ZIRServerEngine {
             }
         }
 
-        const entities = this.getAllEntities();
+        const entities = this.entityCache;
         for (const e of entities) {
             e.setUpdated(true);
         }
@@ -232,7 +233,7 @@ export class ZIRServerEngine {
             debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
-            debugMessages.push("Entities (" + this.getAllEntities().length + " total): " + this.getAllEntities());
+            debugMessages.push("Entities (" + this.entityCache.length + " total): " + this.entityCache);
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
         }
