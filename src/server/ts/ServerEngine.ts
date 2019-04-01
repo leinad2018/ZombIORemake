@@ -80,7 +80,6 @@ export class ZIRServerEngine {
         }
     }
 
-    // but not Dan's way
     public getAllEntities() {
         const toReturn: ZIREntity[] = [];
         for (const world in this.universe) {

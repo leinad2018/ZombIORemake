@@ -46,6 +46,7 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
+        this.sortEntities();
         const potentialCollisions = this.generateCollisionPairs();
         for (const potentialCollision of potentialCollisions) {
             this.checkEntityCollision(potentialCollision);
@@ -56,16 +57,44 @@ export class ZIRWorld {
         }
     }
 
+    private sortEntities() {
+        this.entities.sort((a, b) => {
+            const aabba = a.getAABB();
+            const aabbb = b.getAABB();
+            return aabbb.getMinX() - aabba.getMinX();
+        });
+    }
+
     private generateCollisionPairs(): IZIRCollisionCandidate[] {
         const pairs = [];
-        for (let i = this.entities.length - 1; i > 0; i--) {
-            for (let j = i - 1; j >= 0; j--) {
-                const pair = {
-                    e1: this.entities[i],
-                    e2: this.entities[j],
-                };
-                pairs.push(pair);
+        // for (let i = this.entities.length - 1; i > 0; i--) {
+        //     for (let j = i - 1; j >= 0; j--) {
+        //         const pair = {
+        //             e1: this.entities[i],
+        //             e2: this.entities[j],
+        //         };
+        //         pairs.push(pair);
+        //     }
+        // }
+
+        const active: ZIREntity[] = [];
+        for (const entity of this.entities) {
+            const box = entity.getAABB();
+
+            for (let i = active.length - 1; i >= 0; i--) {
+                const other = active[i];
+                const otherBox = other.getAABB();
+                if (otherBox.getMaxX() < box.getMinX()) {
+                    active.splice(i, 1);
+                } else {
+                    pairs.push({
+                        e1: entity,
+                        e2: other
+                    })
+                }
             }
+
+            active.push(entity);
         }
         return pairs;
     }
@@ -73,6 +102,7 @@ export class ZIRWorld {
     private checkEntityCollision(check: IZIRCollisionCandidate) {
         const { e1, e2 } = check;
 
+        const canCollide = e1.getCollides() && e2.getCollides();
         // Collision is possible if either entity is moving or newly created
         if (true) { // Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
             for (const zone1 of e1.getHitboxes()) {
@@ -80,7 +110,7 @@ export class ZIRWorld {
                     if (zone1.checkCollision(zone2)) {
                         e1.registerEvent(zone2);
                         e2.registerEvent(zone1);
-                        if (e1.getCollides() && e2.getCollides() && zone1.getTypes().indexOf("collision") !== -1 && zone2.getTypes().indexOf("collision") !== -1) {
+                        if (canCollide && zone1.getTypes().indexOf("collision") !== -1 && zone2.getTypes().indexOf("collision") !== -1) {
                             // Normal vector on e1's boundary at point of collision
                             const direction = zone1.getCollisionVector(zone2);
                             this.resolvePhysicalCollision(e1, e2, direction);
