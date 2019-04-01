@@ -25,6 +25,7 @@ export class ZIRClient extends ZIRClientBase {
     private heartAsset: IZIRAsset = ZIRAssetLoader.getAsset("health[30]");
     private running: boolean;
     private updating: boolean;
+    private inputBuffer: any[];
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -38,6 +39,7 @@ export class ZIRClient extends ZIRClientBase {
         this.world = new ZIRWorldData({ zones: [] });
         this.running = false;
         this.updating = false;
+        this.inputBuffer = [];
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
@@ -63,11 +65,22 @@ export class ZIRClient extends ZIRClientBase {
         if (this.running) {
             try {
                 this.canvas.render(this);
+                this.flushInputBuffer();
             } catch (e) {
                 console.log(e);
             }
         }
         requestAnimationFrame(this.runRenderingLoop.bind(this));
+    }
+
+    private flushInputBuffer(){
+        for(const input in this.inputBuffer){
+            this.serverComms.sendInfoToServer("input", {
+                keycode: input,
+                state: this.inputBuffer[input]
+            });
+        }
+        this.inputBuffer = [];
     }
 
     private fetchUsername() {
@@ -142,10 +155,7 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleInput(keycode: string, state: boolean) {
         this.handleClientInput(keycode, state);
-        this.serverComms.sendInfoToServer("input", {
-            keycode,
-            state,
-        });
+        this.inputBuffer[keycode] = state;
     }
 
     private handleClientInput(keycode: string, state: boolean) {
@@ -165,10 +175,7 @@ export class ZIRClient extends ZIRClientBase {
         if (renderOffset) {
             state = this.canvas.transformRenderToPlayer(state);
         }
-        this.serverComms.sendInfoToServer("input", {
-            keycode,
-            state,
-        });
+        this.inputBuffer[keycode] = state;
     }
 
     private parseEntityResult(result: IZIREntityResult) {

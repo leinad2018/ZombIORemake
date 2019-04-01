@@ -121,7 +121,7 @@ export class ZIRServerEngine {
         this.entityCache = this.getAllEntities();
 
         // TODO: Debug flag
-        this.sendDebugInfo();
+        //this.sendDebugInfo();
 
         this.calculatePhysics();
 
@@ -131,7 +131,7 @@ export class ZIRServerEngine {
 
         this.eventScheduler.update(this.tickCounter);
 
-        const shouldReset = this.tickCounter % 30 === 0;
+        const shouldReset = false;//this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
 
         this.entityCache = null;
