@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+    <div id="baseDiv" style="position:absolute;top:0;bottom:0;right:0;left:0;">
+        <canvas id="mainCanvas" hidden></canvas>
+        <div id="startingScreen">
+            <form id="loginForm" onsubmit="return false">
+                <input id="name" type="text" autofocus/>
+                <button id="play" type=submit>Play!</button>
+            </form>
+        </div>
+    </div>
+    <script data-main="web/app" src="../lib/require.js"></script>
+</body>

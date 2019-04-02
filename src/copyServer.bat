@@ -1,1 +1,0 @@
-xcopy /y "./server" "./output"

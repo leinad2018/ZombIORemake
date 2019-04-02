@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "isBackground": false,
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/buildAll.bat",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "yarn lint",
+            "problemMatcher": {
+                "owner": "Lint",
+                "fileLocation": ["absolute"],
+                "pattern": {
+                    "regexp": "^(WARNING|ERROR): (.*.ts):(.*):(.*) - (.*)",
+                    "file": 2,
+                    "line": 3,
+                    "column": 4,
+                    "severity": 1,
+                    "message": 5
+                }
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        }
+    ]
+}
