@@ -1,5 +1,5 @@
 import { ZIREntity } from "../baseObjects/EntityBase";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../baseObjects/Hitbox";
 import { ZIRPlayer } from "./mobs/Player";
 import { ZIRInventoryStack } from "../baseObjects/Inventory";

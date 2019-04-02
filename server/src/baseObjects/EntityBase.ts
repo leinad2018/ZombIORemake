@@ -1,5 +1,5 @@
 import { IZIREntity } from "../globalInterfaces/MainInterfaces";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 import { ZIRZone } from "../baseObjects/Hitbox";
 
 export abstract class ZIREntity implements IZIREntity {

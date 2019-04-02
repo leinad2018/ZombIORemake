@@ -1,6 +1,6 @@
 import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
 
 export class ZIRWorld {

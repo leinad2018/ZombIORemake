@@ -1,6 +1,6 @@
 import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "./utilityObjects/Math";
 import { ZIREntityBase } from "./baseObjects/EntityBase";
 
 export class ZIRCanvasController {

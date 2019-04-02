@@ -15,7 +15,7 @@ export abstract class ZIRClientBase {
     public abstract getPlayersOnline();
 
     public abstract getDebugMessages();
-
+    
     public abstract getBackgroundImage(): IZIRAsset;
 
     public abstract getPlayerPosition(): Vector;

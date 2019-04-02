@@ -1,6 +1,6 @@
 import { ZIREntity } from "../../baseObjects/EntityBase";
 import { ZIRMob } from "../../baseObjects/Mob";
-import { Vector } from "../../../../common/src/Math";
+import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 

@@ -1,5 +1,5 @@
 import { ZIREntity } from "./EntityBase";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 
 export abstract class ZIRTowerBase extends ZIREntity {
     constructor(position: Vector, size: Vector, asset: string) {

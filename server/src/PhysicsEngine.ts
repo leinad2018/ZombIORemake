@@ -1,5 +1,5 @@
 import { ZIREntity } from "./baseObjects/EntityBase";
-import { Vector } from "../../common/src/Math";
+import { Vector } from "./utilityObjects/Math";
 
 export class ZIRPhysicsEngine {
     public readonly G: number = 9.8;

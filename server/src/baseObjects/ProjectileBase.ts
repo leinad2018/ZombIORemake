@@ -1,5 +1,5 @@
 import { ZIREntity } from "./EntityBase";
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 import { ZIRZone } from "./Hitbox";
 import { ZIRServerEngine } from "../ServerEngine";
 

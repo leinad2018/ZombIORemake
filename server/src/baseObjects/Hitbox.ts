@@ -1,6 +1,5 @@
-import { Vector } from "../../../common/src/Math";
+import { Vector } from "../utilityObjects/Math";
 import { ZIREntity } from "./EntityBase";
-import { ZIRPlayer } from "../entities/mobs/Player";
 
 export abstract class ZIRZone {
     protected position: Vector;

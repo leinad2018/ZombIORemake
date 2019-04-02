@@ -3,12 +3,17 @@
         "target": "es6",
         "module": "commonJS",
         "outDir": "../output/server/src",
+        "moduleResolution": "node",
         "sourceMap": true
     },
     "include": [
         "src"
     ],
     "exclude": [
-        "node_modules"
-    ]
+        "node_modules", "../common"
+    ],
+    "rootDirs": [
+        "src",
+        "../common/src"
+    ],
 }

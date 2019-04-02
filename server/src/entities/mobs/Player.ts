@@ -1,4 +1,4 @@
-import { Vector } from "../../../../common/src/Math";
+import { Vector } from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 import { ZIRWorld } from "../../baseObjects/World";
 import { ZIRBoomerang } from "../projectiles/Boomerang";

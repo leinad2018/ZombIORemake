@@ -9,6 +9,5 @@ call tsc -p %PROJECT_DIR%server/tsconfig.json
 call echo D | xcopy /E /Y /Q "%PROJECT_DIR%server/node_modules" "%OUT_DIR%server/node_modules"
 
 :: Load shared code
-call tsc -p %PROJECT_DIR%common/tsconfig.json
 call echo D | xcopy /E /Y "%PROJECT_DIR%common/assets" "%OUT_DIR%common/assets"
 call echo D | xcopy /E /Y "%PROJECT_DIR%common/lib" "%OUT_DIR%common/lib"

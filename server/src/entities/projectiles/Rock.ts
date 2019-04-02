@@ -1,6 +1,6 @@
 import { ZIRProjectile } from "../../baseObjects/ProjectileBase";
 import { ZIREntity } from "../../baseObjects/EntityBase";
-import { Vector } from "../../../../common/src/Math";
+import { Vector } from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRThrownRock extends ZIRProjectile {
