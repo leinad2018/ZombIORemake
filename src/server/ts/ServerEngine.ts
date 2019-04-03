@@ -121,7 +121,7 @@ export class ZIRServerEngine {
         this.entityCache = this.getAllEntities();
 
         // TODO: Debug flag
-        //this.sendDebugInfo();
+        this.sendDebugInfo();
 
         this.calculatePhysics();
 
@@ -176,7 +176,6 @@ export class ZIRServerEngine {
             }
 
             for (const entity of entitiesToUpdate) {
-
                 const update = {
                     asset: entity.getAssetName(),
                     id: entity.getEntityId(),
@@ -227,10 +226,10 @@ export class ZIRServerEngine {
     private sendDebugInfo = (): void => {
         for (const session of this.sessions) {
             const debugMessages = [];
-            debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
+            //debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
-            debugMessages.push("Entities (" + this.entityCache.length + " total): " + this.entityCache);
+            debugMessages.push("Entities (" + this.entityCache.length + " total)");//: " + this.entityCache);
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
         }
