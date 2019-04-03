@@ -1,6 +1,6 @@
 import { IZIREntity } from "../globalInterfaces/MainInterfaces";
 import { Vector } from "../utilityObjects/Math";
-import { ZIRZone } from "../baseObjects/Hitbox";
+import { ZIRZone, ZIRRectangularZone } from "../baseObjects/Hitbox";
 
 export abstract class ZIREntity implements IZIREntity {
     private static entityCount = 0;
@@ -24,6 +24,7 @@ export abstract class ZIREntity implements IZIREntity {
     protected maxMovement: number = 5 * this.PIXELS_PER_METER; // m/s
     protected asset: string;
     protected staticHitboxes: ZIRZone[];
+    protected aabb: ZIRRectangularZone;
     protected size: Vector;
     protected hitboxHandlers: Array<(otherZone: ZIRZone) => void>;
     protected eventsToExecute: ZIRZone[];
@@ -41,6 +42,8 @@ export abstract class ZIREntity implements IZIREntity {
         this.collides = true;
         this.movable = true;
         this.staticHitboxes = this.createStaticHitboxes();
+        //TODO have to call this again when updates are needed
+        this.createAABB();
         this.hitboxHandlers = [];
         this.eventsToExecute = [];
         ZIREntity.entityCount++;
@@ -57,6 +60,28 @@ export abstract class ZIREntity implements IZIREntity {
      */
     public getHitboxes() {
         return this.staticHitboxes;
+    }
+
+    /**
+     * Creates the axis aligned bounding box
+     */
+    private createAABB() {
+        let minX = 100000000;
+        let minY = 100000000;
+        let maxX = 0;
+        let maxY = 0;
+        for (const zone of this.staticHitboxes) {
+            minX = Math.min(zone.getMinX(), minX);
+            minY = Math.min(zone.getMinY(), minY);
+            maxX = Math.max(zone.getMaxX(), maxX);
+            maxY = Math.max(zone.getMaxY(), maxY);
+        }
+
+        this.aabb = new ZIRRectangularZone(new Vector(minX, minY), this, new Vector(maxX - minX, maxY - minY));
+    }
+
+    public getAABB() {
+        return this.aabb;
     }
 
     protected registerHitboxHandlers() {

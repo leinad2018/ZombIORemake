@@ -36,36 +36,14 @@ export abstract class ZIRZone {
         return true; // (this.owner.getEntityId() === other.owner.getEntityId()); //&& this.types === other.types); //&& this.position.equals(other.position));
     }
 
+    public abstract getMinX(): number;
+    public abstract getMinY(): number;
+    public abstract getMaxX(): number;
+    public abstract getMaxY(): number;
+
     public abstract checkCollision(otherZone: ZIRZone): boolean;
 
     public abstract getCollisionVector(otherZone: ZIRZone): Vector;
-}
-
-export class ZIREffectBox extends ZIRZone {
-    private areas: ZIRZone[];
-
-    constructor(parent: ZIREntity, areas: ZIRZone[]) {
-        super(areas[0].getPosition(), parent);
-        this.areas = areas;
-    }
-
-    public checkCollision(zone: ZIRZone): boolean {
-        for (const area of this.areas) {
-            if (area.checkCollision(zone)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public getCollisionVector(zone: ZIRZone): Vector {
-        // TODO: implement maybe
-        return Vector.ZERO_VECTOR;
-    }
-
-    public isMoving() {
-        return Math.abs(this.owner.getVelocity().getMagnitude()) > 0.1;
-    }
 }
 
 export class ZIRCircleZone extends ZIRZone {
@@ -104,6 +82,22 @@ export class ZIRCircleZone extends ZIRZone {
 
     public getRadius() {
         return this.radius;
+    }
+
+    public getMinX() {
+        return this.position.getX() - this.radius;
+    }
+
+    public getMinY() {
+        return this.position.getY() - this.radius;
+    }
+
+    public getMaxX() {
+        return this.position.getX() + this.radius;
+    }
+
+    public getMaxY() {
+        return this.position.getY() + this.radius;
     }
 
     public equals(other: ZIRZone): boolean {
@@ -201,6 +195,22 @@ export class ZIRRectangularZone extends ZIRZone {
             return false;
         }
         return true;
+    }
+
+    public getMinX() {
+        return this.position.getX();
+    }
+
+    public getMinY() {
+        return this.position.getY();
+    }
+
+    public getMaxX() {
+        return this.position.getX() + this.size.getX();
+    }
+
+    public getMaxY() {
+        return this.position.getY() + this.size.getY();
     }
 
     public equals(other: ZIRZone): boolean {

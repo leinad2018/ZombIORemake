@@ -4,7 +4,7 @@ import { Vector } from "./utilityObjects/Math";
 export class ZIRPhysicsEngine {
     public readonly G: number = 9.8;
 
-    public async applyPhysics(entity: ZIREntity, dt: number) {
+    public applyPhysics(entity: ZIREntity, dt: number) {
         if (entity.getIsPhysical()) {
             let velocity = entity.getVelocity();
             const externalForce = entity.getExternalForce();

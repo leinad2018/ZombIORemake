@@ -15,9 +15,9 @@ export class ZIRAnimation implements IZIRAsset {
     }
 
     private parseTimings(times: string) {
-        this.animationTimes = []
-        //Remove the brackets at the beginning and the end then parse each element to an number
-        const numericTimes = times.substring(1, times.length - 1).split(",").map(s => parseInt(s));
+        this.animationTimes = [];
+        // Remove the brackets at the beginning and the end then parse each element to an number
+        const numericTimes = times.substring(1, times.length - 1).split(",").map((s) => parseInt(s, 10));
         const length = this.getLength();
         const maxIndex = numericTimes.length - 1;
         for (let i = 0; i < length; i++) {

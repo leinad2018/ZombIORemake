@@ -18,7 +18,7 @@ export class ZIREventScheduler {
     public update(frame: number) {
         this.currentTick = frame;
         for (let i = 0; i < this.events.length; i++) {
-            let event = this.events[i];
+            const event = this.events[i];
             if (frame > event.getEndingFrame()) {
                 this.events.splice(i, 1);
             } else {
