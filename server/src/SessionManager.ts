@@ -52,10 +52,11 @@ export class ZIRSessionManager {
     }
 
     private handleInput(this: Session, data): void {
-        // console.log(data.keycode);
-        if (data.keycode) {
-            // console.log(data.state);
-            this.getInputs()[data.keycode] = data.state;
+        const inputs = this.getInputs();
+        for(const key of data){
+            if(key.keycode){
+                inputs[key.keycode] = key.state;
+            }
         }
     }
 

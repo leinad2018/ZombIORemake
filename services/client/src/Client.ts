@@ -65,7 +65,6 @@ export class ZIRClient extends ZIRClientBase {
         if (this.running) {
             try {
                 this.canvas.render(this);
-                this.flushInputBuffer();
             } catch (e) {
                 console.log(e);
             }
@@ -74,13 +73,17 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private flushInputBuffer(){
+        let toSend = [];
         for(const input in this.inputBuffer){
-            this.serverComms.sendInfoToServer("input", {
+            toSend.push({
                 keycode: input,
                 state: this.inputBuffer[input]
             });
         }
-        this.inputBuffer = [];
+        if(toSend.length > 0){
+            this.serverComms.sendInfoToServer("input", toSend);
+            this.inputBuffer = [];
+        }
     }
 
     private fetchUsername() {
@@ -109,6 +112,7 @@ export class ZIRClient extends ZIRClientBase {
                 this.entities.push(newEntity);
             }
             this.updateObjects();
+            this.flushInputBuffer();
             this.updating = false;
         }
     }
@@ -141,6 +145,7 @@ export class ZIRClient extends ZIRClientBase {
             }
             this.playersOnline = this.serverComms.getPlayersOnline();
             this.updateObjects();
+            this.flushInputBuffer();
             this.running = true;
             this.setViewSize(this.canvas.getDimensions());
             this.updating = false;
