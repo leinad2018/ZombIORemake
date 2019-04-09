@@ -138,7 +138,7 @@ export class ZIRServerEngine {
 
         this.eventScheduler.update(this.tickCounter);
 
-        const shouldReset = false;//this.tickCounter % 30 === 0;
+        const shouldReset = this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
 
         this.entityCache = null;
@@ -212,6 +212,10 @@ export class ZIRServerEngine {
         }
     }
 
+    private createUpdate(entity: ZIREntity) {
+        
+    }
+
     private handleInput = (): void => {
         for (const session of this.sessions) {
             const world = this.findWorldById(session.getWorldID());
@@ -222,7 +226,7 @@ export class ZIRServerEngine {
         }
     }
 
-    private findWorldById(worldID: string) {
+    private findWorldById(worldID: string): ZIRWorld {
         return this.universe[worldID];
     }
 

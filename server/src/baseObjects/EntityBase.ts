@@ -4,31 +4,30 @@ import { ZIRZone, ZIRRectangularZone } from "../baseObjects/Hitbox";
 
 export abstract class ZIREntity implements IZIREntity {
     private static entityCount = 0;
-    protected id: string;
-    protected updated: boolean;
-    protected creating: boolean;
-    protected isPhysical: boolean;
-    protected movable: boolean;
-    protected collides: boolean;
-    protected dead: boolean;
-    protected position: Vector;
-    protected velocity: Vector = new Vector(0, 0);
-    protected acceleration: Vector = new Vector(0, 0);
-    protected externalForce: Vector = new Vector(0, 0);
-    protected internalForce: Vector = new Vector(0, 0);
-    protected externalAcceleration: Vector = new Vector(0, 0);
-    protected friction: number = 1.5;
-    protected mass: number = 100;
+    private id: string;
+    private updated: boolean;
+    private creating: boolean;
+    private isPhysical: boolean;
+    private movable: boolean;
+    private collides: boolean;
+    private dead: boolean;
+    private position: Vector;
+    private velocity: Vector = new Vector(0, 0);
+    private acceleration: Vector = new Vector(0, 0);
+    private externalForce: Vector = new Vector(0, 0);
+    private internalForce: Vector = new Vector(0, 0);
+    private friction: number = 1.5;
+    private mass: number = 100;
     public readonly PIXELS_PER_METER = 50;
-    protected moveForce: number = 40 * this.PIXELS_PER_METER; // Newtons
-    protected maxMovement: number = 5 * this.PIXELS_PER_METER; // m/s
-    protected asset: string;
-    protected staticHitboxes: ZIRZone[];
-    protected aabb: ZIRRectangularZone;
-    protected size: Vector;
-    protected hitboxHandlers: Array<(otherZone: ZIRZone) => void>;
-    protected eventsToExecute: ZIRZone[];
-    protected name: string = undefined;
+    private moveForce: number = 40 * this.PIXELS_PER_METER; // Newtons
+    private maxMovement: number = 5 * this.PIXELS_PER_METER; // m/s
+    private asset: string;
+    private staticHitboxes: ZIRZone[];
+    private aabb: ZIRRectangularZone;
+    private size: Vector;
+    private hitboxHandlers: Array<(otherZone: ZIRZone) => void>;
+    private eventsToExecute: ZIRZone[];
+    private name: string = undefined;
 
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, isPhysical: boolean = true) {
         this.id = ZIREntity.entityCount + "";
@@ -85,7 +84,11 @@ export abstract class ZIREntity implements IZIREntity {
     }
 
     protected registerHitboxHandlers() {
-        this.hitboxHandlers["die"] = this.kill.bind(this);
+        this.setHitboxHandler("die", this.kill);
+    }
+
+    protected setHitboxHandler(type: string, handler: (otherZone: ZIRZone) => void){
+        this.hitboxHandlers[type] = handler.bind(this);
     }
 
     public registerEvent(otherZone: ZIRZone) {
@@ -111,6 +114,10 @@ export abstract class ZIREntity implements IZIREntity {
 
     public getName(): string {
         return this.name;
+    }
+
+    protected setMovable(movable: boolean){
+        this.movable = movable;
     }
 
     public getMovable(): boolean {
@@ -222,6 +229,10 @@ export abstract class ZIREntity implements IZIREntity {
 
     public getMaxMovement(): number {
         return this.maxMovement;
+    }
+
+    protected setMoveForce(force: number){
+        this.moveForce = force;
     }
 
     public getmoveForce(): number {

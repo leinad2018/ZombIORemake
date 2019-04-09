@@ -35,11 +35,11 @@ export class ZIRPlayer extends ZIRMob {
     }
 
     public do(inputs: any, worldState: ZIRWorld) {
-        if (this.dead) {
+        if (this.isDead()) {
             return;
         }
 
-        const m = this.moveForce * this.mass;
+        const m = this.getmoveForce() * this.getMass();
         let f = new Vector(0, 0);
 
         for (const input in inputs) {
@@ -68,7 +68,7 @@ export class ZIRPlayer extends ZIRMob {
                                 mouse = inputs["mouse"];
                                 direction = new Vector(mouse.x, mouse.y);
                                 velocity = direction.getUnitVector().scale(15 * this.PIXELS_PER_METER);
-                                p = new ZIRBoomerang(this, velocity.add(this.velocity), this.position);
+                                p = new ZIRBoomerang(this, velocity.add(this.getVelocity()), this.getPosition());
                                 worldState.registerEntity(p);
                                 this.dropItem(new ZIRInventoryStack("boomerang", "", 1));
                                 ZIREventScheduler.getInstance().registerEvent(this.startAbilityCooldown("boomerang"));
@@ -82,7 +82,7 @@ export class ZIRPlayer extends ZIRMob {
                                 mouse = inputs["mouse"];
                                 direction = new Vector(mouse.x, mouse.y);
                                 velocity = direction.getUnitVector().scale(30 * this.PIXELS_PER_METER);
-                                p = new ZIRThrownRock(this, velocity.add(this.velocity), this.position);
+                                p = new ZIRThrownRock(this, velocity.add(this.getVelocity()), this.getPosition());
                                 worldState.registerEntity(p);
                                 this.dropItem(new ZIRInventoryStack("rock", "", 1));
                                 ZIREventScheduler.getInstance().registerEvent(this.startAbilityCooldown("rock"));
@@ -90,7 +90,7 @@ export class ZIRPlayer extends ZIRMob {
                         }
                         break;
                     case "debug":
-                        const e = new ZIREnemy(this.position);
+                        const e = new ZIREnemy(this.getPosition());
                         worldState.registerEntity(e);
                         break;
                 }
@@ -100,7 +100,7 @@ export class ZIRPlayer extends ZIRMob {
         if (f.getMagnitude() !== 0) {
             f = f.getUnitVector().scale(m);
         }
-        this.internalForce = f;
+        this.setInternalForce(f);
     }
 
     private startAbilityCooldown(ability: string) {
@@ -207,7 +207,7 @@ export class ZIRPlayer extends ZIRMob {
 
     protected registerHitboxHandlers() {
         super.registerHitboxHandlers();
-        this.hitboxHandlers["boomerang"] = this.onBoomerangHit.bind(this);
+        this.setHitboxHandler("boomerang", this.onBoomerangHit);
         // this.hitboxHandlers["collision"] = this.collide.bind(this);
     }
 
@@ -215,8 +215,8 @@ export class ZIRPlayer extends ZIRMob {
         return {
             health: this.health,
             inventory: this.inventory,
-            name: this.name,
-            playerID: this.id,
+            name: this.getName(),
+            playerID: this.getEntityId(),
         };
     }
 
@@ -226,12 +226,12 @@ export class ZIRPlayer extends ZIRMob {
 
     protected createStaticHitboxes(): ZIRZone[] {
         const toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["harvest", "player", "collision"]);
+        toReturn[0] = new ZIRRectangularZone(this.getPosition(), this, this.getSize(), ["harvest", "player", "collision"]);
         return toReturn;
     }
 
     public toString(): string {
-        return "Player" + this.id + "@" + this.position + "/V" + this.velocity + "/F" + this.externalForce.add(this.getInternalForce());
+        return "Player" + this.getEntityId() + "@" + this.getPosition() + "/V" + this.getVelocity() + "/F" + this.getExternalForce().add(this.getInternalForce());
     }
 }
 

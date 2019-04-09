@@ -36,7 +36,7 @@ export class ZIRBoomerang extends ZIRProjectile {
 
     protected createStaticHitboxes(): ZIRZone[] {
         const toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size, ["projectile", "boomerang"]);
+        toReturn[0] = new ZIRRectangularZone(this.getPosition(), this, this.getSize(), ["projectile", "boomerang"]);
         return toReturn;
     }
 }

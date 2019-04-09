@@ -14,8 +14,8 @@ export class ZIREnemy extends ZIRMob {
 
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "enemy", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.name = ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)];
-        this.maxMovement = 4 * this.PIXELS_PER_METER;
+        this.setName(ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)]);
+        this.setMaxMovement(4 * this.PIXELS_PER_METER);
     }
 
     public update(state): void {
@@ -25,9 +25,9 @@ export class ZIREnemy extends ZIRMob {
     public ai(state): void {
         this.findTarget(state);
         if (this.target) {
-            this.internalForce = this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.moveForce * this.mass);
+            this.setInternalForce(this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.getmoveForce() * this.getMass()));
         } else {
-            this.internalForce = Vector.ZERO_VECTOR;
+            this.setInternalForce(Vector.ZERO_VECTOR);
         }
     }
 
@@ -45,17 +45,17 @@ export class ZIREnemy extends ZIRMob {
 
     public getObject() {
         return {
-            playerID: this.id,
+            playerID: this.getEntityId(),
         };
     }
 
     public createStaticHitboxes() {
         const toReturn: ZIRZone[] = [];
-        toReturn[0] = new ZIRRectangularZone(this.position, this, this.size);
+        toReturn[0] = new ZIRRectangularZone(this.getPosition(), this, this.getSize());
         return toReturn;
     }
 
     public toString(): string {
-        return "Enemy" + this.id + "@" + this.position + "/V" + this.velocity + "/A" + this.acceleration;
+        return "Enemy" + this.getEntityId() + "@" + this.getPosition() + "/V" + this.getVelocity() + "/A" + this.getAcceleration();
     }
 }

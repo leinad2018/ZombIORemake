@@ -10,24 +10,24 @@ export class ZIRResourceNode extends ZIREntity {
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, type: string) {
         super(position, size, asset, true);
         this.itemType = type;
-        this.movable = true;
+        this.setMovable(true);
     }
 
     protected registerHitboxHandlers() {
-        this.hitboxHandlers["harvest"] = this.handleHarvest.bind(this);
+        this.setHitboxHandler("harvest", this.handleHarvest);
     }
 
     private handleHarvest(otherZone: ZIRZone) {
         const parent: ZIREntity = otherZone.getParent();
         if (parent instanceof ZIRPlayer) {
             const player = (parent as ZIRPlayer);
-            const resourceToGive = new ZIRInventoryStack(this.itemType, this.asset, 1);
+            const resourceToGive = new ZIRInventoryStack(this.itemType, this.getAssetName(), 1);
             player.addToInventory(resourceToGive);
         }
     }
 
     protected createStaticHitboxes() {
-        const hitbox = new ZIRRectangularZone(this.position, this, this.size, ["collision"]);
+        const hitbox = new ZIRRectangularZone(this.getPosition(), this, this.getSize(), ["collision"]);
         return [hitbox];
     }
 
