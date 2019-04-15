@@ -1,3 +1,3 @@
 import {ZIRConsole} from "./Console";
 
-const instance = new ZIRConsole();
+const instance = new ZIRConsole(document);

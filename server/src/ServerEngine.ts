@@ -8,6 +8,7 @@ import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpd
 import { ZIRSpite } from "./baseObjects/Spite";
 import { ZIREventScheduler } from "./EventScheduler";
 import { ZIRConsoleManager } from "./ConsoleManager";
+import { ZIRTimer } from "./Timer";
 
 export class ZIRServerEngine {
     private dt: number = 0;
@@ -116,33 +117,55 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private async tick() {
+        ZIRTimer.start("tick");
+        ZIRTimer.start("usernames");
         const usernames: string[] = [];
         for (const session of this.sessions) {
             usernames.push(session.getUsername());
             session.update();
         }
-
         // TODO: Consider moving broadcast packets to central list and reading within SessionManager
         this.sessionManager.broadcast("players", JSON.stringify(usernames));
+        ZIRTimer.stop("usernames");
 
         this.entityCache = this.getAllEntities();
 
+        ZIRTimer.start("debug");
         // TODO: Debug flag
         this.sendDebugInfo();
+        ZIRTimer.stop("debug");
 
+        ZIRTimer.start("physics");
         this.calculatePhysics();
+        ZIRTimer.stop("physics");
 
+        ZIRTimer.start("input");
         this.handleInput();
+        ZIRTimer.stop("input");
 
+        ZIRTimer.start("collision");
         this.checkCollision();
+        ZIRTimer.stop("collision");
 
+        ZIRTimer.start("events");
         this.eventScheduler.update(this.tickCounter);
+        ZIRTimer.stop("events");
 
+        ZIRTimer.start("packets");
         const shouldReset = false;//this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
+        ZIRTimer.stop("packets");
 
         this.entityCache = null;
+        
+        ZIRTimer.start("garbagecollect");
         this.collectGarbage();
+        ZIRTimer.stop("garbagecollect");
+
+        ZIRTimer.start("console");
+        this.consoleManager.updateClients();
+        ZIRTimer.stop("console");
+        ZIRTimer.stop("tick");
     }
 
     private checkCollision() {

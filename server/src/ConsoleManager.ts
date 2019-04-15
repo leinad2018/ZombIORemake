@@ -3,6 +3,8 @@ import * as http from "http";
 import * as path from "path";
 import * as socketIO from "socket.io";
 
+import {ZIRTimer} from "./Timer";
+
 export class ZIRConsoleManager {
 
     private io;
@@ -26,5 +28,10 @@ export class ZIRConsoleManager {
         server.listen(PORT, () => {
             console.log("Starting console server on port " + PORT);
         });
+    }
+
+    public updateClients = (): void => {
+        const update = ZIRTimer.pullLoggedTimes();
+        this.io.sockets.emit("data", update);
     }
 }
