@@ -17,6 +17,13 @@
             "name": "Launch Client",
             "url": "localhost:5001",
             "webRoot": "${workspaceFolder}",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Benchmark Tests",
+            "program": "${workspaceFolder}/output/server/src/utilityObjects/Benchmarking.js",
+            "preLaunchTask": "Build"
         }
     ],
     "compounds": [

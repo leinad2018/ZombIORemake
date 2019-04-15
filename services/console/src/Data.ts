@@ -56,6 +56,25 @@ export class ZIRDataStream {
         return new ZIRDataStream(newData);
     }
 
+    public normalizeToTick(): ZIRDataStream {
+        let newData = [];
+        const maxX = this.getMaxX();
+        const minX = this.getMinX();
+        const maxY = this.getMaxY();
+        const minY = this.getMinY();
+
+        const xRange = maxX - minX;
+        const yRange = maxY - minY;
+
+        for(const point of this.points) {
+            const x = (point.x - minX) / xRange;
+            const y = (point.y) / 30000000;
+            newData.push(new ZIRPoint(x,y));
+        }
+
+        return new ZIRDataStream(newData);
+    }
+
     public truncate(): ZIRDataStream {
         return new ZIRDataStream(this.points.slice(-50));
     }

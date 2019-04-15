@@ -20,7 +20,7 @@ export class ZIRGraph {
 
     public render() {
         let renderData = this.data;
-        renderData = renderData.normalize();
+        renderData = renderData.normalizeToTick();
         renderData = renderData.scaleY(this.canvas.height * .50 * -1);
         renderData = renderData.scaleX(this.canvas.width * .75);
         renderData = renderData.sort();
