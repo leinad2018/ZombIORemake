@@ -14,7 +14,7 @@ export abstract class ZIRMob extends ZIREntity {
 
     protected registerHitboxHandlers() {
         super.registerHitboxHandlers();
-        this.hitboxHandlers["projectile"] = this.onProjectileHit.bind(this);
+        this.setHitboxHandler("projectile", this.onProjectileHit);
         // this.hitboxHandlers["collision"] = this.collide.bind(this);
     }
 

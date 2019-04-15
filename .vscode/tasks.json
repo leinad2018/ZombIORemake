@@ -10,6 +10,10 @@
                 "reveal": "always",
                 "panel": "shared"
             },
+            "problemMatcher": {
+                "base": "$tsc",
+                "fileLocation": ["relative", "${workspaceRoot}/scripts"]
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -21,7 +25,9 @@
             "command": "yarn lint",
             "problemMatcher": {
                 "owner": "Lint",
-                "fileLocation": ["absolute"],
+                "fileLocation": [
+                    "absolute"
+                ],
                 "pattern": {
                     "regexp": "^(WARNING|ERROR): (.*.ts):(.*):(.*) - (.*)",
                     "file": 2,

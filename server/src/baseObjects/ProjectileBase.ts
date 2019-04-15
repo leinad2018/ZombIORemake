@@ -11,14 +11,12 @@ export abstract class ZIRProjectile extends ZIREntity {
     constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(25, 25), asset: string = "rock", expiration: number = 2000) {
         super(position, size, asset);
         this.owner = owner;
-        this.velocity = velocity;
-        this.mass = 1;
-        this.friction = 0;
-        this.moveForce = 30 * this.PIXELS_PER_METER;
+        this.setVelocity(velocity);
+        this.setFriction(0);
+        this.setMoveForce(30 * this.PIXELS_PER_METER);
         this.behavior = (e: ZIREntity) => {
             return null;
         };
-        this.maxMovement = this.PIXELS_PER_METER * 10000000000000000000000000000;
         if (expiration >= 0) {
             setTimeout(() => {
                 this.kill();

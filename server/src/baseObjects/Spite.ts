@@ -5,15 +5,15 @@ import {ZIRRectangularZone} from "./Hitbox";
 export class ZIRSpite extends ZIREntity {
     constructor(position: Vector = new Vector(1000, 1000), size = new Vector(50, 50), asset: string = "spite", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.movable = false;
+        this.setMovable(false);
     }
 
     public toString(): string {
-        return "Spite" + this.id + "@" + this.position;
+        return "Spite" + this.getEntityId() + "@" + this.getPosition();
     }
 
     protected createStaticHitboxes() {
-        const hitbox = new ZIRRectangularZone(this.position, this, this.size, ["collision"]);
+        const hitbox = new ZIRRectangularZone(this.getPosition(), this, this.getSize(), ["collision"]);
         return [hitbox];
     }
 

@@ -152,7 +152,7 @@ export class ZIRServerEngine {
         ZIRTimer.stop("events");
 
         ZIRTimer.start("packets");
-        const shouldReset = false;//this.tickCounter % 30 === 0;
+        const shouldReset = this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
         ZIRTimer.stop("packets");
 
@@ -235,6 +235,10 @@ export class ZIRServerEngine {
         }
     }
 
+    private createUpdate(entity: ZIREntity) {
+        
+    }
+
     private handleInput = (): void => {
         for (const session of this.sessions) {
             const world = this.findWorldById(session.getWorldID());
@@ -245,7 +249,7 @@ export class ZIRServerEngine {
         }
     }
 
-    private findWorldById(worldID: string) {
+    private findWorldById(worldID: string): ZIRWorld {
         return this.universe[worldID];
     }
 
