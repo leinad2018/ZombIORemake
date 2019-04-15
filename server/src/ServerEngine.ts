@@ -11,18 +11,20 @@ import { ZIRConsoleManager } from "./ConsoleManager";
 import { ZIRTimer } from "./Timer";
 
 export class ZIRServerEngine {
-    private dt: number = 0;
+    public readonly IS_DEVELOPMENT = true;
+    private readonly TPS: number = 60;
+
     private sessionManager: ZIRSessionManager;
     private consoleManager: ZIRConsoleManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
-    private readonly TPS: number = 60;
-    protected sessions: Session[] = [];
 
-    public IS_DEVELOPMENT = true;
-    private universe: ZIRWorld[] = [];
     private defaultView: ZIREntity;
     private tickCounter: number = 0;
+    private dt: number = 0;
+
+    private sessions: Session[] = [];
+    private universe: ZIRWorld[] = [];
     private entityCache: ZIREntity[] = [];
 
     constructor() {
@@ -43,8 +45,7 @@ export class ZIRServerEngine {
      * previous game tick
      */
     public getDT(): number {
-        // TODO: Store in divided form
-        return this.dt / 1000;
+        return this.dt;
     }
 
     /**
@@ -108,7 +109,7 @@ export class ZIRServerEngine {
 
             const dt = Date.now() - t;
             const pause = Math.max((1000 / this.TPS) - dt, 0);
-            this.dt = dt + pause;
+            this.dt = (dt + pause)/1000;
             setTimeout(this.gameLoop, pause);
         });
     }
@@ -118,22 +119,18 @@ export class ZIRServerEngine {
      */
     private async tick() {
         ZIRTimer.start("tick");
-        ZIRTimer.start("usernames");
-        const usernames: string[] = [];
-        for (const session of this.sessions) {
-            usernames.push(session.getUsername());
-            session.update();
-        }
-        // TODO: Consider moving broadcast packets to central list and reading within SessionManager
-        this.sessionManager.broadcast("players", JSON.stringify(usernames));
-        ZIRTimer.stop("usernames");
 
         this.entityCache = this.getAllEntities();
 
-        ZIRTimer.start("debug");
-        // TODO: Debug flag
-        this.sendDebugInfo();
-        ZIRTimer.stop("debug");
+        ZIRTimer.start("usernames");
+        this.sendUsernames();
+        ZIRTimer.stop("usernames");
+
+        if (this.IS_DEVELOPMENT) {
+            ZIRTimer.start("debug");
+            this.sendDebugInfo();
+            ZIRTimer.stop("debug");
+        }
 
         ZIRTimer.start("physics");
         this.calculatePhysics();
@@ -156,15 +153,16 @@ export class ZIRServerEngine {
         this.sendUpdate(shouldReset);
         ZIRTimer.stop("packets");
 
+        ZIRTimer.start("console");
+        this.consoleManager.updateClients();
+        ZIRTimer.stop("console");
+
         this.entityCache = null;
         
         ZIRTimer.start("garbagecollect");
         this.collectGarbage();
         ZIRTimer.stop("garbagecollect");
 
-        ZIRTimer.start("console");
-        this.consoleManager.updateClients();
-        ZIRTimer.stop("console");
         ZIRTimer.stop("tick");
     }
 
@@ -251,6 +249,15 @@ export class ZIRServerEngine {
 
     private findWorldById(worldID: string): ZIRWorld {
         return this.universe[worldID];
+    }
+
+    private sendUsernames() {
+        const usernames: string[] = [];
+        for (const session of this.sessions) {
+            usernames.push(session.getUsername());
+            session.update();
+        }
+        this.sessionManager.broadcast("players", JSON.stringify(usernames));
     }
 
     /**
