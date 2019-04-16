@@ -23,7 +23,8 @@
             "request": "launch",
             "name": "Run Benchmark Tests",
             "program": "${workspaceFolder}/output/server/src/utilityObjects/Benchmarking.js",
-            "preLaunchTask": "Build"
+            "preLaunchTask": "Build",
+            "console": "externalTerminal"
         }
     ],
     "compounds": [

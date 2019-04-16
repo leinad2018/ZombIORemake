@@ -1,4 +1,5 @@
 import { ZIRPoint, ZIRDataStream } from "./Data";
+import { ZIRConsole } from "./Console";
 
 export class ZIRGraph {
     private canvas: HTMLCanvasElement;
@@ -32,10 +33,25 @@ export class ZIRGraph {
         const lineOffset = this.canvas.height * .75
         ctx.beginPath();
         ctx.moveTo(renderData.points[0].x, renderData.points[0].y + lineOffset);
-        for(let point of renderData.points) {
+
+        for(let index = 0; index < renderData.points.length; index++) {
+            const point = renderData.points[index];
+            const pointValue = this.data.points[index].y;
             ctx.lineTo(point.x, (point.y + lineOffset));
+            if(pointValue > ZIRConsole.HEALTHY_TICKSPEED) {
+                ctx.strokeStyle = "red";
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y + lineOffset)
+            } else {
+                ctx.strokeStyle = "black";
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y + lineOffset)
+            }
         }
         ctx.stroke();
+        ctx.strokeStyle = "black";
 
         // Draw latest point indicator
         ctx.beginPath();
@@ -45,6 +61,25 @@ export class ZIRGraph {
         ctx.lineTo(this.canvas.width, latestY+lineOffset);
         ctx.stroke();
         ctx.fillText((renderLatestY/1000000).toFixed(1) + " ms", this.canvas.width-50, latestY-2+lineOffset)
+
+        // Draw border lines
+        ctx.beginPath();
+        ctx.moveTo(0, 0+lineOffset);
+        ctx.lineTo(this.canvas.width, 0+lineOffset);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, lineOffset);
+        ctx.lineTo(this.canvas.width, lineOffset);
+        ctx.stroke();
+
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        const unhealthy_y = (this.data.normalizeYToTick(ZIRConsole.HEALTHY_TICKSPEED) * this.canvas.height * -.5) + lineOffset;
+        ctx.moveTo(0, unhealthy_y);
+        ctx.lineTo(this.canvas.width, unhealthy_y);
+        ctx.stroke();
+        ctx.strokeStyle = "black";
 
         // Draw labels
         ctx.fillText(this.id, 5, 10)

@@ -1,9 +1,12 @@
+import { ZIRConsole } from "./Console";
+
 /**
  * An immutable data stream frame
  * Modifying methods return the next frame
  */
 export class ZIRDataStream {
-    points: ZIRPoint[];
+    public points: ZIRPoint[];
+    public static currentTickMax;
 
     constructor(points?: ZIRPoint[]) {
         this.points = points;
@@ -68,12 +71,16 @@ export class ZIRDataStream {
 
         for(const point of this.points) {
             const x = (point.x - minX) / xRange;
-            const y = (point.y) / 30000000;
+            const y = (point.y) / Math.max(ZIRConsole.HEALTHY_TICKSPEED, ZIRDataStream.currentTickMax);
             newData.push(new ZIRPoint(x,y));
         }
 
         return new ZIRDataStream(newData);
     }
+
+    public normalizeYToTick(n: number): number {
+        return (n / Math.max(ZIRConsole.HEALTHY_TICKSPEED, ZIRDataStream.currentTickMax));
+    } 
 
     public truncate(): ZIRDataStream {
         return new ZIRDataStream(this.points.slice(-50));

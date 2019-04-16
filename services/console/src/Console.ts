@@ -9,6 +9,9 @@ export class ZIRConsole {
     private data: {[key: string]: ZIRDataStream};
     private partialData: {[key: string]: PartialDataFrame};
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
+    public static readonly HEALTHY_TICKSPEED = 33000000; // ns
+    // 17449895
+    // 33000000
 
     constructor(document : Document) {
         this.document = document;
@@ -69,6 +72,9 @@ export class ZIRConsole {
     private updateGraphs() {
         for(let graph of this.graphs) {
             graph.update(this.data[graph.getID()]);
+        }
+        if(this.data["tick"]) {
+            ZIRDataStream.currentTickMax = this.data["tick"].getMaxY();
         }
     }
 
