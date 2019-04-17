@@ -50,7 +50,7 @@ function generateStationaryEntityPile(size: number = 50): ZIREntity[] {
 }
 
 function generateMovingEntityPile(size: number = 50): ZIREntity[] {
-    const entities = generateStationaryEntityPile();
+    const entities = generateStationaryEntityPile(size);
     for(const entity of entities) {
         entity.setVelocity(new Vector(10, 0));
     }
