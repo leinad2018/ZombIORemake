@@ -12,7 +12,7 @@ import { ZIRTimer } from "./Timer";
 
 export class ZIRServerEngine {
     public readonly IS_DEVELOPMENT = true;
-    private readonly TPS: number = 60;
+    private readonly TPS: number = 30;
 
     private sessionManager: ZIRSessionManager;
     private consoleManager: ZIRConsoleManager;
@@ -102,6 +102,7 @@ export class ZIRServerEngine {
      * core engine functions
      */
     private gameLoop = (): void => {
+        ZIRTimer.start("gameLoop");
         const t = Date.now();
 
         this.tick().then(() => {
@@ -110,7 +111,10 @@ export class ZIRServerEngine {
             const dt = Date.now() - t;
             const pause = Math.max((1000 / this.TPS) - dt, 0);
             this.dt = (dt + pause)/1000;
-            setTimeout(this.gameLoop, pause);
+            setTimeout(() => {
+                ZIRTimer.stop("gameLoop");
+                this.gameLoop()}
+                ,pause);
         });
     }
 
