@@ -20,7 +20,6 @@ export class ZIRPhysicsEngine {
 
             const frictionVector = velocity.getUnitVector().scale(-1 * friction);
             const velocityChange = frictionVector.scale(dt / entity.getMass());
-
             if (velocityChange.getMagnitude() > velocity.getMagnitude()) {
                 velocity = Vector.ZERO_VECTOR;
             } else {

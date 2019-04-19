@@ -17,8 +17,7 @@ export class ZIRTimer {
                     this.loggedTimes[id] = [];
                 }
                 const dt = this.getNanoTime() - this.startTimes[id]
-                this.loggedTimes[id].push(dt)
-                console.log(id + ": " + dt)
+                this.loggedTimes[id].push(dt);
                 delete this.startTimes[id];
             } else {
                 throw new Error("Cannot stop timer that was not started. ID: " + id);

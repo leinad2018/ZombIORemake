@@ -26,9 +26,12 @@ export class ZIRClient extends ZIRClientBase {
     private running: boolean;
     private updating: boolean;
     private inputBuffer: any[];
+    private activePings: {[id: string]: number};
+    private lastPing: number;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
+        this.activePings = {};
         this.serverComms = comms;
         this.menuController = menus;
         this.entities = [];
@@ -51,10 +54,12 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler("updateFocus", this.updateFocus.bind(this));
         this.serverComms.setHandler("updateWorld", this.handleWorldUpdate.bind(this));
         this.serverComms.setHandler("requestRespawn", this.handleRespawn.bind(this));
+        this.serverComms.setHandler("ping", this.handlePingResponse.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
         this.serverComms.registerServerListeners();
         this.runRenderingLoop();
+        setInterval(this.requestPing.bind(this), 1000);
     }
 
     public isDebugMode(): boolean {
@@ -98,6 +103,19 @@ export class ZIRClient extends ZIRClientBase {
         this.menuController.showRespawnMenu(this.sendRespawn.bind(this));
     }
 
+    private requestPing() {
+        const uniqueKey = "" + Math.random(); // Help ensure integrity against multiple requests
+        this.activePings[uniqueKey] = new Date().getTime();
+        this.serverComms.sendInfoToServer("ping", uniqueKey);
+    }
+
+    private handlePingResponse(data: string) {
+        const sent = this.activePings[data];
+        const received = new Date().getTime();
+        this.lastPing = (received - sent)/2; // Compensate for two-way traffic
+        delete this.activePings[data];
+    }
+
     private sendRespawn() {
         this.serverComms.sendInfoToServer("respawn", "");
         this.menuController.hideRespawnMenu();
@@ -119,6 +137,11 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleDebugMessage(data: string[]) {
         this.debugMessages = data;
+        if(this.lastPing === 0) {
+            data.push("Ping: <0.5 ms")
+        } else {
+            data.push("Ping: " + this.lastPing + " ms")
+        }
     }
 
     private handleServerUpdate(data: IZIRUpdateResult) {
