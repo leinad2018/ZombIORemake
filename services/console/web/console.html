@@ -1,11 +1,30 @@
 <!DOCTYPE html>
-
-<script src="/socket.io/socket.io.js"></script>
+<head>
+    <link rel="stylesheet" href="web/console.css">
+    <script type="text/javascript" src = "web/consoleTabs.js" ></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script data-main="web/app" src="../lib/require.js"></script>
+    <script type="text/javascript" src="../lib/terminal.js"></script>
+    <script>
+        window.onload = function() { document.getElementById("defaultOpen").click(); }
+    </script>
+</head>
 
 <body>
-    <div id="main"></div>
-    <div id="graphs"></div>
-    <div id="baseDiv" style="position:absolute;top:0;bottom:0;right:0;left:0;">
+    <button id="defaultOpen" class="tablink" onclick="openPage('dashboard', this, 'gray')">Dashboard</button>
+    <button class="tablink" onclick="openPage('graphs', this, 'gray')">Performance</button>
+
+    <div id="dashboard" class="tabcontent">
+        <div id="terminal-wrapper" class="terminal-wrapper">
+            <div id="terminal" class="terminal"></div>
+        </div>
     </div>
-    <script data-main="web/app" src="../lib/require.js"></script>
+
+    <div id="graphs" class="tabcontent">
+        <div id="mainGraphs" class="graphs"></div>
+        <hr>
+        <div id="secondaryGraphs" class="graphs"></div>
+    </div>
+
+    <script></script>
 </body>

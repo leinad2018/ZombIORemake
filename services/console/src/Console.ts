@@ -1,30 +1,57 @@
 import { ZIRGraph } from "./Graph";
 import { ZIRDataStream, ZIRPoint } from "./Data";
+import "../lib/terminal";
 
 declare function io();
+declare function Terminal(): void;
+
+const VALID_COMMANDS = [
+    "help", "players"
+]
 
 export class ZIRConsole {
     private document: Document;
     private graphs: ZIRGraph[] = [];
     private data: {[key: string]: ZIRDataStream};
     private partialData: {[key: string]: PartialDataFrame};
+    private terminal;
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
     public static readonly HEALTHY_TICKSPEED = 33000000; // ns
-    // 17449895
-    // 33000000
 
     constructor(document : Document) {
         this.document = document;
         this.data = {};
         this.partialData = {};
-        
 
         const socket = io();
         socket.on("data", ((data) => {
             this.parseData(data);
         }).bind(this));
 
+        this.terminal = new Terminal();
+        document.getElementById("terminal").appendChild(this.terminal.html as Node);
+        this.terminal.print("Welcome to Terrafort Server Console 0.1\n\n");
+        this.prompt();
+
         setInterval(this.consoleTick.bind(this), 1);
+    }
+
+    private prompt() {
+        this.terminal.input("", (input: string) => {
+            if(VALID_COMMANDS.indexOf(input) != -1) {
+                switch(input) {
+                    case "help":
+                        this.terminal.print("Valid commands: " + VALID_COMMANDS + "\n\n");
+                        break;
+                    default:
+                        this.terminal.print("TODO: implement" + "\n\n");
+                        break;
+                }
+            } else {
+                this.terminal.print("Unknown command. Try 'help'.");
+            }
+            this.prompt();
+        });
     }
 
     private consoleTick() {
@@ -85,10 +112,10 @@ export class ZIRConsole {
     }
 
     private addGraph(graph: ZIRGraph) {
-        if(graph.getID() == "tick") {
-            document.getElementById("main").appendChild(graph.getElement() as Node);
+        if(graph.getID() == "tick" || graph.getID() == "gameLoop") {
+            document.getElementById("mainGraphs").appendChild(graph.getElement() as Node);
         } else {
-            document.getElementById("graphs").appendChild(graph.getElement() as Node);
+            document.getElementById("secondaryGraphs").appendChild(graph.getElement() as Node);
         }
         this.graphs.push(graph);
     }
