@@ -12,6 +12,8 @@ export abstract class ZIRClientBase {
 
     public abstract isDebugMode(): boolean;
 
+    public abstract shouldRenderHitbox(): boolean;
+
     public abstract getPlayersOnline();
 
     public abstract getDebugMessages();

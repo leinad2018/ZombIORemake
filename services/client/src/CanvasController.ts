@@ -6,6 +6,7 @@ import { ZIREntityBase } from "./baseObjects/EntityBase";
 export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private shouldRenderDebug: boolean = true;
+    private shouldRenderHitbox: boolean = false;
     private playerPosition: Vector;
     private terrainCache: IZIRImageCache;
     private heartSize: Vector = new Vector(50, 50);
@@ -34,6 +35,7 @@ export class ZIRCanvasController {
     public render(state: ZIRClientBase) {
         const start = new Date().getTime();
         this.shouldRenderDebug = state.isDebugMode();
+        this.shouldRenderHitbox = state.shouldRenderHitbox();
         this.playerPosition = state.getPlayerPosition();
         const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
 
@@ -134,10 +136,11 @@ export class ZIRCanvasController {
                 const asset = entity.getImageToRender();
                 ctx.drawImage(asset.getImage(), x, y, xs, ys);
                 if (entity instanceof ZIREntityBase) {
-                    if (entity.getName()) {
+                    const name = entity.getName()
+                    if (name && name != "") {
                         ctx.fillText(entity.getName(), x, y - 5);
                     }
-                    if (this.shouldRenderDebug) {
+                    if (this.shouldRenderHitbox) {
                         ctx.strokeRect(x, y, xs, ys);
                     }
                 }

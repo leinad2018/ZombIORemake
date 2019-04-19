@@ -5,6 +5,7 @@ import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIREnemy extends ZIRMob {
+    private named = false;
     private cooldownUses: {[ability: string]: number}; // For storing cooldown timestamps
     private target: ZIREntity;
     private agroRange = 500;
@@ -14,7 +15,9 @@ export class ZIREnemy extends ZIRMob {
 
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "enemy", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        this.setName(ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)]);
+        if(this.named) {
+            this.setName(ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)]);
+        }
         this.setMaxMovement(4 * this.PIXELS_PER_METER);
     }
 

@@ -28,6 +28,9 @@ export class ZIRGraph {
         const ctx = this.canvas.getContext("2d");
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = "lightgray";
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = "black";
 
         // Draw main line graph
         const lineOffset = this.canvas.height * .75

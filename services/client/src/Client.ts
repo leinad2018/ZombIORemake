@@ -67,6 +67,10 @@ export class ZIRClient extends ZIRClientBase {
         return this.input.getDebug();
     }
 
+    public shouldRenderHitbox(): boolean {
+        return this.input.getRenderHitbox();
+    }
+
     public setLastRender(dt: number) {
         this.lastRender = dt;
     }
