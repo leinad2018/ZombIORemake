@@ -28,6 +28,7 @@ export class ZIRClient extends ZIRClientBase {
     private inputBuffer: any[];
     private activePings: {[id: string]: number};
     private lastPing: number;
+    private lastRender: number;
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -64,6 +65,10 @@ export class ZIRClient extends ZIRClientBase {
 
     public isDebugMode(): boolean {
         return this.input.getDebug();
+    }
+
+    public setLastRender(dt: number) {
+        this.lastRender = dt;
     }
 
     private runRenderingLoop() {
@@ -141,6 +146,12 @@ export class ZIRClient extends ZIRClientBase {
             data.push("Ping: <0.5 ms")
         } else {
             data.push("Ping: " + this.lastPing + " ms")
+        }
+
+        if(this.lastRender === 0) {
+            data.push("Render: <1 ms");
+        } else {
+            data.push("Render: " + this.lastRender + " ms");
         }
     }
 

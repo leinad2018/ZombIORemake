@@ -32,6 +32,8 @@ export abstract class ZIRClientBase {
         return [];
     }
 
+    public abstract setLastRender(dt: number);
+
     public setViewSize(size: Vector) {
         this.sizeVector = size;
     }

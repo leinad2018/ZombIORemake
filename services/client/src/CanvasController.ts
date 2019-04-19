@@ -32,6 +32,7 @@ export class ZIRCanvasController {
     }
 
     public render(state: ZIRClientBase) {
+        const start = new Date().getTime();
         this.shouldRenderDebug = state.isDebugMode();
         this.playerPosition = state.getPlayerPosition();
         const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
@@ -49,6 +50,8 @@ export class ZIRCanvasController {
         if (this.shouldRenderDebug) {
             this.renderDebugBox(ctx, state.getDebugMessages());
         }
+        const end = new Date().getTime();
+        state.setLastRender(end - start);
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
