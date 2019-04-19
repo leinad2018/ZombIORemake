@@ -30,7 +30,7 @@ export class ZIRConsole {
 
         this.terminal = new Terminal();
         document.getElementById("terminal").appendChild(this.terminal.html as Node);
-        this.terminal.print("Welcome to Terrafort Server Console 0.1\n\n");
+        this.terminal.print("Welcome to Terrafort Server Console 0.1");
         this.prompt();
 
         setInterval(this.consoleTick.bind(this), 1);
@@ -41,10 +41,10 @@ export class ZIRConsole {
             if(VALID_COMMANDS.indexOf(input) != -1) {
                 switch(input) {
                     case "help":
-                        this.terminal.print("Valid commands: " + VALID_COMMANDS + "\n\n");
+                        this.terminal.print("Valid commands: " + VALID_COMMANDS);
                         break;
                     default:
-                        this.terminal.print("TODO: implement" + "\n\n");
+                        this.terminal.print("TODO: implement");
                         break;
                 }
             } else {
