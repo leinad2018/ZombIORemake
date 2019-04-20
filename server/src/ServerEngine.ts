@@ -12,6 +12,7 @@ import { ZIRTimer } from "./Timer";
 
 export class ZIRServerEngine {
     public readonly IS_DEVELOPMENT = true;
+    private readonly GAMELOOP_OVERHEAD: number = 3; // Compensate for delay in game loop
     private readonly TPS: number = 30;
 
     private sessionManager: ZIRSessionManager;
@@ -97,6 +98,17 @@ export class ZIRServerEngine {
         return toReturn;
     }
 
+    public getAllPlayers(): ZIRPlayer[] {
+        const players = [];
+        for(const session of this.sessions) {
+            const player = session.getPlayer();
+            if(player) {
+                players.push(session.getPlayer());
+            }
+        }
+        return players;
+    }
+
     /**
      * Regulates game ticks and other
      * core engine functions
@@ -109,7 +121,7 @@ export class ZIRServerEngine {
             this.tickCounter++;
 
             const dt = Date.now() - t;
-            const pause = Math.max((1000 / this.TPS) - dt, 0);
+            const pause = Math.max((1000 / this.TPS) - dt - this.GAMELOOP_OVERHEAD, 0);
             this.dt = (dt + pause)/1000;
             setTimeout(() => {
                 ZIRTimer.stop("gameLoop");
@@ -122,48 +134,48 @@ export class ZIRServerEngine {
      * Triggers calculation of all game mechanics
      */
     private async tick() {
-        ZIRTimer.start("tick");
+        ZIRTimer.start("tick", "gameLoop");
 
         this.entityCache = this.getAllEntities();
 
-        ZIRTimer.start("usernames");
+        ZIRTimer.start("usernames", "tick");
         this.sendUsernames();
         ZIRTimer.stop("usernames");
 
         if (this.IS_DEVELOPMENT) {
-            ZIRTimer.start("debug");
+            ZIRTimer.start("debug", "tick");
             this.sendDebugInfo();
             ZIRTimer.stop("debug");
         }
 
-        ZIRTimer.start("physics");
+        ZIRTimer.start("physics", "tick");
         this.calculatePhysics();
         ZIRTimer.stop("physics");
 
-        ZIRTimer.start("input");
+        ZIRTimer.start("input", "tick");
         this.handleInput();
         ZIRTimer.stop("input");
 
-        ZIRTimer.start("collision");
+        ZIRTimer.start("collision", "tick");
         this.checkCollision();
         ZIRTimer.stop("collision");
 
-        ZIRTimer.start("events");
+        ZIRTimer.start("events", "tick");
         this.eventScheduler.update(this.tickCounter);
         ZIRTimer.stop("events");
 
-        ZIRTimer.start("packets");
+        ZIRTimer.start("packets", "tick");
         const shouldReset = this.tickCounter % 30 === 0;
         this.sendUpdate(shouldReset);
         ZIRTimer.stop("packets");
 
-        ZIRTimer.start("console");
+        ZIRTimer.start("console", "tick");
         this.consoleManager.updateClients();
         ZIRTimer.stop("console");
 
         this.entityCache = null;
         
-        ZIRTimer.start("garbagecollect");
+        ZIRTimer.start("garbagecollect", "tick");
         this.collectGarbage();
         ZIRTimer.stop("garbagecollect");
 
@@ -184,10 +196,16 @@ export class ZIRServerEngine {
 
     private calculatePhysics() {
         const entities = this.entityCache;
+        
         for (const entity of entities) {
+            ZIRTimer.start("entityUpdates", "physics");
             entity.update(this);
+            ZIRTimer.stop("entityUpdates");
+            ZIRTimer.start("applyPhysics", "physics");
             this.physicsEngine.applyPhysics(entity, this.getDT());
+            ZIRTimer.stop("applyPhysics");
         }
+        
     }
 
     private sendUpdate(reset: boolean = false) {
@@ -261,7 +279,7 @@ export class ZIRServerEngine {
             usernames.push(session.getUsername());
             session.update();
         }
-        this.sessionManager.broadcast("players", JSON.stringify(usernames));
+        // this.sessionManager.broadcast("players", JSON.stringify(usernames));
     }
 
     /**

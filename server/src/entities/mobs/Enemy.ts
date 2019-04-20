@@ -3,6 +3,7 @@ import { ZIRMob } from "../../baseObjects/Mob";
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
+import { ZIRTimer } from "../../Timer";
 
 export class ZIREnemy extends ZIRMob {
     private named = false;
@@ -26,21 +27,23 @@ export class ZIREnemy extends ZIRMob {
     }
 
     public ai(state): void {
+        ZIRTimer.start("findTarget", "enemyAI");
         this.findTarget(state);
+        ZIRTimer.stop("findTarget");
+        ZIRTimer.start("enemyMove", "enemyAI");
         if (this.target) {
             this.setInternalForce(this.getPosition().sub(this.target.getPosition()).getUnitVector().scale(this.getmoveForce() * this.getMass()));
         } else {
             this.setInternalForce(Vector.ZERO_VECTOR);
         }
+        ZIRTimer.stop("enemyMove");
     }
 
     private findTarget(state): void {
-        for (const entity of state.getAllEntities()) {
-            if (entity instanceof ZIRPlayer) {
-                if (this.getPosition().sub(entity.getPosition()).getMagnitude() < this.agroRange) {
-                    this.target = entity;
-                    return;
-                }
+        for (const entity of state.getAllPlayers()) {
+            if (this.getPosition().sub(entity.getPosition()).getMagnitude() < this.agroRange) {
+                this.target = entity;
+                return;
             }
         }
         this.target = null;

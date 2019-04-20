@@ -14,6 +14,7 @@ export class ZIRConsole {
     private graphs: ZIRGraph[] = [];
     private data: {[key: string]: ZIRDataStream};
     private partialData: {[key: string]: PartialDataFrame};
+    private metadata: {[key: string]: IZIRTimerMetadata};
     private terminal;
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
     public static readonly HEALTHY_TICKSPEED = 33000000; // ns
@@ -22,10 +23,14 @@ export class ZIRConsole {
         this.document = document;
         this.data = {};
         this.partialData = {};
+        this.metadata = {};
 
         const socket = io();
         socket.on("data", ((data) => {
             this.parseData(data);
+        }).bind(this));
+        socket.on("metadata", ((data) => {
+            this.parseMetadata(data);
         }).bind(this));
 
         this.terminal = new Terminal();
@@ -59,6 +64,12 @@ export class ZIRConsole {
         this.renderGraphs();
     }
 
+    private parseMetadata(receivedData) {
+        for(let id in receivedData) {
+            this.metadata[id] = receivedData[id] as IZIRTimerMetadata;
+        }
+    }
+
     private parseData(receivedData) {
         const timeReceived = (new Date).getTime();
         const sampleTime = Math.trunc(timeReceived/this.SAMPLE_INTERVAL);
@@ -88,7 +99,13 @@ export class ZIRConsole {
         const newPoint = new ZIRPoint(this.partialData[id].sampleTime, avg);
         if(!this.data[id]) {
             this.data[id] = new ZIRDataStream([newPoint]);
-            const graph = new ZIRGraph(id, this.data[id]);
+            let graph = null;
+            if(this.metadata[id]) {
+                graph = new ZIRGraph(id, this.data[id], this.metadata[id].parent);
+            } else {
+                graph = new ZIRGraph(id, this.data[id]);
+            }
+            
             this.addGraph(graph);
         } else {
             this.data[id] = this.data[id].push(newPoint).truncate();   
@@ -110,12 +127,26 @@ export class ZIRConsole {
             graph.render();
         }
     }
-
+    
     private addGraph(graph: ZIRGraph) {
-        if(graph.getID() == "tick" || graph.getID() == "gameLoop") {
+        const parent = graph.getParent();
+        if(!parent || parent == "gameLoop") {
             document.getElementById("mainGraphs").appendChild(graph.getElement() as Node);
         } else {
-            document.getElementById("secondaryGraphs").appendChild(graph.getElement() as Node);
+            let div = document.getElementById(parent + "_children");
+            if (div === null) {
+                const divider = document.createElement("HR");
+                const header = document.createElement("H1");
+                const headerText = document.createTextNode(parent);
+                header.appendChild(headerText); 
+                div = document.createElement("div");
+                div.id = parent + "_children";
+                div.className = "graphs";
+                div.appendChild(header)
+                document.getElementById("graphs").appendChild(divider);
+                document.getElementById("graphs").appendChild(div);
+            }
+            div.appendChild(graph.getElement() as Node);
         }
         this.graphs.push(graph);
     }
@@ -128,4 +159,8 @@ export class ZIRConsole {
 interface PartialDataFrame {
     sampleTime: number;
     samples: number[];
+}
+
+interface IZIRTimerMetadata {
+    parent: string;
 }
