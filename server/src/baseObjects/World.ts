@@ -86,15 +86,18 @@ export class ZIRWorld {
         //     }
         // }
 
-        const active: ZIREntity[] = [];
-        for (const entity of this.entities) {
+        let activeIndex = 0;
+        //The first entity does not need to be checked because it will not match with any entity before it
+        for (let curIndex = 1; curIndex < this.entities.length; curIndex++) {
+            const entity = this.entities[curIndex];
             const box = entity.getAABB();
-
-            for (let i = active.length - 1; i >= 0; i--) {
-                const other = active[i];
+            let end = false;
+            for (let i = curIndex - 1; !end && i >= activeIndex; i--) {
+                const other = this.entities[i];
                 const otherBox = other.getAABB();
                 if (otherBox.getMaxX() < box.getMinX()) {
-                    active.splice(i, 1);
+                    activeIndex = i;
+                    end = true;
                 } else {
                     pairs.push({
                         e1: entity,
@@ -102,8 +105,6 @@ export class ZIRWorld {
                     })
                 }
             }
-
-            active.push(entity);
         }
         return pairs;
     }
