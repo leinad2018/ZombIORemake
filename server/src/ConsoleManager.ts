@@ -33,5 +33,7 @@ export class ZIRConsoleManager {
     public updateClients = (): void => {
         const update = ZIRTimer.pullLoggedTimes();
         this.io.sockets.emit("data", update);
+        const metadata = ZIRTimer.pullLoggedMetadata();
+        this.io.sockets.emit("metadata", metadata);
     }
 }

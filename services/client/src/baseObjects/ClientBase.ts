@@ -12,6 +12,8 @@ export abstract class ZIRClientBase {
 
     public abstract isDebugMode(): boolean;
 
+    public abstract shouldRenderHitbox(): boolean;
+
     public abstract getPlayersOnline();
 
     public abstract getDebugMessages();
@@ -31,6 +33,8 @@ export abstract class ZIRClientBase {
     public getEntitiesToRender() {
         return [];
     }
+
+    public abstract setLastRender(dt: number);
 
     public setViewSize(size: Vector) {
         this.sizeVector = size;

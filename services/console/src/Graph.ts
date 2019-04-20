@@ -4,11 +4,13 @@ import { ZIRConsole } from "./Console";
 export class ZIRGraph {
     private canvas: HTMLCanvasElement;
     private id: string;
+    private parent: string;
     private data: ZIRDataStream;
 
-    constructor(name: string, data: ZIRDataStream) {
+    constructor(name: string, data: ZIRDataStream, parent?: string) {
         this.data = data;
         this.id = name;
+        this.parent = parent;
         const canvas = document.createElement('canvas');
         canvas.id = name;
         canvas.width = name == "tick" ? 600 : 300;
@@ -28,6 +30,9 @@ export class ZIRGraph {
         const ctx = this.canvas.getContext("2d");
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = "lightgray";
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = "black";
 
         // Draw main line graph
         const lineOffset = this.canvas.height * .75
@@ -87,10 +92,13 @@ export class ZIRGraph {
         ctx.fillText("Max: " + this.data.getMaxY() + " ns", 5, this.canvas.height - 15);
     }
 
-    public getID() {
+    public getID(): string {
         return this.id;
     }
 
+    public getParent(): string {
+        return this.parent;
+    }
 
     public update(data) {
         this.data = data;

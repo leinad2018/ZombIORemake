@@ -60,6 +60,10 @@ export class ZIRSessionManager {
         }
     }
 
+    private handlePing(this: Session, data) {
+        this.respondToPing(data);
+    }
+
     /**
      * Handle dropped connection by removing
      * any sessions corresponding to the connection
@@ -86,6 +90,7 @@ export class ZIRSessionManager {
         socket.on("rename", this.handleRename.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
+        socket.on("ping", this.handlePing.bind(s));
         socket.on("respawn", (() => { this.spawnHandler(s); }).bind(this));
         this.registerSessionHandler(s);
         socket.emit("requestRename");
@@ -149,6 +154,10 @@ export class Session {
             this.respawnRequested = false;
             this.setFocus(this.player);
         }
+    }
+
+    public respondToPing(id: string) {
+        this.io.to(this.socket).emit("ping", id);
     }
 
     public requestRespawn() {

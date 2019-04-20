@@ -3,12 +3,13 @@ import { Vector } from "./utilityObjects/Math";
 export class ZIRInput {
     private handler: (keycode: string, state: boolean) => void;
     private pointHandler: (keycode: string, state: Vector) => void;
-    private activeKeys: boolean[];
+    private activeKeys: {[key: string]: boolean};
     private cursorState: Vector;
     private debugState: boolean;
+    private renderHitboxState: boolean;
 
     constructor() {
-        this.activeKeys = [];
+        this.activeKeys = {shift: false, ctrl: false};
         document.addEventListener("keyup", this.handleKeyupEvent.bind(this));
         document.addEventListener("keydown", this.handleKeydownEvent.bind(this));
         document.addEventListener("mousemove", this.handleMouseMove.bind(this));
@@ -28,6 +29,10 @@ export class ZIRInput {
         return this.debugState;
     }
 
+    public getRenderHitbox(): boolean {
+        return this.renderHitboxState;
+    }
+
     private handleKeyupEvent(event) {
         const keycode: string = this.getKeyFromEvent(event);
         this.handler(keycode, false);
@@ -41,7 +46,12 @@ export class ZIRInput {
             this.activeKeys[keycode] = true;
         }
         if (keycode === "debug") {
-            this.debugState = !this.debugState;
+            if(this.activeKeys["shift"]) {
+                this.debugState = !this.debugState;
+            }
+            if(this.activeKeys["ctrl"]) {
+                this.renderHitboxState = !this.renderHitboxState;
+            }
         }
     }
 
@@ -69,6 +79,12 @@ export class ZIRInput {
         switch (event.keyCode) {
             case 32:
                 keyName = "space";
+                break;
+            case 16:
+                keyName = "shift";
+                break;
+            case 17:
+                keyName = "ctrl";
                 break;
             case 65:
                 keyName = "leftArrow";
