@@ -16,9 +16,20 @@ export class ZIRGraph {
         canvas.width = name == "tick" ? 600 : 300;
         canvas.height = name == "tick" ? 400 : 200;
         canvas.style.zIndex = "8";
-        //canvas.style.position = "absolute";
         canvas.style.border = "1px solid";
+        canvas.addEventListener('click', this.onclick, false);
         this.canvas = canvas;
+    }
+
+    private onclick(click) {
+        const child_div = document.getElementById(this.id + "_children");
+        if(child_div) {
+            if(child_div.style.display === "none") {
+                child_div.style.display = "block";
+            } else {
+                child_div.style.display = "none";
+            }
+        }
     }
 
     public render() {

@@ -127,7 +127,7 @@ export class ZIRConsole {
             graph.render();
         }
     }
-    
+
     private addGraph(graph: ZIRGraph) {
         const parent = graph.getParent();
         if(!parent || parent == "gameLoop") {

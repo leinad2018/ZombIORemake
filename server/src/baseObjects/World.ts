@@ -2,6 +2,7 @@ import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
+import { ZIRTimer } from "../Timer";
 
 export class ZIRWorld {
     private worldID: string;
@@ -46,15 +47,23 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
+        ZIRTimer.start("sort", "collision");
         this.sortEntities();
+        ZIRTimer.stop("sort");
+        ZIRTimer.start("generatePairs", "collision");
         const potentialCollisions = this.generateCollisionPairs();
+        ZIRTimer.stop("generatePairs");
+        ZIRTimer.start("checkCollision", "collision");
         for (const potentialCollision of potentialCollisions) {
             this.checkEntityCollision(potentialCollision);
         }
+        ZIRTimer.stop("checkCollision");
+        ZIRTimer.start("events", "collision");
         for (const entity of this.entities) {
             entity.runEvents();
             entity.setCreating(false);
         }
+        ZIRTimer.stop("events");
     }
 
     private sortEntities() {
@@ -107,14 +116,20 @@ export class ZIRWorld {
         if (true) { // Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
             for (const zone1 of e1.getHitboxes()) {
                 for (const zone2 of e2.getHitboxes()) {
+                    ZIRTimer.start("baseCollision", "checkCollision");
                     if (zone1.checkCollision(zone2)) {
                         e1.registerEvent(zone2);
                         e2.registerEvent(zone1);
+                        ZIRTimer.stop("baseCollision");
+                        ZIRTimer.start("physicalCollision", "checkCollision");
                         if (canCollide && zone1.getTypes().indexOf("collision") !== -1 && zone2.getTypes().indexOf("collision") !== -1) {
                             // Normal vector on e1's boundary at point of collision
                             const direction = zone1.getCollisionVector(zone2);
                             this.resolvePhysicalCollision(e1, e2, direction);
                         }
+                        ZIRTimer.stop("physicalCollision");
+                    } else {
+                        ZIRTimer.stop("baseCollision");
                     }
                 }
             }
