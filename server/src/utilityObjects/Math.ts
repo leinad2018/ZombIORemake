@@ -9,6 +9,26 @@ export class Vector {
         this.y = y;
     }
 
+    /**
+     * Return true if this vector falls inside the input square
+     * @param corner lower-left corner of the square
+     * @param size 
+     */
+    public fallsWithin(corner: Vector, size: number): boolean {
+        const x = corner.getX();
+        const y = corner.getY();
+        const maxX = x + size;
+        const maxY = y + size;
+
+        const xHit = this.x > x && this.x < maxX;
+
+        if (xHit) {
+            const yHit = this.y > y && this.y < maxY;
+            return yHit;
+        }
+        return false;
+    }
+
     public getMagnitude(): number {
         return (Math.sqrt((this.x * this.x) + (this.y * this.y)));
     }

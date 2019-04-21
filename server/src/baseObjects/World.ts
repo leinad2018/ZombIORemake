@@ -3,11 +3,15 @@ import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
 import { ZIRTimer } from "../Timer";
+import { EntityQuadtree } from "../utilityObjects/DataStructures";
 
 export class ZIRWorld {
     private worldID: string;
     private terrain: IZIRTerrainMap;
     private entities: ZIREntity[];
+    private quadtree: EntityQuadtree;
+    private SORT: boolean = true;
+    private QUADTREE: boolean = true;
 
     constructor(id: string) {
         this.worldID = id;
@@ -47,9 +51,12 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
-        ZIRTimer.start("sort", "collision");
-        this.sortEntities();
-        ZIRTimer.stop("sort");
+        if(this.SORT) {
+            ZIRTimer.start("sort", "collision");
+            this.sortEntities();
+            ZIRTimer.stop("sort");
+        }
+
         ZIRTimer.start("generatePairs", "collision");
         const potentialCollisions = this.generateCollisionPairs();
         ZIRTimer.stop("generatePairs");
@@ -67,45 +74,65 @@ export class ZIRWorld {
     }
 
     private sortEntities() {
-        this.entities.sort((a, b) => {
-            const aabba = a.getAABB();
-            const aabbb = b.getAABB();
-            return aabbb.getMinX() - aabba.getMinX();
-        });
+        if(this.QUADTREE) {
+            this.quadtree = new EntityQuadtree(this.entities);
+        } else {
+            this.entities.sort((a, b) => {
+                const aabba = a.getAABB();
+                const aabbb = b.getAABB();
+                return aabbb.getMinX() - aabba.getMinX();
+            });
+        }
     }
 
     private generateCollisionPairs(): IZIRCollisionCandidate[] {
         const pairs = [];
-        // for (let i = this.entities.length - 1; i > 0; i--) {
-        //     for (let j = i - 1; j >= 0; j--) {
-        //         const pair = {
-        //             e1: this.entities[i],
-        //             e2: this.entities[j],
-        //         };
-        //         pairs.push(pair);
-        //     }
-        // }
-
-        let activeIndex = 0;
-        //The first entity does not need to be checked because it will not match with any entity before it
-        for (let curIndex = 1; curIndex < this.entities.length; curIndex++) {
-            const entity = this.entities[curIndex];
-            const box = entity.getAABB();
-            let end = false;
-            for (let i = curIndex - 1; !end && i >= activeIndex; i--) {
-                const other = this.entities[i];
-                const otherBox = other.getAABB();
-                if (otherBox.getMaxX() < box.getMinX()) {
-                    activeIndex = i;
-                    end = true;
-                } else {
-                    pairs.push({
-                        e1: entity,
-                        e2: other
-                    })
+        if(this.SORT) {
+            if(this.QUADTREE) {
+                for(let entity of this.entities) {
+                    for(let matchEntity of this.quadtree.getEntitiesAtAddress(entity.getCollisionQuadtreeAddress())) {
+                        const pair = {
+                            e1: entity,
+                            e2: matchEntity,
+                        };
+                        pairs.push(pair);
+                    }
+                }
+            } else {
+                let activeIndex = 0;
+                //The first entity does not need to be checked because it will not match with any entity before it
+                for (let curIndex = 1; curIndex < this.entities.length; curIndex++) {
+                    const entity = this.entities[curIndex];
+                    const box = entity.getAABB();
+                    let end = false;
+                    for (let i = curIndex - 1; !end && i >= activeIndex; i--) {
+                        const other = this.entities[i];
+                        const otherBox = other.getAABB();
+                        if (otherBox.getMaxX() < box.getMinX()) {
+                            activeIndex = i;
+                            end = true;
+                        } else {
+                            pairs.push({
+                                e1: entity,
+                                e2: other
+                            })
+                        }
+                    }
                 }
             }
+        } else {
+            for (let i = this.entities.length - 1; i > 0; i--) {
+                for (let j = i - 1; j >= 0; j--) {
+                    const pair = {
+                        e1: this.entities[i],
+                        e2: this.entities[j],
+                    };
+                    pairs.push(pair);
+                }
+            }
+
         }
+
         return pairs;
     }
 

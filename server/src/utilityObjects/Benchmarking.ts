@@ -7,6 +7,7 @@ import { isNumber } from "util";
 import { writeFile, readFile } from "fs";
 import { createInterface } from "readline";
 import { ZIRPlayerWorld } from "../PlayerWorld";
+import { EntityQuadtree } from "./DataStructures";
 
 const RED = "\x1b[31m";
 const GREEN = "\x1b[32m";
@@ -238,11 +239,17 @@ function repeat(process: Function, repetitions: number) {
     }
 }
 
+function testDataStructures() {
+    const entities = generateStationaryEntityGrid();
+    const quadTree = new EntityQuadtree(entities);
+}
+
 loadSnapshot();
 
 function runTests() {
-    calibrate();
-    testPhysics();
-    testCollision();
-    promptForSnapshotWrite();
+    // calibrate();
+    // testPhysics();
+    // testCollision();
+    testDataStructures();
+    // promptForSnapshotWrite();
 }

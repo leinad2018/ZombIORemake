@@ -293,6 +293,7 @@ export class ZIRServerEngine {
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
             debugMessages.push("Entities (" + this.entityCache.length + " total)");//: " + this.entityCache);
+            debugMessages.push("Quadtree Address: " + session.getPlayer().getCollisionQuadtreeAddress());
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
         }

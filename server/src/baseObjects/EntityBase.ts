@@ -28,6 +28,7 @@ export abstract class ZIREntity implements IZIREntity {
     private hitboxHandlers: Array<(otherZone: ZIRZone) => void>;
     private eventsToExecute: ZIRZone[];
     private name: string = undefined;
+    private collisionQuadtreeAddress: number[];
 
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, isPhysical: boolean = true) {
         this.id = ZIREntity.entityCount + "";
@@ -95,6 +96,14 @@ export abstract class ZIREntity implements IZIREntity {
         this.eventsToExecute.push(otherZone);
     }
 
+    public setCollisionQuadtreeAddress(address: number[]) {
+        this.collisionQuadtreeAddress = address;
+    }
+
+    public getCollisionQuadtreeAddress(): number[] {
+        return this.collisionQuadtreeAddress;
+    }
+
     // INCOMPLETE. Do not use.
     public hasEvent(otherZone: ZIRZone): boolean {
         // Needs modification to work properly.
@@ -114,6 +123,16 @@ export abstract class ZIREntity implements IZIREntity {
 
     public getName(): string {
         return this.name;
+    }
+
+    public getHitboxPoints(): Vector[] {
+        let points = [];
+
+        for(let hitbox of this.getHitboxes()) {
+            points = points.concat(hitbox.getPoints());
+        }
+
+        return points;
     }
 
     protected setMovable(movable: boolean){

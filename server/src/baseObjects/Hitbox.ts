@@ -28,6 +28,20 @@ export abstract class ZIRZone {
         return this.owner;
     }
 
+    public getPoints(): Vector[] {
+        const minX = this.getMinX();
+        const maxX = this.getMaxX();
+        const minY = this.getMinY();
+        const maxY = this.getMaxY();
+        const points = [
+            new Vector(minX, minY),
+            new Vector(minX, maxY),
+            new Vector(maxX, minY),
+            new Vector(maxX, maxY),
+        ];
+        return points;
+    }
+
     public equals(other: ZIRZone): boolean {
         // TODO: FIX THIS. It is horribly broken
         // console.log("Equals?");
