@@ -14,7 +14,7 @@ export class EntityQuadtree {
      * @param size Side length of square area
      * @param corner Bottom-left coordinate
      */
-    constructor(entities: ZIREntity[], size: number = 10000, corner: Vector = new Vector(-5000, -5000), split_threshold: number = 8, max_depth = 10) {
+    constructor(entities: ZIREntity[], size: number = 10000, corner: Vector = new Vector(-5000, -5000), split_threshold: number = 8, max_depth = 7) {
         this.split_threshold = split_threshold;
         this.root = new Node(null, -1, entities, size, corner, max_depth, this)
     }
@@ -158,9 +158,10 @@ class Node {
         return address;
     }
 
-    public getEntitiesAtAddress(address: number[]): ZIREntity[] {
+    public getEntitiesAtAddress(address: number[], searchUp = true, searchDown = true): ZIREntity[] {
         const nextAddress = [];
-        if(address.length > 0) {
+        let found = this.data;
+        if(searchDown && address.length > 0) {
             for(let i = 1; i < address.length; i++) {
                 nextAddress.push(address[i]);
             }
@@ -179,9 +180,11 @@ class Node {
                     nextNode = this.br;
                     break;
             }
-            return this.data.concat(nextNode.getEntitiesAtAddress(nextAddress));
-        } else {
-            return this.data;
+            found = found.concat(nextNode.getEntitiesAtAddress(nextAddress, false, true));
         }
+        if(searchUp && this.parent) {
+            found = found.concat(this.parent.getEntitiesAtAddress(address, true, false))
+        }
+        return found;
     }
 }
