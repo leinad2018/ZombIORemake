@@ -3,7 +3,8 @@
         "target": "es6",
         "module": "amd",
         "outDir": "../../output/services/client/src",
-        "sourceMap": true
+        "sourceMap": true,
+        "sourceRoot": "./"
     },
     "include": [
         "src"

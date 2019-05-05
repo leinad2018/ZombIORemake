@@ -35,5 +35,7 @@ export class ZIRConsoleManager {
         this.io.sockets.emit("data", update);
         const metadata = ZIRTimer.pullLoggedMetadata();
         this.io.sockets.emit("metadata", metadata);
+        const counts = ZIRTimer.pullLoggedCounts();
+        this.io.sockets.emit("counts", counts);
     }
 }

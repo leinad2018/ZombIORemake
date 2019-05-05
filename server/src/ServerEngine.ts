@@ -137,6 +137,7 @@ export class ZIRServerEngine {
         ZIRTimer.start("tick", "gameLoop");
 
         this.entityCache = this.getAllEntities();
+        ZIRTimer.count(this.entityCache.length, "entities");
 
         ZIRTimer.start("usernames", "tick");
         this.sendUsernames();

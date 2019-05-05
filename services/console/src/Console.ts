@@ -1,4 +1,4 @@
-import { ZIRGraph } from "./Graph";
+import { ZIRTimeGraph, ZIRLineGraph, ZIRGraph } from "./Graph";
 import { ZIRDataStream, ZIRPoint } from "./Data";
 import "../lib/terminal";
 
@@ -14,6 +14,7 @@ export class ZIRConsole {
     private graphs: ZIRGraph[] = [];
     private data: {[key: string]: ZIRDataStream};
     private partialData: {[key: string]: PartialDataFrame};
+    private partialCountData: {[key: string]: PartialDataFrame};
     private metadata: {[key: string]: IZIRTimerMetadata};
     private terminal;
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
@@ -31,6 +32,9 @@ export class ZIRConsole {
         }).bind(this));
         socket.on("metadata", ((data) => {
             this.parseMetadata(data);
+        }).bind(this));
+        socket.on("counts", ((data) => {
+            this.parseCountData(data);
         }).bind(this));
 
         this.terminal = new Terminal();
@@ -62,6 +66,29 @@ export class ZIRConsole {
     private consoleTick() {
         this.updateGraphs();
         this.renderGraphs();
+    }
+
+    private parseCountData(receivedData) {
+        const timeReceived = (new Date).getTime();
+        const sampleTime = Math.trunc(timeReceived/this.SAMPLE_INTERVAL);
+        for(let id in receivedData) {
+            if(this.partialData[id]) {
+                if (sampleTime != this.partialData[id].sampleTime) {
+                    this.packagePartialData(id);
+                    this.partialData[id] = {
+                        sampleTime,
+                        samples: [receivedData[id]],
+                    } as PartialDataFrame;
+                } else {
+                    this.partialData[id].samples.concat([receivedData[id]]);
+                }
+            } else {
+                this.partialData[id] = {
+                    sampleTime,
+                    samples: [receivedData[id]],
+                } as PartialDataFrame;
+            }
+        }
     }
 
     private parseMetadata(receivedData) {
@@ -101,9 +128,13 @@ export class ZIRConsole {
             this.data[id] = new ZIRDataStream([newPoint]);
             let graph = null;
             if(this.metadata[id]) {
-                graph = new ZIRGraph(id, this.data[id], this.metadata[id].parent);
+                if(this.metadata[id].type === "count") {
+                    graph = new ZIRLineGraph(id, this.data[id], this.metadata[id].type, this.metadata[id].parent);
+                } else {
+                    graph = new ZIRTimeGraph(id, this.data[id], this.metadata[id].type, this.metadata[id].parent);
+                }
             } else {
-                graph = new ZIRGraph(id, this.data[id]);
+                graph = new ZIRTimeGraph(id, this.data[id], "time");
             }
             
             this.addGraph(graph);
@@ -163,4 +194,5 @@ interface PartialDataFrame {
 
 interface IZIRTimerMetadata {
     parent: string;
+    type: string;
 }

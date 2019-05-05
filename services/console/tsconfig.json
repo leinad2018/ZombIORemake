@@ -3,7 +3,8 @@
         "target": "es6",
         "module": "amd",
         "outDir": "../../output/services/console/src",
-        "sourceMap": true
+        "sourceMap": true,
+        "sourceRoot": "./"
     },
     "include": [
         "src"

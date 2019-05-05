@@ -1,13 +1,14 @@
 export class ZIRTimer {
     private static startTimes: {[id: string]: number} = {};
     private static loggedTimes: {[id: string]: number[]} = {};
+    private static loggedCounts: {[id: string]: number} = {};
     private static metadata: {[id: string]: IZIRTimerMetadata} = {};
     private static timingEnabled = true;
 
     public static start(id: string, parent?: string) {
         if(this.timingEnabled) {
             this.startTimes[id] = this.getNanoTime();
-            this.metadata[id] = {parent: parent};
+            this.metadata[id] = {parent: parent, type: "time"};
         }
     }
 
@@ -28,9 +29,26 @@ export class ZIRTimer {
         }
     }
 
+    public static count(data: number, id: string, parent?: string) {
+        if (this.timingEnabled) {
+            this.metadata[id] = {parent: parent, type: "count"};
+            if(!this.loggedCounts[id]) {
+                this.loggedCounts[id] = data;
+            } else {
+                this.loggedCounts[id] += data;
+            }
+        }
+    }
+
     public static pullLoggedTimes(): {[id: string]: number[]} {
         const temp = this.loggedTimes;
         this.loggedTimes = {};
+        return temp;
+    }
+
+    public static pullLoggedCounts(): {[id: string]: number} {
+        const temp = this.loggedCounts;
+        this.loggedCounts = {};
         return temp;
     }
 
@@ -52,4 +70,5 @@ export class ZIRTimer {
 
 export interface IZIRTimerMetadata {
     parent: string;
+    type: string;
 }
