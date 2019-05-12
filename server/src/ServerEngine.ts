@@ -9,6 +9,7 @@ import { ZIRSpite } from "./baseObjects/Spite";
 import { ZIREventScheduler } from "./EventScheduler";
 import { ZIRConsoleManager } from "./ConsoleManager";
 import { ZIRTimer } from "./Timer";
+import { EntityQuadtree } from "./utilityObjects/DataStructures";
 
 export class ZIRServerEngine {
     public readonly IS_DEVELOPMENT = true;
@@ -35,7 +36,7 @@ export class ZIRServerEngine {
         this.eventScheduler = ZIREventScheduler.getInstance();
 
         if (this.IS_DEVELOPMENT) {
-            this.consoleManager = new ZIRConsoleManager();
+            this.consoleManager = new ZIRConsoleManager(this);
         }
 
         this.gameLoop();
@@ -47,6 +48,12 @@ export class ZIRServerEngine {
      */
     public getDT(): number {
         return this.dt;
+    }
+
+    public getQuadtree(): EntityQuadtree {
+        for(let world in this.universe) {
+            return this.universe[world].getQuadtree();
+        }
     }
 
     /**
@@ -137,7 +144,7 @@ export class ZIRServerEngine {
         ZIRTimer.start("tick", "gameLoop");
 
         this.entityCache = this.getAllEntities();
-        ZIRTimer.count(this.entityCache.length, "entities");
+        ZIRTimer.count(this.entityCache.length, "entities", "count");
 
         ZIRTimer.start("usernames", "tick");
         this.sendUsernames();

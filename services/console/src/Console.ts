@@ -1,6 +1,7 @@
 import { ZIRTimeGraph, ZIRLineGraph, ZIRGraph } from "./Graph";
 import { ZIRDataStream, ZIRPoint } from "./Data";
 import "../lib/terminal";
+import { QuadtreeDisplay } from "./QuadtreeDisplay";
 
 declare function io();
 declare function Terminal(): void;
@@ -16,6 +17,7 @@ export class ZIRConsole {
     private partialData: {[key: string]: PartialDataFrame};
     private partialCountData: {[key: string]: PartialDataFrame};
     private metadata: {[key: string]: IZIRTimerMetadata};
+    private quadtreeDisplay: QuadtreeDisplay;
     private terminal;
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
     public static readonly HEALTHY_TICKSPEED = 33000000; // ns
@@ -36,8 +38,12 @@ export class ZIRConsole {
         socket.on("counts", ((data) => {
             this.parseCountData(data);
         }).bind(this));
+        socket.on("quadtree", ((data) => {
+            this.handleQuadtree(data);
+        }).bind(this));
 
         this.terminal = new Terminal();
+        this.quadtreeDisplay = new QuadtreeDisplay(document.getElementById("quadtree") as HTMLCanvasElement);
         document.getElementById("terminal").appendChild(this.terminal.html as Node);
         this.terminal.print("Welcome to Terrafort Server Console 0.1");
         this.prompt();
@@ -66,6 +72,10 @@ export class ZIRConsole {
     private consoleTick() {
         this.updateGraphs();
         this.renderGraphs();
+    }
+
+    private handleQuadtree(receivedData) {
+        this.quadtreeDisplay.render(receivedData);
     }
 
     private parseCountData(receivedData) {

@@ -4,12 +4,16 @@ import * as path from "path";
 import * as socketIO from "socket.io";
 
 import {ZIRTimer} from "./Timer";
+import { ZIRServerEngine } from "./ServerEngine";
 
 export class ZIRConsoleManager {
 
     private io;
+    private engine;
+    private loopTracker: number = 0;
 
-    constructor() {
+    constructor(engine: ZIRServerEngine) {
+        this.engine = engine;
         const app = express();
         const server = new http.Server(app);
         this.io = socketIO(server);
@@ -37,5 +41,13 @@ export class ZIRConsoleManager {
         this.io.sockets.emit("metadata", metadata);
         const counts = ZIRTimer.pullLoggedCounts();
         this.io.sockets.emit("counts", counts);
+        if(this.loopTracker % 30 === 0) {
+            const quadtree = this.engine.getQuadtree();
+            if(quadtree !== undefined) {
+                const send = quadtree.getExport();
+                this.io.sockets.emit("quadtree", send)
+            }        
+        }
+        this.loopTracker++;
     }
 }

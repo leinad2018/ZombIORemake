@@ -1,5 +1,7 @@
 import { ZIREntity } from "../baseObjects/EntityBase";
 import { Vector } from "./Math";
+import { generateKeyPairSync } from "crypto";
+import { IZIRCollisionCandidate } from "../baseObjects/World";
 
 export class EntityQuadtree {
     public root: Node;
@@ -21,6 +23,14 @@ export class EntityQuadtree {
 
     public getEntitiesAtAddress(address: number[]): ZIREntity[] {
         return this.root.getEntitiesAtAddress(address);
+    }
+
+    public getExport(): any {
+        return this.root.getExport();
+    }
+
+    public getCollisionPairs(): IZIRCollisionCandidate[] {
+        return this.root.getCollisionPairs();
     }
 }
 
@@ -71,7 +81,7 @@ class Node {
         this.corner = corner;
         this.structure = structure;
 
-        if(this.data.length > this.structure.split_threshold && splits_allowed > 0) {
+        if(this.data.length > this.structure.split_threshold && splits_allowed > 0 || this.parent == null) {
             this.divide();
         } else {
             const address = this.getAddress();
@@ -79,6 +89,46 @@ class Node {
                 entity.setCollisionQuadtreeAddress(address);
             }
         }
+    }
+
+    public getCollisionPairs(borderEntities: ZIREntity[] = []): IZIRCollisionCandidate[] {
+        let pairs = [];
+
+        let toCollide = this.data.concat(borderEntities);
+        for(let i = toCollide.length - 1; i > 0; i--) {
+            for(let j = i-1; j > -1; j--) {
+                pairs.push({e1: toCollide[i], e2: toCollide[j]} as IZIRCollisionCandidate)
+            }
+        }
+
+        if(this.bl) {
+            pairs = pairs.concat(this.bl.getCollisionPairs(this.data))
+        }
+        if(this.br) {
+            pairs = pairs.concat(this.br.getCollisionPairs(this.data))
+        }
+        if(this.tl) {
+            pairs = pairs.concat(this.tl.getCollisionPairs(this.data))
+        }
+        if(this.tr) {
+            pairs = pairs.concat(this.tr.getCollisionPairs(this.data))
+        }
+
+        return pairs;
+    }
+
+    public getExport() {
+        return ({
+                entities: this.data.map((entity) => {
+                    const pos = entity.getPosition();
+                    const name = entity.getName();
+                    return {pos, name};
+                }),
+                tl: this.tl ? this.tl.getExport() : null,
+                tr: this.tr ? this.tr.getExport() : null,
+                bl: this.bl ? this.bl.getExport() : null,
+                br: this.br ? this.br.getExport() : null
+            });
     }
 
     public divide() {
@@ -124,18 +174,15 @@ class Node {
             } else {
                 if (q1) {
                     q1_data.push(entity);
-                }
-    
-                if (q2) {
+                } else if (q2) {
                     q2_data.push(entity);
-                }
-    
-                if (q3) {
+                } else if (q3) {
                     q3_data.push(entity);
-                }
-    
-                if (q4) {
+                } else if (q4) {
                     q4_data.push(entity);
+                } else {
+                    // Out of bounds
+                    entity.kill();
                 }
             }
         }
@@ -161,6 +208,9 @@ class Node {
     public getEntitiesAtAddress(address: number[], searchUp = true, searchDown = true): ZIREntity[] {
         const nextAddress = [];
         let found = this.data;
+        if(address === undefined) {
+            return [];
+        }
         if(searchDown && address.length > 0) {
             for(let i = 1; i < address.length; i++) {
                 nextAddress.push(address[i]);
@@ -180,7 +230,10 @@ class Node {
                     nextNode = this.br;
                     break;
             }
-            found = found.concat(nextNode.getEntitiesAtAddress(nextAddress, false, true));
+            if(nextNode !== undefined) {
+                found = found.concat(nextNode.getEntitiesAtAddress(nextAddress, false, true)); 
+            }
+            
         }
         if(searchUp && this.parent) {
             found = found.concat(this.parent.getEntitiesAtAddress(address, true, false))

@@ -27,6 +27,10 @@ export class ZIRWorld {
         this.entities.push(entity);
     }
 
+    public getQuadtree(): EntityQuadtree {
+        return this.quadtree;
+    }
+
     public collectGarbage() {
         for (let i = this.entities.length - 1; i > 0; i--) {
             const entity = this.entities[i];
@@ -59,6 +63,7 @@ export class ZIRWorld {
 
         ZIRTimer.start("generatePairs", "collision");
         const potentialCollisions = this.generateCollisionPairs();
+        ZIRTimer.count(potentialCollisions.length, "collisionPairs", "count");
         ZIRTimer.stop("generatePairs");
         ZIRTimer.start("checkCollision", "collision");
         for (const potentialCollision of potentialCollisions) {
@@ -89,15 +94,7 @@ export class ZIRWorld {
         const pairs = [];
         if(this.SORT) {
             if(this.QUADTREE) {
-                for(let entity of this.entities) {
-                    for(let matchEntity of this.quadtree.getEntitiesAtAddress(entity.getCollisionQuadtreeAddress())) {
-                        const pair = {
-                            e1: entity,
-                            e2: matchEntity,
-                        };
-                        pairs.push(pair);
-                    }
-                }
+                return this.quadtree.getCollisionPairs();
             } else {
                 let activeIndex = 0;
                 //The first entity does not need to be checked because it will not match with any entity before it
