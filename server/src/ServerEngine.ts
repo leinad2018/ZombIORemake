@@ -2,7 +2,7 @@ import { ZIRSessionManager, Session } from "./SessionManager";
 import { ZIREntity } from "./baseObjects/EntityBase";
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
 import { ZIRWorld } from "./baseObjects/World";
-import { ZIRPlayerWorld } from "./PlayerWorld";
+import { ZIRLoadTestWorld } from "./LoadTestWorld";
 import { ZIRPlayer } from "./entities/mobs/Player";
 import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
 import { ZIRSpite } from "./baseObjects/Spite";
@@ -70,7 +70,7 @@ export class ZIRServerEngine {
 
         let world = this.findWorldById(worldID);
         if (!world) {
-            const newWorld = new ZIRPlayerWorld(worldID);
+            const newWorld = new ZIRLoadTestWorld(worldID);
             newWorld.registerEntity(this.defaultView);
             this.universe[worldID] = newWorld;
             world = newWorld;
@@ -261,10 +261,6 @@ export class ZIRServerEngine {
         for (const e of entities) {
             e.setUpdated(true);
         }
-    }
-
-    private createUpdate(entity: ZIREntity) {
-        
     }
 
     private handleInput = (): void => {
