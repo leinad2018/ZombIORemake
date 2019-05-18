@@ -138,7 +138,7 @@ export class ZIRWorld {
 
         const canCollide = e1.getCollides() && e2.getCollides();
         // Collision is possible if either entity is moving or newly created
-        if (true) { // Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
+        if (Math.abs(e1.getVelocity().getMagnitude()) > 0.1 || e1.isCreating() || Math.abs(e2.getVelocity().getMagnitude()) > 0.1 || e2.isCreating()) {
             for (const zone1 of e1.getHitboxes()) {
                 for (const zone2 of e2.getHitboxes()) {
                     ZIRTimer.start("baseCollision", "checkCollision");
