@@ -42,7 +42,7 @@ export abstract class ZIREntity implements IZIREntity {
         this.collides = true;
         this.movable = true;
         this.staticHitboxes = this.createStaticHitboxes();
-        //TODO have to call this again when updates are needed
+        // TODO have to call this again when updates are needed
         this.createAABB();
         this.hitboxHandlers = [];
         this.eventsToExecute = [];
@@ -88,7 +88,7 @@ export abstract class ZIREntity implements IZIREntity {
         this.setHitboxHandler("die", this.kill);
     }
 
-    protected setHitboxHandler(type: string, handler: (otherZone: ZIRZone) => void){
+    protected setHitboxHandler(type: string, handler: (otherZone: ZIRZone) => void) {
         this.hitboxHandlers[type] = handler.bind(this);
     }
 
@@ -128,14 +128,14 @@ export abstract class ZIREntity implements IZIREntity {
     public getHitboxPoints(): Vector[] {
         let points = [];
 
-        for(let hitbox of this.getHitboxes()) {
+        for (const hitbox of this.getHitboxes()) {
             points = points.concat(hitbox.getPoints());
         }
 
         return points;
     }
 
-    protected setMovable(movable: boolean){
+    protected setMovable(movable: boolean) {
         this.movable = movable;
     }
 
@@ -250,7 +250,7 @@ export abstract class ZIREntity implements IZIREntity {
         return this.maxMovement;
     }
 
-    protected setMoveForce(force: number){
+    protected setMoveForce(force: number) {
         this.moveForce = force;
     }
 
