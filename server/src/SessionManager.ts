@@ -6,6 +6,7 @@ import * as express from "express";
 import * as http from "http";
 import * as path from "path";
 import * as socketIO from "socket.io";
+import { IZIRChatAgent, IZIRChatMessage } from "./ChatManager";
 
 export class ZIRSessionManager {
     private listeners: { [header: string]: () => void } = {};
@@ -85,9 +86,15 @@ export class ZIRSessionManager {
         }
     }
 
+    private handleChat(this: Session, data: IZIRChatMessage): void {
+        data.sender = this;
+        this.queueMessage(data);
+    }
+
     private handleLogin(socket): void {
         const s = new Session(socket.id, this.defaultView, this.io);
         socket.on("rename", this.handleRename.bind(s));
+        socket.on("chat", this.handleChat.bind(s));
         socket.on("disconnect", this.handleDisconnection.bind(s));
         socket.on("input", this.handleInput.bind(s));
         socket.on("ping", this.handlePing.bind(s));
@@ -121,7 +128,8 @@ export class ZIRSessionManager {
     }
 }
 
-export class Session {
+export class Session implements IZIRChatAgent {
+    protected queuedMessages: IZIRChatMessage[] = [];
     private static sessionCount: number = 0;
     private active: boolean;
     private username: string;
@@ -142,6 +150,28 @@ export class Session {
         this.username = "Player" + Session.sessionCount;
         this.io = io;
         Session.sessionCount++;
+    }
+
+    public getChatId(): string {
+        return "player" + this.socket;
+    }
+
+    public getChatSenderName(): string {
+        return this.username;
+    }
+
+    public queueMessage(message: IZIRChatMessage) {
+        this.queuedMessages.push(message);
+    }
+
+    public fetchMessages(): IZIRChatMessage[] {
+        const temp = this.queuedMessages;
+        this.queuedMessages = [];
+        return temp;
+    }
+
+    public sendMessage(message: IZIRChatMessage) {
+        this.io.to(this.socket).emit("chat", {content: message.content, sender: message.sender.getChatSenderName()});
     }
 
     public update() {

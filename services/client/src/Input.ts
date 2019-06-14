@@ -1,20 +1,28 @@
 import { Vector } from "./utilityObjects/Math";
 
 export class ZIRInput {
+    private chatHandler: (message: string) => void;
     private handler: (keycode: string, state: boolean) => void;
     private pointHandler: (keycode: string, state: Vector) => void;
     private activeKeys: {[key: string]: boolean};
     private cursorState: Vector;
     private debugState: boolean;
+    private chatting: boolean = false;
     private renderHitboxState: boolean;
+    private textInputString: string;
 
     constructor() {
+        this.textInputString = "";
         this.activeKeys = {shift: false, ctrl: false};
         document.addEventListener("keyup", this.handleKeyupEvent.bind(this));
         document.addEventListener("keydown", this.handleKeydownEvent.bind(this));
         document.addEventListener("mousemove", this.handleMouseMove.bind(this));
         document.addEventListener("mousedown", this.handleMousedownEvent.bind(this));
         document.addEventListener("mouseup", this.handleMouseupEvent.bind(this));
+    }
+
+    public setChatHandler(chatHandler: (message: string) => void) {
+        this.chatHandler = chatHandler;
     }
 
     public setInputHandler(handler: (keycode: string, state: boolean) => void) {
@@ -33,6 +41,14 @@ export class ZIRInput {
         return this.renderHitboxState;
     }
 
+    public getChatting(): boolean {
+        return this.chatting;
+    }
+
+    public getTextInputString(): string {
+        return this.textInputString;
+    }
+
     private handleKeyupEvent(event) {
         const keycode: string = this.getKeyFromEvent(event);
         this.handler(keycode, false);
@@ -41,16 +57,42 @@ export class ZIRInput {
 
     private handleKeydownEvent(event) {
         const keycode: string = this.getKeyFromEvent(event);
-        if (!this.activeKeys[keycode]) {
+        if (!this.chatting && !this.activeKeys[keycode]) {
             this.handler(keycode, true);
             this.activeKeys[keycode] = true;
         }
+        
+        if(this.chatting) {
+            const BACKSPACE = 8;
+            const ENTER = 13;
+            if(event.keyCode === BACKSPACE) {
+                this.textInputString = this.textInputString.length > 0 ? this.textInputString.slice(0, this.textInputString.length - 1) : "";
+            } else if(event.keyCode === ENTER) {
+                this.chatting = false;
+                const temp = this.textInputString;
+                this.textInputString = "";
+                this.chatHandler(temp);
+            } else if(event.key.length === 1) {
+                this.textInputString += event.key
+            }
+        }
+
         if (keycode === "debug") {
             if(this.activeKeys["shift"]) {
                 this.debugState = !this.debugState;
             }
             if(this.activeKeys["ctrl"]) {
                 this.renderHitboxState = !this.renderHitboxState;
+            }
+        }
+        if (keycode === "chat") {
+            if(this.chatting === false) {
+                this.chatting = true;
+            }
+        }
+        if (keycode === "escape") {
+            if(this.chatting === true) {
+                this.chatting = false;
             }
         }
     }
@@ -61,15 +103,17 @@ export class ZIRInput {
     }
 
     private handleMousedownEvent(event) {
-        if (!this.activeKeys["click"]) {
+        if (!this.chatting && !this.activeKeys["click"]) {
             this.handler("click", true);
             this.activeKeys["click"] = true;
         }
     }
 
     private handleMouseMove(event) {
-        this.cursorState = new Vector(event.pageX, event.pageY);
-        this.pointHandler("mouse", this.cursorState);
+        if(!this.chatting) {
+            this.cursorState = new Vector(event.pageX, event.pageY);
+            this.pointHandler("mouse", this.cursorState);
+        }
     }
 
     private getKeyFromEvent(event) {
@@ -106,6 +150,12 @@ export class ZIRInput {
                 break;
             case 187:
                 keyName = "debug";
+                break;
+            case 84:
+                keyName = "chat";
+                break;
+            case 27:
+                keyName = "escape";
                 break;
         }
 

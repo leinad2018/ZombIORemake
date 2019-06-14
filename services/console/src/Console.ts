@@ -41,6 +41,9 @@ export class ZIRConsole {
         socket.on("quadtree", ((data) => {
             this.handleQuadtree(data);
         }).bind(this));
+        socket.on("chat", ((data) => {
+            this.handleChat(data);
+        }).bind(this));
 
         this.terminal = new Terminal();
         this.quadtreeDisplay = new QuadtreeDisplay(document.getElementById("quadtree") as HTMLCanvasElement);
@@ -76,6 +79,10 @@ export class ZIRConsole {
 
     private handleQuadtree(receivedData) {
         this.quadtreeDisplay.render(receivedData);
+    }
+    
+    private handleChat(message) {
+        this.terminal.print("[" + message.sender + "] " + message.content);
     }
 
     private parseCountData(receivedData) {

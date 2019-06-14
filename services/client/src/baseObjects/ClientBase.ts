@@ -12,6 +12,8 @@ export abstract class ZIRClientBase {
 
     public abstract isDebugMode(): boolean;
 
+    public abstract isChatting(): boolean;
+
     public abstract shouldRenderHitbox(): boolean;
 
     public abstract getPlayersOnline();
@@ -25,6 +27,10 @@ export abstract class ZIRClientBase {
     public abstract getPlayerHealth(): number;
 
     public abstract getWorldData(): IZIRRenderable[];
+
+    public abstract getTextInputString(): string;
+
+    public abstract getCurrentChatMessages(): string[];
 
     public registerUpdateHandler(objectToUpdate: IZIRServerUpdate) {
         this.objectsToUpdate.push(objectToUpdate);

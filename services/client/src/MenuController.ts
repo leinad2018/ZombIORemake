@@ -24,6 +24,8 @@ export class ZIRMenuController {
                 case "build":
                     this.showBuildMenu(argument);
                     break;
+                case "chat":
+                    this.showChatMenu(argument);
             }
         }
     }
@@ -40,6 +42,24 @@ export class ZIRMenuController {
         div.appendChild(button);
         div.setAttribute("style", "position:absolute;top:50%;left:50%");
         this.mainDiv.appendChild(div);
+    }
+
+    public showChatMenu(handler: () => void) {
+        if (document.getElementById("chat")) {
+            return;
+        }
+        const div = document.createElement("div");
+        div.id = "chat";
+        const button = document.createElement("button");
+        button.textContent = "Send";
+        button.addEventListener("click", handler);
+        div.appendChild(button);
+        div.setAttribute("style", "position:absolute;top:75%;left:25%");
+        this.mainDiv.appendChild(div);
+    }
+
+    public hideChatMenu() {
+        this.hideMenu("chat");
     }
 
     public hideRespawnMenu() {

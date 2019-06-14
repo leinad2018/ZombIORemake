@@ -7,6 +7,7 @@ export class ZIRCanvasController {
     private canvas: HTMLCanvasElement;
     private shouldRenderDebug: boolean = true;
     private shouldRenderHitbox: boolean = false;
+    private shouldRenderChat: boolean = false;
     private playerPosition: Vector;
     private terrainCache: IZIRImageCache;
     private heartSize: Vector = new Vector(50, 50);
@@ -36,6 +37,7 @@ export class ZIRCanvasController {
         const start = new Date().getTime();
         this.shouldRenderDebug = state.isDebugMode();
         this.shouldRenderHitbox = state.shouldRenderHitbox();
+        this.shouldRenderChat = state.isChatting();
         this.playerPosition = state.getPlayerPosition();
         const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
 
@@ -52,8 +54,28 @@ export class ZIRCanvasController {
         if (this.shouldRenderDebug) {
             this.renderDebugBox(ctx, state.getDebugMessages());
         }
+        if (this.shouldRenderChat) {
+            this.renderChatBox(ctx, state.getTextInputString(), state.getCurrentChatMessages());
+        }
         const end = new Date().getTime();
         state.setLastRender(end - start);
+    }
+
+    private renderChatBox(ctx: CanvasRenderingContext2D, currentInput: string, currentMessages: string[]) {
+        const messagesAtOnce = 20;
+        const buffer = 10;
+        const fontSize = 20; //Math.floor((this.canvas.height - (buffer * 2)) / (messagesAtOnce + 1));
+        const chatWidth = 150;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, 150, this.canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = fontSize + "px Arial";
+        let messageDrawY = buffer + ((messagesAtOnce - currentMessages.length) * fontSize);
+        for(let message of currentMessages) {
+            ctx.fillText(message, buffer, messageDrawY, chatWidth - (2 * buffer))
+            messageDrawY += fontSize;
+        }
+        ctx.fillText(currentInput, buffer, this.canvas.height - fontSize - buffer, chatWidth - (2 * buffer))
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
@@ -74,6 +96,7 @@ export class ZIRCanvasController {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(this.canvas.width - 150, 0, 150, players.length * 10 + 30);
         ctx.fillStyle = "white";
+        ctx.font = "15px Arial";
         ctx.fillText("Players Online:\n", this.canvas.width - 145, 15);
         for (let i = 0; i < players.length; i++) {
             ctx.fillText(players[i], this.canvas.width - 145, 25 + i * 10);
@@ -89,6 +112,7 @@ export class ZIRCanvasController {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(0, vOffset, this.canvas.width, boxHeight);
         ctx.fillStyle = "white";
+        ctx.font = "15px Arial";
         ctx.fillText("Debug:\n", 5, vOffset + 15);
         for (let i = 0; i < messages.length; i++) {
             ctx.fillText(messages[i], 5, vOffset + 25 + i * 10);
@@ -138,6 +162,8 @@ export class ZIRCanvasController {
                 if (entity instanceof ZIREntityBase) {
                     const name = entity.getName()
                     if (name && name != "") {
+                        ctx.fillStyle = "black";
+                        ctx.font = "15px Arial";
                         ctx.fillText(entity.getName(), x, y - 5);
                     }
                     if (this.shouldRenderHitbox) {

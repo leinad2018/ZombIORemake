@@ -5,12 +5,14 @@ import * as socketIO from "socket.io";
 
 import {ZIRTimer} from "./Timer";
 import { ZIRServerEngine } from "./ServerEngine";
+import { IZIRChatAgent, IZIRChatMessage } from "./ChatManager";
 
-export class ZIRConsoleManager {
+export class ZIRConsoleManager implements IZIRChatAgent{
 
     private io;
     private engine;
     private loopTracker: number = 0;
+    private queuedMessages: IZIRChatMessage[] = [];
 
     constructor(engine: ZIRServerEngine) {
         this.engine = engine;
@@ -49,5 +51,23 @@ export class ZIRConsoleManager {
             }        
         }
         this.loopTracker++;
+    }
+
+    public fetchMessages(): IZIRChatMessage[] {
+        const temp = this.queuedMessages;
+        this.queuedMessages = [];
+        return temp;
+    }
+
+    public sendMessage(message: IZIRChatMessage) {
+        this.io.sockets.emit("chat", {content: message.content, sender: message.sender.getChatSenderName()});
+    }
+
+    public getChatId(): string {
+        return "console";
+    }
+
+    public getChatSenderName(): string {
+        return "Server"
     }
 }

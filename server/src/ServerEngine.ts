@@ -10,6 +10,7 @@ import { ZIREventScheduler } from "./EventScheduler";
 import { ZIRConsoleManager } from "./ConsoleManager";
 import { ZIRTimer } from "./Timer";
 import { EntityQuadtree } from "./utilityObjects/DataStructures";
+import { ZIRChatManager} from "./ChatManager";
 
 export class ZIRServerEngine {
     public readonly IS_DEVELOPMENT = true;
@@ -17,6 +18,7 @@ export class ZIRServerEngine {
     private readonly TPS: number = 30;
 
     private sessionManager: ZIRSessionManager;
+    private chatManager: ZIRChatManager;
     private consoleManager: ZIRConsoleManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
@@ -34,9 +36,11 @@ export class ZIRServerEngine {
 
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.defaultView);
         this.eventScheduler = ZIREventScheduler.getInstance();
+        this.chatManager = new ZIRChatManager();
 
         if (this.IS_DEVELOPMENT) {
             this.consoleManager = new ZIRConsoleManager(this);
+            this.chatManager.registerAgent(this.consoleManager);
         }
 
         this.gameLoop();
@@ -67,6 +71,7 @@ export class ZIRServerEngine {
         session.setDisconnectHandler(this.disconnectSession.bind(this));
         const worldID = "wilderness";
         session.setWorldID(worldID);
+        this.chatManager.registerAgent(session);
 
         let world = this.findWorldById(worldID);
         if (!world) {
@@ -91,6 +96,7 @@ export class ZIRServerEngine {
         for (let i = 0; i < this.sessions.length; i++) {
             const session = this.sessions[i];
             if (session === disconnectedSession) {
+                this.chatManager.removeAgent(session);
                 session.getPlayer().kill();
                 this.sessions.splice(i, 1);
             }
@@ -162,6 +168,7 @@ export class ZIRServerEngine {
 
         ZIRTimer.start("input", "tick");
         this.handleInput();
+        this.chatManager.routeMessages();
         ZIRTimer.stop("input");
 
         ZIRTimer.start("collision", "tick");

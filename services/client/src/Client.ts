@@ -29,6 +29,7 @@ export class ZIRClient extends ZIRClientBase {
     private activePings: {[id: string]: number};
     private lastPing: number;
     private lastRender: number;
+    private chat: string[];
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -44,6 +45,7 @@ export class ZIRClient extends ZIRClientBase {
         this.running = false;
         this.updating = false;
         this.inputBuffer = [];
+        this.chat = [];
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
@@ -56,8 +58,10 @@ export class ZIRClient extends ZIRClientBase {
         this.serverComms.setHandler("updateWorld", this.handleWorldUpdate.bind(this));
         this.serverComms.setHandler("requestRespawn", this.handleRespawn.bind(this));
         this.serverComms.setHandler("ping", this.handlePingResponse.bind(this));
+        this.serverComms.setHandler("chat", this.handleChatFromServer.bind(this));
         this.input.setInputHandler(this.handleInput.bind(this));
         this.input.setPointInputHandler(this.handlePointInput.bind(this));
+        this.input.setChatHandler(this.sendChatToServer.bind(this));
         this.serverComms.registerServerListeners();
         this.runRenderingLoop();
         setInterval(this.requestPing.bind(this), 1000);
@@ -67,12 +71,24 @@ export class ZIRClient extends ZIRClientBase {
         return this.input.getDebug();
     }
 
+    public isChatting(): boolean {
+        return this.input.getChatting();
+    }
+
+    public getCurrentChatMessages(): string[] {
+        return this.chat;
+    }
+
     public shouldRenderHitbox(): boolean {
         return this.input.getRenderHitbox();
     }
 
     public setLastRender(dt: number) {
         this.lastRender = dt;
+    }
+
+    public getTextInputString(): string {
+        return this.input.getTextInputString();
     }
 
     private runRenderingLoop() {
@@ -84,6 +100,11 @@ export class ZIRClient extends ZIRClientBase {
             }
         }
         requestAnimationFrame(this.runRenderingLoop.bind(this));
+    }
+
+    private sendChatToServer(message: string) {
+        console.log("sent " + message);
+        this.serverComms.sendInfoToServer("chat", {content: message})
     }
 
     private flushInputBuffer(){
@@ -110,6 +131,14 @@ export class ZIRClient extends ZIRClientBase {
 
     private handleRespawn() {
         this.menuController.showRespawnMenu(this.sendRespawn.bind(this));
+    }
+
+    private handleChatFromServer(message) {
+        if(this.chat.length > 19) {
+            this.chat = this.chat.slice(1);
+        }
+        const messageString = "[" + message.sender + "] " + message.content;
+        this.chat.push(messageString);
     }
 
     private requestPing() {
