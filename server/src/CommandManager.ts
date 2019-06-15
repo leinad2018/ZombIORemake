@@ -1,8 +1,9 @@
 import { ZIRServerEngine } from "./ServerEngine";
 import { IZIRChatAgent, IZIRChatMessage, ZIRMessageType} from "./ChatManager";
+import { Vector } from "./utilityObjects/Math";
 
 const VALID_COMMANDS = [
-    "help", "players"
+    "help", "players", "say", "spawn"
 ]
 
 export class ZIRCommandManager implements IZIRChatAgent {
@@ -40,6 +41,39 @@ export class ZIRCommandManager implements IZIRChatAgent {
                         this.help(command.sender);
                     }
                     break;
+                case "players":
+                    if(args.length > 0) {
+                        this.returnError(sender, "'/players' takes no arguments");
+                    } else {
+                        this.players(sender);
+                    }
+                    break;
+                case "say":
+                    if(args.length !== 1) {
+                        this.returnError(sender, "'/say' requires exactly one argument");
+                    } else {
+                        this.say(sender, args[0]);
+                    }
+                    break;
+                case "spawn":
+                    if(args.length !== 3) {
+                        this.returnError(sender, "'/spawn' requires exactly three arguments");
+                    } else {
+                        try {
+                            const pos = new Vector(parseInt(args[1]), parseInt(args[2]))
+                        } catch(e) {
+                            this.returnError(sender, "Could not create vector <" + args[1] + ", " + args[2] + ">");
+                        }
+                        switch(args[0]) {
+                            case "enemy":
+                                this.returnError(sender, "not yet implemented");
+                                break;
+                            default:
+                                this.returnError(sender, "not yet implemented");
+                                break;
+                        }
+                    }
+                    break;
                 default:
                     this.returnError(sender, "Command not found");
                     break;
@@ -60,6 +94,10 @@ export class ZIRCommandManager implements IZIRChatAgent {
         );
     }
 
+    public players(sender: IZIRChatAgent) {
+        this.returnResponse(sender, "Players online: " + this.state.getAllPlayers().map(player => player.getName()).join(", "));
+    }
+
     public help(sender: IZIRChatAgent, commandToHelp?: string) {
         if(commandToHelp != null) {
             switch(commandToHelp) {
@@ -70,7 +108,7 @@ export class ZIRCommandManager implements IZIRChatAgent {
                     this.returnResponse(sender, "No help available for " + commandToHelp);
             }
         } else {
-            this.returnResponse(sender, "Valid commands: " + VALID_COMMANDS);
+            this.returnResponse(sender, "Valid commands: " + VALID_COMMANDS.join(", "));
         }
     }
 
@@ -129,7 +167,7 @@ export class ZIRCommand {
     public static fromMessage(s: IZIRChatMessage): ZIRCommand | string {
         const command = new ZIRCommand();
         command.sender = s.sender;
-        const components = s.content.split(" ");
+        const components = s.content.match(/(".*?"|[^"\s]+)+(?=\s*|\s*$)/g)
         if (components.length === 0) {
             return "Error parsing blank command";
         }
