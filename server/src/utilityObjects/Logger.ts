@@ -1,4 +1,4 @@
-import {IZIRUpdateResult, IZIRResetResult} from "./globalInterfaces/IServerUpdate";
+import {IZIRUpdateResult, IZIRResetResult} from "../globalInterfaces/IServerUpdate";
 
 export class ZIRLogger {
     private active: boolean;

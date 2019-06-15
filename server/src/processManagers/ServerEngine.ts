@@ -1,23 +1,25 @@
 import { ZIRSessionManager, Session } from "./SessionManager";
-import { ZIREntity } from "./baseObjects/EntityBase";
+import { ZIREntity } from "../baseObjects/EntityBase";
 import { ZIRPhysicsEngine } from "./PhysicsEngine";
-import { ZIRWorld } from "./baseObjects/World";
-import { ZIRLoadTestWorld } from "./LoadTestWorld";
-import { ZIRPlayer } from "./entities/mobs/Player";
-import { IZIRResetResult, IZIRUpdateResult } from "./globalInterfaces/IServerUpdate";
-import { ZIRSpite } from "./baseObjects/Spite";
+import { ZIRWorld } from "../baseObjects/World";
+import { ZIRLoadTestWorld } from "../worlds/LoadTestWorld";
+import { ZIRPlayer } from "../entities/mobs/Player";
+import { IZIRResetResult, IZIRUpdateResult } from "../globalInterfaces/IServerUpdate";
+import { ZIRSpite } from "../entities/Spite";
 import { ZIREventScheduler } from "./EventScheduler";
 import { ZIRConsoleManager } from "./ConsoleManager";
-import { ZIRTimer } from "./Timer";
-import { EntityQuadtree } from "./utilityObjects/DataStructures";
+import { ZIRTimer } from "../utilityObjects/Timer";
+import { EntityQuadtree } from "../utilityObjects/DataStructures";
 import { ZIRChatManager} from "./ChatManager";
 import { ZIRCommandManager } from "./CommandManager";
 
 export class ZIRServerEngine {
+    // Constants
     public readonly IS_DEVELOPMENT = true;
     private readonly GAMELOOP_OVERHEAD: number = 3; // Compensate for delay in game loop
     private readonly TPS: number = 30;
 
+    // Process Managers
     private sessionManager: ZIRSessionManager;
     private chatManager: ZIRChatManager;
     private commandManager: ZIRCommandManager;
@@ -25,10 +27,14 @@ export class ZIRServerEngine {
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
 
-    private defaultView: ZIREntity;
+    // Tick management
     private tickCounter: number = 0;
     private dt: number = 0;
 
+    // TODO: Make this world-based
+    private defaultView: ZIREntity;
+
+    // Global data structures
     private sessions: Session[] = [];
     private universe: ZIRWorld[] = [];
     private entityCache: ZIREntity[] = [];
@@ -288,6 +294,7 @@ export class ZIRServerEngine {
         return this.universe[worldID];
     }
 
+    // TODO: Change to leaderboard
     private sendUsernames() {
         const usernames: string[] = [];
         for (const session of this.sessions) {

@@ -2,7 +2,7 @@ import { ZIREntity } from "./EntityBase";
 import { IZIRTerrainMap } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRResourceNode } from "../entities/ResourceNode";
-import { ZIRTimer } from "../Timer";
+import { ZIRTimer } from "../utilityObjects/Timer";
 import { EntityQuadtree } from "../utilityObjects/DataStructures";
 
 export class ZIRWorld {

@@ -1,12 +1,13 @@
-import { IZIREntityUpdateResult, IZIRResetResult } from "./globalInterfaces/IServerUpdate";
-import { Inputs } from "./globalInterfaces/UtilityInterfaces";
-import { ZIRPlayer } from "./entities/mobs/Player";
-import { ZIREntity } from "./baseObjects/EntityBase";
+import { IZIREntityUpdateResult, IZIRResetResult } from "../globalInterfaces/IServerUpdate";
+import { Inputs } from "../globalInterfaces/UtilityInterfaces";
+import { ZIRPlayer } from "../entities/mobs/Player";
+import { ZIREntity } from "../baseObjects/EntityBase";
 import * as express from "express";
 import * as http from "http";
 import * as path from "path";
 import * as socketIO from "socket.io";
-import { IZIRChatAgent, IZIRChatMessage, ZIRMessageType } from "./ChatManager";
+import { IZIRChatMessage, IZIRChatAgent } from "../globalInterfaces/MainInterfaces";
+import { ZIRMessageType } from "../globalEnums/MainEnums";
 
 export class ZIRSessionManager {
     private listeners: { [header: string]: () => void } = {};
@@ -24,7 +25,7 @@ export class ZIRSessionManager {
         this.defaultView = defaultView;
 
         const PORT: number = 5000;
-        const CLIENT_ROOT = __dirname + "/../../services/client/";
+        const CLIENT_ROOT = __dirname + "/../../../services/client/";
         app.set("port", PORT);
         app.use(express.static(CLIENT_ROOT));
 

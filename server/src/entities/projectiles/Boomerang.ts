@@ -5,6 +5,7 @@ import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRBoomerang extends ZIRProjectile {
     private returning: boolean = false;
+    public static entityTypeId = "Boomerang";
 
     constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(80, 50), asset: string = "boomerang", expiration: number = -1) {
         super(owner, velocity, position, size, asset, expiration);

@@ -1,5 +1,5 @@
-import { ZIRWorld } from "./baseObjects/World";
-import { IZIRTerrainMap, IZIRTerrainZone } from "./globalInterfaces/IServerUpdate";
+import { ZIRWorld } from "../baseObjects/World";
+import { IZIRTerrainMap, IZIRTerrainZone } from "../globalInterfaces/IServerUpdate";
 
 export class ZIRPlayerWorld extends ZIRWorld {
     constructor(id: string) {

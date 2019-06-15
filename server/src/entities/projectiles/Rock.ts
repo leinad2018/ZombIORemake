@@ -4,6 +4,8 @@ import { Vector } from "../../utilityObjects/Math";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
 
 export class ZIRThrownRock extends ZIRProjectile {
+    public static entityTypeId = "ThrownRock";
+
     constructor(owner: ZIREntity, velocity: Vector, position: Vector, size: Vector = new Vector(25, 25), asset: string = "rock", expiration: number = 2000) {
         super(owner, velocity, position, size, asset, expiration);
     }

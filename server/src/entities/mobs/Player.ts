@@ -6,9 +6,10 @@ import { ZIRThrownRock } from "../projectiles/Rock";
 import { ZIREnemy } from "./Enemy";
 import { ZIRMob } from "../../baseObjects/Mob";
 import { ZIRInventoryStack } from "../../baseObjects/Inventory";
-import { ZIRSingleEvent, ZIREventScheduler } from "../../EventScheduler";
+import { ZIRSingleEvent, ZIREventScheduler } from "../../processManagers/EventScheduler";
 
 export class ZIRPlayer extends ZIRMob {
+    public static entityTypeId = "Player";
     private inventory: ZIRInventoryStack[];
     private cooldowns: { [ability: string]: boolean }; // For storing cooldown timestamps
 

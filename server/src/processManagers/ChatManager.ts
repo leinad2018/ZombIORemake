@@ -1,4 +1,6 @@
 import { ZIRCommandManager } from "./CommandManager";
+import { IZIRChatAgent, IZIRChatMessage } from "../globalInterfaces/MainInterfaces";
+import { ZIRMessageType } from "../globalEnums/MainEnums";
 
 /**
  * The chat manager maintains a list of ChatAgents. Every time routeMessages is
@@ -36,7 +38,7 @@ export class ZIRChatManager {
         delete this.agents[agent.getChatId()];
     }
 
-    public processMessage(message: IZIRChatMessage) {
+    private processMessage(message: IZIRChatMessage) {
         if(this.messages.length > 50) {
             this.messages = this.messages.slice(1);
         }
@@ -117,75 +119,4 @@ export class ZIRChatGroup implements IZIRChatAgent {
     public getChatId(): string {
         return "chatgroup" + name;
     }
-}
-
-/**
- * A ChatAgent is any object capable of generating or accepting chat messages.
- * The ChatManager only routes messages between ChatAgents. Valid ChatAgents
- * include player sessions, the console manager, chat-enabled NPCs, and ChatGroups
- */
-export interface IZIRChatAgent {
-    /**
-     * The ChatManager will route messages intended for the ChatAgent
-     * through this method. The implementation should consume these
-     * messages and display or log them as appropriate.
-     * (For session objects, this method should send the messages to the client for processing)
-     */
-    sendMessage(message: IZIRChatMessage): void;
-
-    /**
-     * This should return any new chat messages that the ChatAgent
-     * would like to send to the server for routing.
-     * If the ChatAgent is storing these messages in a buffer, it should
-     * also clear the buffer during this process to prevent resending.
-     */
-    fetchMessages(): IZIRChatMessage[];
-
-    /**
-     * This should return a unique identifier used
-     * internally for message routing to specific ChatAgents.
-     */
-    getChatId(): string;
-
-    /**
-     * This should return the human-readable and chat-friendly
-     * name that will display in chat with the message. Not necessarily unique.
-     */
-    getChatSenderName(): string;
-}
-
-export interface IZIRChatMessage {
-    /**
-     * Indicator for rendering and routing purposes.
-     * Chat messages beginning with a forward-slash are
-     * automatically routed as commands.
-     */
-    type: ZIRMessageType;
-
-    /**
-     * This should be stamped onto the ChatMessage
-     * whenever a message is received from a client. Serverside
-     * ChatAgents should be able to stamp this with "this" automatically.
-     */
-    sender: IZIRChatAgent;
-    
-    /**
-     * Recipients will be sent to the server as string ChatIds, since clients
-     * will generally not have access to full ChatAgent objects.
-     * The ChatManager will try to parse ChatAgents from the ChatId and return
-     * a rejection message to the sender if this fails.
-     */
-    recipient: IZIRChatAgent | string;
-    
-    /**
-     * Plaintext message content
-     */
-    content: string;
-}
-
-export enum ZIRMessageType {
-    ERROR, // Unused so far
-    COMMAND, // First routed to CommandManager
-    RAW, // For flavor text, join messages, etc - without sender displayed. May later support markup.
-    CHAT, // Displays with sender ChatName
 }

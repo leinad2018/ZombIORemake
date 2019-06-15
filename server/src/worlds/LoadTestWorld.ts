@@ -1,9 +1,9 @@
-import {ZIRWorld} from "../src/baseObjects/World";
-import {ZIREntity} from "../src/baseObjects/EntityBase";
-import {ZIRResourceNode} from "../src/entities/ResourceNode";
-import {Vector} from "./utilityObjects/Math";
-import {ZIREnemy} from "./entities/mobs/Enemy";
-import {IZIRTerrainMap, IZIRTerrainZone} from "./globalInterfaces/IServerUpdate";
+import {ZIRWorld} from "../baseObjects/World";
+import {ZIREntity} from "../baseObjects/EntityBase";
+import {ZIRResourceNode} from "../entities/ResourceNode";
+import {Vector} from "../utilityObjects/Math";
+import {ZIREnemy} from "../entities/mobs/Enemy";
+import {IZIRTerrainMap, IZIRTerrainZone} from "../globalInterfaces/IServerUpdate";
 
 export class ZIRLoadTestWorld extends ZIRWorld {
 

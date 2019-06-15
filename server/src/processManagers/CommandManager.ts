@@ -1,6 +1,7 @@
 import { ZIRServerEngine } from "./ServerEngine";
-import { IZIRChatAgent, IZIRChatMessage, ZIRMessageType} from "./ChatManager";
-import { Vector } from "./utilityObjects/Math";
+import { IZIRChatAgent, IZIRChatMessage} from "../globalInterfaces/MainInterfaces";
+import { Vector } from "../utilityObjects/Math";
+import { ZIRMessageType } from "../globalEnums/MainEnums";
 
 const VALID_COMMANDS = [
     "help", "players", "say", "spawn"

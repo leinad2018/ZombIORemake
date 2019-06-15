@@ -3,9 +3,9 @@ import * as http from "http";
 import * as path from "path";
 import * as socketIO from "socket.io";
 
-import {ZIRTimer} from "./Timer";
+import {ZIRTimer} from "../utilityObjects/Timer";
 import { ZIRServerEngine } from "./ServerEngine";
-import { IZIRChatAgent, IZIRChatMessage } from "./ChatManager";
+import { IZIRChatAgent, IZIRChatMessage } from "../globalInterfaces/MainInterfaces";
 
 export class ZIRConsoleManager implements IZIRChatAgent{
 
@@ -21,7 +21,7 @@ export class ZIRConsoleManager implements IZIRChatAgent{
         this.io = socketIO(server);
 
         const PORT: number = 5001;
-        const CONSOLE_ROOT = __dirname + "/../../services/console/";
+        const CONSOLE_ROOT = __dirname + "/../../../services/console/";
 
         app.set("port", PORT);
         app.use(express.static(CONSOLE_ROOT));

@@ -1,7 +1,7 @@
 import { ZIREntity } from "./EntityBase";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRZone } from "./Hitbox";
-import { ZIRServerEngine } from "../ServerEngine";
+import { ZIRServerEngine } from "../processManagers/ServerEngine";
 
 export abstract class ZIRProjectile extends ZIREntity {
     protected behavior: (e: ZIREntity) => void;

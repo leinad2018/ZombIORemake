@@ -3,9 +3,10 @@ import { ZIRMob } from "../../baseObjects/Mob";
 import { Vector } from "../../utilityObjects/Math";
 import { ZIRPlayer } from "./Player";
 import { ZIRZone, ZIRRectangularZone } from "../../baseObjects/Hitbox";
-import { ZIRTimer } from "../../Timer";
+import { ZIRTimer } from "../../utilityObjects/Timer";
 
 export class ZIREnemy extends ZIRMob {
+    public static entityTypeId = "Enemy";
     private named = false;
     private cooldownUses: {[ability: string]: number}; // For storing cooldown timestamps
     private target: ZIREntity;

@@ -4,6 +4,7 @@ import { ZIRZone, ZIRRectangularZone } from "../baseObjects/Hitbox";
 
 export abstract class ZIREntity implements IZIREntity {
     private static entityCount = 0;
+    public static entityTypeId: string;
     private id: string;
     private updated: boolean;
     private creating: boolean;
@@ -296,5 +297,5 @@ export abstract class ZIREntity implements IZIREntity {
 }
 
 
-import { ZIRServerEngine } from "../ServerEngine";
+import { ZIRServerEngine } from "../processManagers/ServerEngine";
 

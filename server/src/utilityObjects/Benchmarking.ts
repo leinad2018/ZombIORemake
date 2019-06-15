@@ -1,12 +1,12 @@
 import { ZIREntity } from "../baseObjects/EntityBase";
 import { Vector } from "./Math";
 import { ZIREnemy } from "../entities/mobs/Enemy";
-import { ZIRPhysicsEngine } from "../PhysicsEngine";
-import { ZIRTimer } from "../Timer";
+import { ZIRPhysicsEngine } from "../processManagers/PhysicsEngine";
+import { ZIRTimer } from "./Timer";
 import { isNumber } from "util";
 import { writeFile, readFile } from "fs";
 import { createInterface } from "readline";
-import { ZIRPlayerWorld } from "../PlayerWorld";
+import { ZIRPlayerWorld } from "../worlds/PlayerWorld";
 import { EntityQuadtree } from "./DataStructures";
 
 const RED = "\x1b[31m";
