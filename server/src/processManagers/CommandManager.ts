@@ -1,4 +1,4 @@
-import { ZIRServerEngine } from "./ServerEngine";
+import { ZIRServerEngine, ZIRServerChatAgent } from "./ServerEngine";
 import { IZIRChatAgent, IZIRChatMessage} from "../globalInterfaces/MainInterfaces";
 import { Vector } from "../utilityObjects/Math";
 import { ZIRMessageType } from "../globalEnums/MainEnums";
@@ -7,12 +7,12 @@ const VALID_COMMANDS = [
     "help", "players", "say", "spawn"
 ]
 
-export class ZIRCommandManager implements IZIRChatAgent {
-    protected queuedMessages: IZIRChatMessage[];
+export class ZIRCommandManager {
+    protected chatAgent: ZIRServerChatAgent;
     protected state: ZIRServerEngine;
 
-    constructor(state: ZIRServerEngine) {
-        this.queuedMessages = [];
+    constructor(chatAgent: ZIRServerChatAgent, state: ZIRServerEngine) {
+        this.chatAgent = chatAgent;
         this.state = state;
     }
 
@@ -85,7 +85,7 @@ export class ZIRCommandManager implements IZIRChatAgent {
     }
 
     public say(sender: IZIRChatAgent, message: string) {
-        this.queuedMessages.push(
+        this.chatAgent.queueMessage(
             {
                 type: ZIRMessageType.CHAT,
                 recipient: null,
@@ -114,43 +114,25 @@ export class ZIRCommandManager implements IZIRChatAgent {
     }
 
     public returnResponse(recipient: IZIRChatAgent, message: string) {
-        this.queuedMessages.push(
+        this.chatAgent.queueMessage(
             {
                 type: ZIRMessageType.RAW,
                 recipient: recipient,
                 content: message,
-                sender: this
+                sender: null,
             }
         );
     }
 
     public returnError(recipient: IZIRChatAgent, message: string) {
-        this.queuedMessages.push(
+        this.chatAgent.queueMessage(
             {
                 type: ZIRMessageType.ERROR,
                 recipient: recipient,
                 content: message,
-                sender: this
+                sender: null,
             }
         );
-    }
-
-    public sendMessage() {
-        // Unused
-    }
-
-    public fetchMessages() {
-        const temp = this.queuedMessages;
-        this.queuedMessages = [];
-        return temp;
-    }
-
-    public getChatSenderName(): string {
-        return "Server";
-    }
-
-    public getChatId(): string {
-        return "server";
     }
 }
 

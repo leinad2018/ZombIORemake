@@ -12,6 +12,8 @@ import { ZIRTimer } from "../utilityObjects/Timer";
 import { EntityQuadtree } from "../utilityObjects/DataStructures";
 import { ZIRChatManager} from "./ChatManager";
 import { ZIRCommandManager } from "./CommandManager";
+import { IZIRChatAgent, IZIRChatMessage } from "../globalInterfaces/MainInterfaces";
+import { ZIRMessageType } from "../globalEnums/MainEnums";
 
 export class ZIRServerEngine {
     // Constants
@@ -26,6 +28,7 @@ export class ZIRServerEngine {
     private consoleManager: ZIRConsoleManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
+    private chatAgent: ZIRServerChatAgent;
 
     // Tick management
     private tickCounter: number = 0;
@@ -42,11 +45,12 @@ export class ZIRServerEngine {
     constructor() {
         this.defaultView = new ZIRSpite();
 
+        this.chatAgent = new ZIRServerChatAgent();
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.defaultView);
         this.eventScheduler = ZIREventScheduler.getInstance();
-        this.commandManager = new ZIRCommandManager(this);
+        this.commandManager = new ZIRCommandManager(this.chatAgent, this);
         this.chatManager = new ZIRChatManager(this.commandManager);
-        this.chatManager.registerAgent(this.commandManager);
+        this.chatManager.registerAgent(this.chatAgent);
 
         if (this.IS_DEVELOPMENT) {
             this.consoleManager = new ZIRConsoleManager(this);
@@ -92,6 +96,7 @@ export class ZIRServerEngine {
         }
 
         this.sessionManager.sendToClient(session.getSocket(), "updateWorld", world.getTerrainMap());
+        this.chatAgent.chatBroadcast(session.getUsername() + " joined.");
         this.handleSpawn(session);
     }
 
@@ -106,6 +111,7 @@ export class ZIRServerEngine {
         for (let i = 0; i < this.sessions.length; i++) {
             const session = this.sessions[i];
             if (session === disconnectedSession) {
+                this.chatAgent.chatBroadcast(session.getUsername() + " disconnected.");
                 this.chatManager.removeAgent(session);
                 session.getPlayer().kill();
                 this.sessions.splice(i, 1);
@@ -321,3 +327,30 @@ export class ZIRServerEngine {
         }
     }
 }
+
+/**
+ * To handle all server chat communications
+ */
+export class ZIRServerChatAgent implements IZIRChatAgent {
+    private queuedMessages = [];
+    public chatBroadcast(message: string) {
+        this.queuedMessages.push({content: message, type: ZIRMessageType.RAW, sender: this, recipient: null} as IZIRChatMessage)
+    }
+    public queueMessage(message: IZIRChatMessage) {
+        message.sender = this;
+        this.queuedMessages.push(message);
+    }
+    public sendMessage(message: IZIRChatMessage): void {
+        // Unused
+    }
+    public fetchMessages(): IZIRChatMessage[] {
+        const temp = this.queuedMessages;
+        this.queuedMessages = [];
+        return temp;
+    }
+    public getChatId(): string {
+        return "server";
+    }
+    public getChatSenderName(): string {
+        return "Server";
+    }}

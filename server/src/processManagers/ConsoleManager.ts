@@ -89,6 +89,6 @@ export class ZIRConsoleManager implements IZIRChatAgent{
     }
 
     public getChatSenderName(): string {
-        return "Server"
+        return "Console"
     }
 }
