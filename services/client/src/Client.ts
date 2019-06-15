@@ -2,7 +2,7 @@ import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { ZIRAssetLoader } from "./AssetLoader";
 import { ZIREntityBase } from "./baseObjects/EntityBase";
 import { Vector } from "./utilityObjects/Math";
-import { IZIRAsset } from "./globalInterfaces/RenderingInterfaces";
+import { IZIRAsset, IZIRFormattedChatText } from "./globalInterfaces/RenderingInterfaces";
 import { IZIRResetResult, IZIRUpdateResult, IZIREntityResult, IZIRWorldUpdate } from "./globalInterfaces/IServerUpdate";
 import { ZIRInput } from "./Input";
 import { ZIRPlayerData } from "./PlayerData";
@@ -29,7 +29,8 @@ export class ZIRClient extends ZIRClientBase {
     private activePings: {[id: string]: number};
     private lastPing: number;
     private lastRender: number;
-    private chat: string[];
+    private chat: IZIRFormattedChatText[];
+    public newChatMessages: IZIRFormattedChatText[]; // Chat messages that were received in the last 5 seconds
 
     constructor(name: string, renderer: ZIRCanvasController, comms: ZIRServerBase, input: ZIRInput, menus: ZIRMenuController) {
         super();
@@ -46,6 +47,7 @@ export class ZIRClient extends ZIRClientBase {
         this.updating = false;
         this.inputBuffer = [];
         this.chat = [];
+        this.newChatMessages = [];
         this.canvas = renderer;
         this.canvas.addHudAsset("health", this.heartAsset);
         this.canvas.createTerrainCache(this.world.getWorldData());
@@ -75,8 +77,12 @@ export class ZIRClient extends ZIRClientBase {
         return this.input.getChatting();
     }
 
-    public getCurrentChatMessages(): string[] {
+    public getChatMessages(): IZIRFormattedChatText[] {
         return this.chat;
+    }
+
+    public getNewChatMessages(): IZIRFormattedChatText[] {
+        return this.newChatMessages;
     }
 
     public shouldRenderHitbox(): boolean {
@@ -103,7 +109,6 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private sendChatToServer(message: string) {
-        console.log("sent " + message);
         this.serverComms.sendInfoToServer("chat", {content: message})
     }
 
@@ -134,11 +139,29 @@ export class ZIRClient extends ZIRClientBase {
     }
 
     private handleChatFromServer(message) {
-        if(this.chat.length > 19) {
+        if(this.chat.length > 99) {
             this.chat = this.chat.slice(1);
         }
-        const messageString = "[" + message.sender + "] " + message.content;
-        this.chat.push(messageString);
+        let formattedMessage;
+        if(message.type === 0) { // Error
+            formattedMessage = ({content: message.content, color: "red"});
+        } else if(message.type === 1) { // Command
+            // Commmand should never be received by the client
+            formattedMessage = ({content: "ERROR: Client received command " + message.content + ". This should never happen!", color: "red", bold: true});
+        } else if(message.type === 2) { // Raw
+            formattedMessage = ({content: message.content, color: "yellow"});
+        } else if(message.type === 3) { // Chat
+            formattedMessage = ({content: "[" + message.sender + "] " + message.content, color: "white"});
+        }
+        this.chat.push(formattedMessage);
+        this.newChatMessages.push(formattedMessage);
+        setTimeout(this.popNewChatMessage.bind(this), 5000)
+    }
+
+    private popNewChatMessage() {
+        if(this.newChatMessages.length > 0) {
+            this.newChatMessages = this.newChatMessages.slice(1);
+        }
     }
 
     private requestPing() {

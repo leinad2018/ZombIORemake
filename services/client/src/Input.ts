@@ -71,7 +71,7 @@ export class ZIRInput {
                 this.chatting = false;
                 const temp = this.textInputString;
                 this.textInputString = "";
-                this.chatHandler(temp);
+                if(temp.length > 0) this.chatHandler(temp);
             } else if(event.key.length === 1) {
                 this.textInputString += event.key
             }
@@ -88,12 +88,26 @@ export class ZIRInput {
         if (keycode === "chat") {
             if(this.chatting === false) {
                 this.chatting = true;
+                this.clearKeys();
+            }
+        }
+        if (keycode === "command") {
+            if(this.chatting === false) {
+                this.chatting = true;
+                this.clearKeys();
+                this.textInputString = "/";
             }
         }
         if (keycode === "escape") {
             if(this.chatting === true) {
                 this.chatting = false;
             }
+        }
+    }
+
+    private clearKeys() {
+        for(let keyName in this.activeKeys) {
+            this.activeKeys[keyName] = false;
         }
     }
 
@@ -156,6 +170,9 @@ export class ZIRInput {
                 break;
             case 27:
                 keyName = "escape";
+                break;
+            case 191:
+                keyName = "command";
                 break;
         }
 

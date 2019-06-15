@@ -12,3 +12,10 @@ export interface IZIRAsset {
     getLength: () => number;
     isLoaded: () => boolean;
 }
+
+export interface IZIRFormattedChatText {
+    content: string;
+    bold: boolean;
+    italics: boolean;
+    color: string;
+}

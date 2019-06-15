@@ -6,7 +6,7 @@ import * as express from "express";
 import * as http from "http";
 import * as path from "path";
 import * as socketIO from "socket.io";
-import { IZIRChatAgent, IZIRChatMessage } from "./ChatManager";
+import { IZIRChatAgent, IZIRChatMessage, ZIRMessageType } from "./ChatManager";
 
 export class ZIRSessionManager {
     private listeners: { [header: string]: () => void } = {};
@@ -88,6 +88,7 @@ export class ZIRSessionManager {
 
     private handleChat(this: Session, data: IZIRChatMessage): void {
         data.sender = this;
+        data.type = ZIRMessageType.CHAT;
         this.queueMessage(data);
     }
 
@@ -171,7 +172,7 @@ export class Session implements IZIRChatAgent {
     }
 
     public sendMessage(message: IZIRChatMessage) {
-        this.io.to(this.socket).emit("chat", {content: message.content, sender: message.sender.getChatSenderName()});
+        this.io.to(this.socket).emit("chat", {content: message.content, type: message.type, sender: message.sender.getChatSenderName()});
     }
 
     public update() {

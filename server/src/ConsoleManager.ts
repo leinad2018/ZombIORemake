@@ -29,6 +29,10 @@ export class ZIRConsoleManager implements IZIRChatAgent{
         app.get("/", (request, response) => {
             response.sendFile(path.resolve(CONSOLE_ROOT + "web/console.html"));
         });
+        // Add the WebSocket handlers
+        this.io.on("connection", (socket) => {
+            this.onConnection(socket);
+        });
 
         // Starts the server.
         server.listen(PORT, () => {
@@ -53,6 +57,19 @@ export class ZIRConsoleManager implements IZIRChatAgent{
         this.loopTracker++;
     }
 
+    private onConnection(socket): void {
+        socket.on("chat", this.handleChat.bind(this));
+    }
+
+    public queueMessage(message: IZIRChatMessage) {
+        this.queuedMessages.push(message);
+    }
+
+    private handleChat(this: ZIRConsoleManager, data: IZIRChatMessage): void {
+        data.sender = this;
+        this.queueMessage(data);
+    }
+
     public fetchMessages(): IZIRChatMessage[] {
         const temp = this.queuedMessages;
         this.queuedMessages = [];
@@ -60,7 +77,11 @@ export class ZIRConsoleManager implements IZIRChatAgent{
     }
 
     public sendMessage(message: IZIRChatMessage) {
-        this.io.sockets.emit("chat", {content: message.content, sender: message.sender.getChatSenderName()});
+        this.io.sockets.emit("chat", {content: message.content, sender: message.sender.getChatSenderName(), type: message.type});
+    }
+
+    public sendCommandResponse(output: string) {
+        this.io.sockets.emit("chat", output);
     }
 
     public getChatId(): string {

@@ -11,6 +11,7 @@ import { ZIRConsoleManager } from "./ConsoleManager";
 import { ZIRTimer } from "./Timer";
 import { EntityQuadtree } from "./utilityObjects/DataStructures";
 import { ZIRChatManager} from "./ChatManager";
+import { ZIRCommandManager } from "./CommandManager";
 
 export class ZIRServerEngine {
     public readonly IS_DEVELOPMENT = true;
@@ -19,6 +20,7 @@ export class ZIRServerEngine {
 
     private sessionManager: ZIRSessionManager;
     private chatManager: ZIRChatManager;
+    private commandManager: ZIRCommandManager;
     private consoleManager: ZIRConsoleManager;
     private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
     private eventScheduler: ZIREventScheduler;
@@ -36,7 +38,9 @@ export class ZIRServerEngine {
 
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.defaultView);
         this.eventScheduler = ZIREventScheduler.getInstance();
-        this.chatManager = new ZIRChatManager();
+        this.commandManager = new ZIRCommandManager(this);
+        this.chatManager = new ZIRChatManager(this.commandManager);
+        this.chatManager.registerAgent(this.commandManager);
 
         if (this.IS_DEVELOPMENT) {
             this.consoleManager = new ZIRConsoleManager(this);

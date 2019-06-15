@@ -6,10 +6,6 @@ import { QuadtreeDisplay } from "./QuadtreeDisplay";
 declare function io();
 declare function Terminal(): void;
 
-const VALID_COMMANDS = [
-    "help", "players"
-]
-
 export class ZIRConsole {
     private document: Document;
     private graphs: ZIRGraph[] = [];
@@ -19,6 +15,7 @@ export class ZIRConsole {
     private metadata: {[key: string]: IZIRTimerMetadata};
     private quadtreeDisplay: QuadtreeDisplay;
     private terminal;
+    private socket;
     readonly SAMPLE_INTERVAL = 500; // ms per data frame
     public static readonly HEALTHY_TICKSPEED = 33000000; // ns
 
@@ -27,21 +24,21 @@ export class ZIRConsole {
         this.data = {};
         this.partialData = {};
         this.metadata = {};
+        this.socket = io();
 
-        const socket = io();
-        socket.on("data", ((data) => {
+        this.socket.on("data", ((data) => {
             this.parseData(data);
         }).bind(this));
-        socket.on("metadata", ((data) => {
+        this.socket.on("metadata", ((data) => {
             this.parseMetadata(data);
         }).bind(this));
-        socket.on("counts", ((data) => {
+        this.socket.on("counts", ((data) => {
             this.parseCountData(data);
         }).bind(this));
-        socket.on("quadtree", ((data) => {
+        this.socket.on("quadtree", ((data) => {
             this.handleQuadtree(data);
         }).bind(this));
-        socket.on("chat", ((data) => {
+        this.socket.on("chat", ((data) => {
             this.handleChat(data);
         }).bind(this));
 
@@ -54,20 +51,13 @@ export class ZIRConsole {
         setInterval(this.consoleTick.bind(this), 1);
     }
 
+    public sendTerminalInputToServer(message: any) {
+        this.socket.emit("chat", {type:1, content:message});
+    }
+
     private prompt() {
         this.terminal.input("", (input: string) => {
-            if(VALID_COMMANDS.indexOf(input) != -1) {
-                switch(input) {
-                    case "help":
-                        this.terminal.print("Valid commands: " + VALID_COMMANDS);
-                        break;
-                    default:
-                        this.terminal.print("TODO: implement");
-                        break;
-                }
-            } else {
-                this.terminal.print("Unknown command. Try 'help'.");
-            }
+            this.sendTerminalInputToServer(input);
             this.prompt();
         });
     }

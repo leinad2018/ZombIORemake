@@ -1,6 +1,6 @@
 import { IZIRServerUpdate } from "../globalInterfaces/IServerUpdate";
 import { Vector } from "../utilityObjects/Math";
-import { IZIRAsset, IZIRRenderable } from "../globalInterfaces/RenderingInterfaces";
+import { IZIRAsset, IZIRRenderable, IZIRFormattedChatText } from "../globalInterfaces/RenderingInterfaces";
 
 export abstract class ZIRClientBase {
     protected sizeVector: Vector;
@@ -30,7 +30,9 @@ export abstract class ZIRClientBase {
 
     public abstract getTextInputString(): string;
 
-    public abstract getCurrentChatMessages(): string[];
+    public abstract getChatMessages(): IZIRFormattedChatText[];
+
+    public abstract getNewChatMessages(): IZIRFormattedChatText[];
 
     public registerUpdateHandler(objectToUpdate: IZIRServerUpdate) {
         this.objectsToUpdate.push(objectToUpdate);

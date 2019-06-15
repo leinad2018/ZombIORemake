@@ -1,4 +1,4 @@
-import { IZIRAsset, IZIRRenderable } from "./globalInterfaces/RenderingInterfaces";
+import { IZIRAsset, IZIRRenderable, IZIRFormattedChatText } from "./globalInterfaces/RenderingInterfaces";
 import { ZIRClientBase } from "./baseObjects/ClientBase";
 import { Vector } from "./utilityObjects/Math";
 import { ZIREntityBase } from "./baseObjects/EntityBase";
@@ -55,27 +55,74 @@ export class ZIRCanvasController {
             this.renderDebugBox(ctx, state.getDebugMessages());
         }
         if (this.shouldRenderChat) {
-            this.renderChatBox(ctx, state.getTextInputString(), state.getCurrentChatMessages());
+            this.renderChatBox(ctx, state.getTextInputString(), state.getChatMessages());
+        } else {
+            const newMessages = state.getNewChatMessages();
+            if(newMessages.length > 0) this.renderNewMessages(ctx, newMessages);
         }
         const end = new Date().getTime();
         state.setLastRender(end - start);
     }
 
-    private renderChatBox(ctx: CanvasRenderingContext2D, currentInput: string, currentMessages: string[]) {
-        const messagesAtOnce = 20;
-        const buffer = 10;
+    private renderNewMessages(ctx: CanvasRenderingContext2D, newMessages: IZIRFormattedChatText[]) {
+        const buffer = 5;
         const fontSize = 20; //Math.floor((this.canvas.height - (buffer * 2)) / (messagesAtOnce + 1));
-        const chatWidth = 150;
+        const verticalBuffer = Math.floor(fontSize/5)
+        const chatWidth = Math.floor(this.canvas.width / 3);
+        let messageLines = [];
+        for(let message of newMessages) {
+            messageLines = messageLines.concat(this.getChatLines(ctx, message, chatWidth - 2 * buffer))
+        }
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-        ctx.fillRect(0, 0, 150, this.canvas.height);
+        ctx.font = fontSize + "px Arial";
+
+        ctx.fillRect(0, this.canvas.height - ((messageLines.length + 2) * (verticalBuffer + fontSize)),
+            chatWidth, this.canvas.height - (2 * (fontSize + verticalBuffer)));
+
+        ctx.fillStyle = "white";
+        let messageDrawY = this.canvas.height - (1 * (verticalBuffer + fontSize));
+
+        for(let i = messageLines.length - 1; i >= 0 && messageDrawY > -fontSize; i--) {
+            const message = messageLines[i];
+            ctx.fillStyle = message.color != null ? message.color : "white";
+            ctx.font = fontSize + "px Arial";
+            if(message.bold) ctx.font = "bold " + ctx.font;
+            if(message.italics) ctx.font = "italic " + ctx.font;
+            ctx.fillText(message.content, buffer, messageDrawY - fontSize, chatWidth - (2 * buffer))
+            messageDrawY -= fontSize + verticalBuffer;
+        }
+    }
+
+    private renderChatBox(ctx: CanvasRenderingContext2D, currentInput: string, currentMessages: IZIRFormattedChatText[]) {
+        const buffer = 5;
+        const fontSize = 20; //Math.floor((this.canvas.height - (buffer * 2)) / (messagesAtOnce + 1));
+        const verticalBuffer = Math.floor(fontSize/5)
+        const chatWidth = Math.floor(this.canvas.width / 3);
+        let messageLines: IZIRFormattedChatText[] = [];
+        for(let message of currentMessages) {
+            messageLines = messageLines.concat(this.getChatLines(ctx, message, chatWidth - 2 * buffer))
+        }
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.font = fontSize + "px Arial";
+
+        ctx.fillRect(0, 0, chatWidth, this.canvas.height - (2 * (fontSize + verticalBuffer)));
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(0, this.canvas.height - (2 * (fontSize + verticalBuffer)), chatWidth, 2 * (fontSize + verticalBuffer));
+        let messageDrawY = this.canvas.height - (2 * (verticalBuffer + fontSize));
+
+        for(let i = messageLines.length - 1; i >= 0 && messageDrawY > -fontSize; i--) {
+            
+            const message = messageLines[i];
+            ctx.fillStyle = message.color != null ? message.color : "white";
+            ctx.font = fontSize + "px Arial";
+            if(message.bold) ctx.font = "bold " + ctx.font;
+            if(message.italics) ctx.font = "italic " + ctx.font;
+            ctx.fillText(message.content, buffer, messageDrawY - fontSize, chatWidth - (2 * buffer))
+            messageDrawY -= fontSize + verticalBuffer;
+        }
         ctx.fillStyle = "white";
         ctx.font = fontSize + "px Arial";
-        let messageDrawY = buffer + ((messagesAtOnce - currentMessages.length) * fontSize);
-        for(let message of currentMessages) {
-            ctx.fillText(message, buffer, messageDrawY, chatWidth - (2 * buffer))
-            messageDrawY += fontSize;
-        }
-        ctx.fillText(currentInput, buffer, this.canvas.height - fontSize - buffer, chatWidth - (2 * buffer))
+        ctx.fillText(currentInput, buffer, this.canvas.height - fontSize - verticalBuffer, chatWidth - (2 * buffer))
     }
 
     private renderHUD(ctx: CanvasRenderingContext2D, health) {
@@ -119,6 +166,26 @@ export class ZIRCanvasController {
         }
 
         ctx.restore();
+    }
+
+    private getChatLines(ctx, message, maxWidth) {
+        const text = message.content;
+        const words = text.split(" ");
+        const lines = [];
+        let currentLine = words[0];
+    
+        for (var i = 1; i < words.length; i++) {
+            const word = words[i];
+            const width = ctx.measureText(currentLine + " " + word).width;
+            if (width < maxWidth) {
+                currentLine += " " + word;
+            } else {
+                lines.push({content: currentLine, bold: message.bold, italics: message.italics, color: message.color} as IZIRFormattedChatText);
+                currentLine = word;
+            }
+        }
+        lines.push({content: currentLine, bold: message.bold, italics: message.italics, color: message.color} as IZIRFormattedChatText);
+        return lines;
     }
 
     private renderBackground(ctx: CanvasRenderingContext2D, image: IZIRAsset) {
