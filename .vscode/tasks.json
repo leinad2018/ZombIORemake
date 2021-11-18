@@ -37,6 +37,9 @@
                     "message": 5
                 }
             },
+            "options": {
+                "cwd": "${workspaceFolder}/server"
+            },
             "group": "test",
             "presentation": {
                 "reveal": "always",

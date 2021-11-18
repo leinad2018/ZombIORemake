@@ -6,7 +6,7 @@ import { ZIRInventoryStack } from "../baseObjects/Inventory";
 
 export class ZIRResourceNode extends ZIREntity {
     private itemType: string;
-    public static entityTypeId = "ResourceNode"
+    public static entityTypeId = "ResourceNode";
 
     constructor(position: Vector, size: Vector = new Vector(50, 50), asset: string, type: string) {
         super(position, size, asset, true);

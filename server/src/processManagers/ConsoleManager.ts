@@ -7,7 +7,7 @@ import {ZIRTimer} from "../utilityObjects/Timer";
 import { ZIRServerEngine } from "./ServerEngine";
 import { IZIRChatAgent, IZIRChatMessage } from "../globalInterfaces/MainInterfaces";
 
-export class ZIRConsoleManager implements IZIRChatAgent{
+export class ZIRConsoleManager implements IZIRChatAgent {
 
     private io;
     private engine;
@@ -47,12 +47,12 @@ export class ZIRConsoleManager implements IZIRChatAgent{
         this.io.sockets.emit("metadata", metadata);
         const counts = ZIRTimer.pullLoggedCounts();
         this.io.sockets.emit("counts", counts);
-        if(this.loopTracker % 30 === 0) {
+        if (this.loopTracker % 30 === 0) {
             const quadtree = this.engine.getQuadtree();
-            if(quadtree !== undefined) {
+            if (quadtree !== undefined) {
                 const send = quadtree.getExport();
-                this.io.sockets.emit("quadtree", send)
-            }        
+                this.io.sockets.emit("quadtree", send);
+            }
         }
         this.loopTracker++;
     }
@@ -89,6 +89,6 @@ export class ZIRConsoleManager implements IZIRChatAgent{
     }
 
     public getChatSenderName(): string {
-        return "Console"
+        return "Console";
     }
 }

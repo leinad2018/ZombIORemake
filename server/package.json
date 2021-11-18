@@ -8,7 +8,7 @@
     "typescript": "^3.3.1"
   },
   "scripts": {
-    "lint": "tslint --project tsconfig-client.json --config tslint.json & tslint --project tsconfig-server.json --config tslint.json",
+    "lint": "tslint --project tsconfig.json --config ../tslint.json",
     "build": "../scripts/buildAll.bat",
     "server": "node ../output/server/src/server.js"
   }

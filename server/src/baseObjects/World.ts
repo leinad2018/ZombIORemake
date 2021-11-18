@@ -55,7 +55,7 @@ export class ZIRWorld {
     }
 
     public runCollisionLogic() {
-        if(this.SORT) {
+        if (this.SORT) {
             ZIRTimer.start("sort", "collision");
             this.sortEntities();
             ZIRTimer.stop("sort");
@@ -79,7 +79,7 @@ export class ZIRWorld {
     }
 
     private sortEntities() {
-        if(this.QUADTREE) {
+        if (this.QUADTREE) {
             this.quadtree = new EntityQuadtree(this.entities);
         } else {
             this.entities.sort((a, b) => {
@@ -92,12 +92,12 @@ export class ZIRWorld {
 
     private generateCollisionPairs(): IZIRCollisionCandidate[] {
         const pairs = [];
-        if(this.SORT) {
-            if(this.QUADTREE) {
+        if (this.SORT) {
+            if (this.QUADTREE) {
                 return this.quadtree.getCollisionPairs();
             } else {
                 let activeIndex = 0;
-                //The first entity does not need to be checked because it will not match with any entity before it
+                // The first entity does not need to be checked because it will not match with any entity before it
                 for (let curIndex = 1; curIndex < this.entities.length; curIndex++) {
                     const entity = this.entities[curIndex];
                     const box = entity.getAABB();
@@ -111,8 +111,8 @@ export class ZIRWorld {
                         } else {
                             pairs.push({
                                 e1: entity,
-                                e2: other
-                            })
+                                e2: other,
+                            });
                         }
                     }
                 }

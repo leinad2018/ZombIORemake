@@ -55,8 +55,8 @@ export class ZIRSessionManager {
 
     private handleInput(this: Session, data): void {
         const inputs = this.getInputs();
-        for(const key of data){
-            if(key.keycode){
+        for (const key of data) {
+            if (key.keycode) {
                 inputs[key.keycode] = key.state;
             }
         }

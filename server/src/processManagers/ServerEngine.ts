@@ -26,7 +26,7 @@ export class ZIRServerEngine {
     private chatManager: ZIRChatManager;
     private commandManager: ZIRCommandManager;
     private consoleManager: ZIRConsoleManager;
-    private physicsEngine: ZIRPhysicsEngine = new ZIRPhysicsEngine();
+    private physicsEngine: ZIRPhysicsEngine;
     private eventScheduler: ZIREventScheduler;
     private chatAgent: ZIRServerChatAgent;
 
@@ -46,6 +46,7 @@ export class ZIRServerEngine {
         this.defaultView = new ZIRSpite();
 
         this.chatAgent = new ZIRServerChatAgent();
+        this.physicsEngine = new ZIRPhysicsEngine();
         this.sessionManager = new ZIRSessionManager(this.registerSession.bind(this), this.handleSpawn.bind(this), this.defaultView);
         this.eventScheduler = ZIREventScheduler.getInstance();
         this.commandManager = new ZIRCommandManager(this.chatAgent, this);
@@ -69,7 +70,7 @@ export class ZIRServerEngine {
     }
 
     public getQuadtree(): EntityQuadtree {
-        for(let world in this.universe) {
+        for (const world in this.universe) {
             return this.universe[world].getQuadtree();
         }
     }
@@ -129,9 +130,9 @@ export class ZIRServerEngine {
 
     public getAllPlayers(): ZIRPlayer[] {
         const players = [];
-        for(const session of this.sessions) {
+        for (const session of this.sessions) {
             const player = session.getPlayer();
-            if(player) {
+            if (player) {
                 players.push(session.getPlayer());
             }
         }
@@ -151,11 +152,11 @@ export class ZIRServerEngine {
 
             const dt = Date.now() - t;
             const pause = Math.max((1000 / this.TPS) - dt - this.GAMELOOP_OVERHEAD, 0);
-            this.dt = (dt + pause)/1000;
+            this.dt = (dt + pause) / 1000;
             setTimeout(() => {
                 ZIRTimer.stop("gameLoop");
-                this.gameLoop()}
-                ,pause);
+                this.gameLoop();
+            }, pause);
         });
     }
 
@@ -205,7 +206,7 @@ export class ZIRServerEngine {
         ZIRTimer.stop("console");
 
         this.entityCache = null;
-        
+
         ZIRTimer.start("garbagecollect", "tick");
         this.collectGarbage();
         ZIRTimer.stop("garbagecollect");
@@ -227,7 +228,7 @@ export class ZIRServerEngine {
 
     private calculatePhysics() {
         const entities = this.entityCache;
-        
+
         for (const entity of entities) {
             ZIRTimer.start("entityUpdates", "physics");
             entity.update(this);
@@ -236,7 +237,6 @@ export class ZIRServerEngine {
             this.physicsEngine.applyPhysics(entity, this.getDT());
             ZIRTimer.stop("applyPhysics");
         }
-        
     }
 
     private sendUpdate(reset: boolean = false) {
@@ -317,10 +317,10 @@ export class ZIRServerEngine {
     private sendDebugInfo = (): void => {
         for (const session of this.sessions) {
             const debugMessages = [];
-            //debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
+            // debugMessages.push("Controls: " + JSON.stringify(session.getInputs()));
             debugMessages.push("Server Tick Speed: " + this.getDT().toFixed(4));
             debugMessages.push("Current Session: " + session);
-            debugMessages.push("Entities (" + this.entityCache.length + " total)");//: " + this.entityCache);
+            debugMessages.push("Entities (" + this.entityCache.length + " total)"); // : " + this.entityCache);
             debugMessages.push("Quadtree Address: " + session.getPlayer().getCollisionQuadtreeAddress());
             session.setDebugMessages(debugMessages);
             this.sessionManager.sendToClient(session.getSocket(), "debug", debugMessages);
@@ -334,7 +334,7 @@ export class ZIRServerEngine {
 export class ZIRServerChatAgent implements IZIRChatAgent {
     private queuedMessages = [];
     public chatBroadcast(message: string) {
-        this.queuedMessages.push({content: message, type: ZIRMessageType.RAW, sender: this, recipient: null} as IZIRChatMessage)
+        this.queuedMessages.push({content: message, type: ZIRMessageType.RAW, sender: this, recipient: null} as IZIRChatMessage);
     }
     public queueMessage(message: IZIRChatMessage) {
         message.sender = this;

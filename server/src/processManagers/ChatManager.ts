@@ -5,7 +5,7 @@ import { ZIRMessageType } from "../globalEnums/MainEnums";
 /**
  * The chat manager maintains a list of ChatAgents. Every time routeMessages is
  * called, fetchMessages is called on each ChatAgent and the messages returned are
- * routed through the chat system and delivered to their intended recipients. 
+ * routed through the chat system and delivered to their intended recipients.
  */
 export class ZIRChatManager {
     private agents: {[chatId: string]: IZIRChatAgent};
@@ -20,10 +20,10 @@ export class ZIRChatManager {
     }
 
     public routeMessages(): void {
-        for(let agent in this.agents) {
+        for (const agent in this.agents) {
             const messages = this.agents[agent].fetchMessages();
-            if(messages.length > 0) {
-                for(let message of messages) {
+            if (messages.length > 0) {
+                for (const message of messages) {
                     this.processMessage(message);
                 }
             }
@@ -39,11 +39,11 @@ export class ZIRChatManager {
     }
 
     private processMessage(message: IZIRChatMessage) {
-        if(this.messages.length > 50) {
+        if (this.messages.length > 50) {
             this.messages = this.messages.slice(1);
         }
 
-        if(message.type === ZIRMessageType.COMMAND) {
+        if (message.type === ZIRMessageType.COMMAND) {
             this.commandManager.parseCommandFromMessage(message);
         } else if (message.content.charAt(0) === "/") {
             message.type = ZIRMessageType.COMMAND;
@@ -52,34 +52,42 @@ export class ZIRChatManager {
         } else {
             this.messages.push(message);
             this.deliverMessage(message);
+            /* tslint:disable */
             console.log(this.messageToString(message));
+            /* tslint:enable */
         }
     }
 
     private deliverMessage(message: IZIRChatMessage) {
-        if(message.recipient == null) {
-            for(let agentId in this.agents) {
+        if (message.recipient == null) {
+            for (const agentId in this.agents) {
                 this.agents[agentId].sendMessage(message);
             }
         } else {
             let recipientId;
-            if(typeof message.recipient != typeof "string") {
+            if (typeof message.recipient !== typeof "string") {
                 recipientId = (message.recipient as IZIRChatAgent).getChatId();
-            }
-            else {
+            } else {
                 recipientId = message.recipient;
             }
-            const recipient = this.agents[recipientId as string];
-            if(recipient == null) {
-                message.sender.sendMessage({type: ZIRMessageType.ERROR, content: "Message recipient could not be found", sender: null, recipient: recipient})
+            const destination = this.agents[recipientId as string];
+            if (destination == null) {
+                message.sender.sendMessage(
+                    {
+                        type: ZIRMessageType.ERROR,
+                        content: "Message recipient could not be found",
+                        sender: null,
+                        recipient: destination,
+                    },
+                );
             } else {
-                recipient.sendMessage(message);
+                destination.sendMessage(message);
             }
         }
     }
 
     public messageToString(message: IZIRChatMessage): string {
-        return "[" + message.sender.getChatSenderName() + "] " + message.content; 
+        return "[" + message.sender.getChatSenderName() + "] " + message.content;
     }
 }
 
@@ -101,7 +109,7 @@ export class ZIRChatGroup implements IZIRChatAgent {
     }
 
     public sendMessage(message: IZIRChatMessage) {
-        for(let member of this.members) {
+        for (const member of this.members) {
             member.sendMessage(message);
         }
     }

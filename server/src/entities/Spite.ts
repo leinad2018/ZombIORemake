@@ -3,7 +3,7 @@ import {Vector} from "../utilityObjects/Math";
 import {ZIRRectangularZone} from "../baseObjects/Hitbox";
 
 export class ZIRSpite extends ZIREntity {
-    public static entityTypeId = "Spite"
+    public static entityTypeId = "Spite";
 
     constructor(position: Vector = new Vector(1000, 1000), size = new Vector(50, 50), asset: string = "spite", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);

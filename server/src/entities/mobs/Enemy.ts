@@ -17,7 +17,7 @@ export class ZIREnemy extends ZIRMob {
 
     constructor(position: Vector = new Vector(50 + Math.random() * 500, 50 + Math.random() * 500), size: Vector = new Vector(50, 50), asset: string = "enemy", isPhysical: boolean = true) {
         super(position, size, asset, isPhysical);
-        if(this.named) {
+        if (this.named) {
             this.setName(ZIREnemy.names[Math.trunc(Math.random() * ZIREnemy.names.length - 1)]);
         }
         this.setMaxMovement(4 * this.PIXELS_PER_METER);

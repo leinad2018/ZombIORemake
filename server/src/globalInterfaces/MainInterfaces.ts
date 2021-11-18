@@ -22,7 +22,7 @@ export interface IZIRChatManager {
     /**
      * This will be called by the engine every tick.
      * The implementation should aggregate messages that
-     * need to be sent from each chat agent, process them, 
+     * need to be sent from each chat agent, process them,
      * and send them to their appropriate destinations
      */
     routeMessages(): void;
@@ -33,9 +33,9 @@ export interface IZIRChatManager {
      */
     registerAgent(agent: IZIRChatAgent): void;
 
-    /** 
+    /**
      * This will be called by the engine whenever a new
-     * chat agent disconnects or is deleted 
+     * chat agent disconnects or is deleted
      */
     removeAgent(agent: IZIRChatAgent): void;
 }
@@ -93,7 +93,7 @@ export interface IZIRChatMessage {
      * ChatAgents should be able to stamp this with "this" automatically.
      */
     sender: IZIRChatAgent;
-    
+
     /**
      * Recipients will be sent to the server as string ChatIds, since clients
      * will generally not have access to full ChatAgent objects.
@@ -101,7 +101,7 @@ export interface IZIRChatMessage {
      * a rejection message to the sender if this fails.
      */
     recipient: IZIRChatAgent | string;
-    
+
     /**
      * Plaintext message content
      */
